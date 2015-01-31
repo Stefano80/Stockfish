@@ -793,7 +793,7 @@ namespace {
         Tracing::sf = sf;
     }
 
-    return (pos.side_to_move() == WHITE ? v : -v) + Eval::Tempo;
+    return (pos.side_to_move() == WHITE ? v : -v);
   }
 
 

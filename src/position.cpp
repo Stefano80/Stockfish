@@ -43,7 +43,6 @@ namespace Zobrist {
   Key psq[COLOR_NB][PIECE_TYPE_NB][SQUARE_NB];
   Key enpassant[FILE_NB];
   Key castling[CASTLING_RIGHT_NB];
-  Key side;
   Key exclusion;
 }
 
@@ -157,7 +156,6 @@ void Position::init() {
       }
   }
 
-  Zobrist::side = rng.rand<Key>();
   Zobrist::exclusion  = rng.rand<Key>();
 
   for (PieceType pt = PAWN; pt <= KING; ++pt)
@@ -377,9 +375,6 @@ void Position::set_state(StateInfo* si) const {
 
   if (ep_square() != SQ_NONE)
       si->key ^= Zobrist::enpassant[file_of(ep_square())];
-
-  if (sideToMove == BLACK)
-      si->key ^= Zobrist::side;
 
   si->key ^= Zobrist::castling[st->castlingRights];
 
@@ -709,9 +704,6 @@ void Position::do_move(Move m, StateInfo& newSt, const CheckInfo& ci, bool moveI
   newSt.previous = st;
   st = &newSt;
 
-  // Update side to move
-  k ^= Zobrist::side;
-
   // Increment ply counters. In particular, rule50 will be reset to zero later on
   // in case of a capture or a pawn move.
   ++gamePly;
@@ -987,7 +979,6 @@ void Position::do_null_move(StateInfo& newSt) {
       st->epSquare = SQ_NONE;
   }
 
-  st->key ^= Zobrist::side;
   prefetch((char*)TT.first_entry(st->key));
 
   ++st->rule50;
@@ -1018,7 +1009,7 @@ Key Position::key_after(Move m) const {
   Square to = to_sq(m);
   PieceType pt = type_of(piece_on(from));
   PieceType captured = type_of(piece_on(to));
-  Key k = st->key ^ Zobrist::side;
+  Key k = st->key;
 
   if (captured)
       k ^= Zobrist::psq[~us][captured][to];
