@@ -29,8 +29,8 @@
 class TimeManagement {
 public:
   void init(Search::LimitsType& limits, Color us, int ply, TimePoint now);
-  void pv_instability(double bestMoveChanges) { unstablePvFactor = 1 + bestMoveChanges; }
-  int available() const { return int(optimumTime * unstablePvFactor * 0.60); }
+  void pv_instability(double bestMoveChanges) { unstablePvFactor = upfOffset + bestMoveChanges; }
+  int available() const { return int(optimumTime * unstablePvFactor * upfScaling); }
   int maximum() const { return maximumTime; }
   int elapsed() const { return int(Search::Limits.npmsec ? Search::RootPos.nodes_searched() : now() - start); }
 
@@ -41,6 +41,9 @@ private:
   int optimumTime;
   int maximumTime;
   double unstablePvFactor;
+  int upfPars [2] = {100, 60};
+  double upfOffset  = upfPars[0]/100.0;
+  double upfScaling = upfPars[1]/100.0;
 };
 
 extern TimeManagement Time;

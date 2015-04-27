@@ -131,6 +131,9 @@ namespace {
   size_t PVIdx;
   EasyMoveManager EasyMove;
   double BestMoveChanges;
+  int bmcPars [2] = {100, 50};
+  double bmcIncrement = bmcPars[0]/100.0;
+  double bmcDecay     = bmcPars[1]/100.0;
   Value DrawValue[COLOR_NB];
   HistoryStats History;
   CounterMovesHistoryStats CounterMovesHistory;
@@ -358,7 +361,7 @@ namespace {
     while (++depth < DEPTH_MAX && !Signals.stop && (!Limits.depth || depth <= Limits.depth))
     {
         // Age out PV variability metric
-        BestMoveChanges *= 0.5;
+        BestMoveChanges *= bmcDecay;
 
         // Save the last iteration's scores before first PV line is searched and
         // all the move scores except the (new) PV are set to -VALUE_INFINITE.
@@ -1057,7 +1060,7 @@ moves_loop: // When in check and at SpNode search starts from here
               // We record how often the best move has been changed in each
               // iteration. This information is used for time management: When
               // the best move changes frequently, we allocate some more time.
-              for(int c = moveCount >> 1; c; c >>= 1){BestMoveChanges++;}
+              for(int c = moveCount >> 1; c; c >>= 1){BestMoveChanges += bmcIncrement;}
           }
           else
               // All other moves but the PV are set to the lowest value: this is
