@@ -131,9 +131,8 @@ namespace {
   size_t PVIdx;
   EasyMoveManager EasyMove;
   double BestMoveChanges;
-  int bmcPars [2] = {100, 50};
-  double bmcIncrement = bmcPars[0]/100.0;
-  double bmcDecay     = bmcPars[1]/100.0;
+  double bmcIncrement = 0.99;
+  double bmcDecay     = 0.48;
   Value DrawValue[COLOR_NB];
   HistoryStats History;
   CounterMovesHistoryStats CounterMovesHistory;
