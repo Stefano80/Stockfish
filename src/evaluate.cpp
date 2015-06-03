@@ -22,6 +22,8 @@
 #include <cstring>   // For std::memset
 #include <iomanip>
 #include <sstream>
+#include <numeric>
+#include <iostream>
 
 #include "bitcount.h"
 #include "evaluate.h"
@@ -173,6 +175,23 @@ namespace {
   const Score Hanging            = S(31, 26);
   const Score PawnAttackThreat   = S(20, 20);
   const Score PawnSafePush       = S( 5,  5);
+
+  // Values for scale factor evaluation
+  // Denominator
+  int ScaleFactorDen = 4096;
+
+  // Offsets
+  int ScaleFactorBase[2] = {109080, -9824}; // Normal, Opposite bishops
+
+  //                                PawnSpan/sw  PawnCount/sw   King/sw     Threats/sw   Mobility/sw  PassedPawn/sw NonPawn/sw PawnScore Imbalance
+  // Linear coefficients
+  int ScaleFactorLinear[2][16] =  {{6325, -1401, 77262, -6047, -894,   96,  61, -51,    -251,   7,    58,  46,      54, -51,      8,     -450},  // Normal
+                                   {4115, -6679, 52013, 18586, -698, -502, -27,  -6,      39, -66,    38, -26,      75, -71,    -31,     -650}}; // Opposite bishops
+
+  // Pawncount coefficients:
+ int ScaleFactorPC[2][16]      =  {{-1089,  221, -7132,  3961,  171, -23,   -7,   6,      33, -4,      -8, -7,      -7,  7,       0,      46},   // Normal
+                                   {-1524, 1364, -6363, -1722,  139, 129,    1,  -2,     -14, 23,      -8, 10,      -6, 27,      -8,      44}};  // Opposite bishops
+
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -713,6 +732,9 @@ namespace {
 
     EvalInfo ei;
     Score score, mobility[2] = { SCORE_ZERO, SCORE_ZERO };
+    Score ks[2]          = { SCORE_ZERO, SCORE_ZERO };
+    Score threats[2]     = { SCORE_ZERO, SCORE_ZERO };
+    Score passedPawns[2] = { SCORE_ZERO, SCORE_ZERO };
 
     // Initialize score by reading the incrementally updated scores included
     // in the position object (material + piece square tables).
@@ -749,16 +771,22 @@ namespace {
 
     // Evaluate kings after all other pieces because we need complete attack
     // information when computing the king safety evaluation.
-    score +=  evaluate_king<WHITE, Trace>(pos, ei)
-            - evaluate_king<BLACK, Trace>(pos, ei);
+    ks[WHITE] = evaluate_king<WHITE, Trace>(pos, ei);
+    ks[BLACK] = evaluate_king<BLACK, Trace>(pos, ei);
+
+    score +=  ks[WHITE] - ks[BLACK];
 
     // Evaluate tactical threats, we need full attack information including king
-    score +=  evaluate_threats<WHITE, Trace>(pos, ei)
-            - evaluate_threats<BLACK, Trace>(pos, ei);
+    threats[WHITE] = evaluate_threats<WHITE, Trace>(pos, ei);
+    threats[BLACK] = evaluate_threats<BLACK, Trace>(pos, ei);
+
+    score +=  threats[WHITE] - threats[BLACK];
 
     // Evaluate passed pawns, we need full attack information including king
-    score +=  evaluate_passed_pawns<WHITE, Trace>(pos, ei)
-            - evaluate_passed_pawns<BLACK, Trace>(pos, ei);
+    passedPawns[WHITE] = evaluate_passed_pawns<WHITE, Trace>(pos, ei);
+    passedPawns[BLACK] = evaluate_passed_pawns<BLACK, Trace>(pos, ei);
+
+    score +=  passedPawns[WHITE] - passedPawns[BLACK];
 
     // If both sides have only pawns, score for potential unstoppable pawns
     if (!pos.non_pawn_material(WHITE) && !pos.non_pawn_material(BLACK))
@@ -777,33 +805,25 @@ namespace {
 
     // Scale winning side if position is more drawish than it appears
     Color strongSide = eg_value(score) > VALUE_DRAW ? WHITE : BLACK;
-    ScaleFactor sf = ei.mi->scale_factor(pos, strongSide);
 
-    // If we don't already have an unusual scale factor, check for certain
-    // types of endgames, and use a lower scale for those.
-    if (    ei.mi->game_phase() < PHASE_MIDGAME
-        && (sf == SCALE_FACTOR_NORMAL || sf == SCALE_FACTOR_ONEPAWN))
+    int scaleFactorVector[16] = {
+        ei.pi->pawn_span(strongSide)        , ei.pi->pawn_span(~strongSide),
+        pos.count<PAWN >(strongSide)        , pos.count<PAWN >(~strongSide),
+        eg_value(ks[strongSide])            , eg_value(ks[~strongSide]),
+        eg_value(threats[strongSide])       , eg_value(threats[~strongSide]),
+        eg_value(mobility[strongSide])      , eg_value(mobility[~strongSide]),
+        eg_value(passedPawns[strongSide])   , eg_value(passedPawns[~strongSide]),
+        pos.non_pawn_material(strongSide)   , pos.non_pawn_material(~strongSide),
+        eg_value(ei.pi->pawns_score()),
+        abs(eg_value(ei.mi->imbalance()))};
+
+    int PawnCount = pos.count<PAWN >(WHITE) + pos.count<PAWN >(BLACK);
+    int sf = ScaleFactorBase[pos.opposite_bishops()];
+    for( int idx = 0; idx < 16; idx++ )
     {
-        if (pos.opposite_bishops())
-        {
-            // Endgame with opposite-colored bishops and no other pieces (ignoring pawns)
-            // is almost a draw, in case of KBP vs KB is even more a draw.
-            if (   pos.non_pawn_material(WHITE) == BishopValueMg
-                && pos.non_pawn_material(BLACK) == BishopValueMg)
-                sf = more_than_one(pos.pieces(PAWN)) ? ScaleFactor(32) : ScaleFactor(8);
-
-            // Endgame with opposite-colored bishops, but also other pieces. Still
-            // a bit drawish, but not as drawish as with only the two bishops.
-            else
-                 sf = ScaleFactor(50 * sf / SCALE_FACTOR_NORMAL);
-        }
-        // Endings where weaker side can place his king in front of the opponent's
-        // pawns are drawish.
-        else if (    abs(eg_value(score)) <= BishopValueEg
-                 &&  ei.pi->pawn_span(strongSide) <= 1
-                 && !pos.pawn_passed(~strongSide, pos.king_square(~strongSide)))
-                 sf = ei.pi->pawn_span(strongSide) ? ScaleFactor(56) : ScaleFactor(38);
+        sf += scaleFactorVector[idx] * (ScaleFactorLinear[pos.opposite_bishops()][idx] + PawnCount * ScaleFactorPC[pos.opposite_bishops()][idx]) ;
     }
+    sf /= ScaleFactorDen;
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     Value v =  mg_value(score) * int(ei.mi->game_phase())
