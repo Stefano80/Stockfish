@@ -486,15 +486,3 @@ template<>
 ScaleFactor Endgame<KNPKB>::operator()(const Position& pos) const {
  return SCALE_FACTOR_NONE;
 }
-
-
-/// KP vs KP. This is done by removing the weakest side's pawn and probing the
-/// KP vs K bitbase: If the weakest side has a draw without the pawn, it probably
-/// has at least a draw with the pawn as well. The exception is when the stronger
-/// side's pawn is far advanced and not on a rook file; in this case it is often
-/// possible to win (e.g. 8/4k3/3p4/3P4/6K1/8/8/8 w - - 0 1).
-template<>
-ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
-
- return SCALE_FACTOR_NONE;
-}
