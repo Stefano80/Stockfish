@@ -70,20 +70,6 @@ namespace {
           && pos.non_pawn_material(us) >= RookValueMg;
   }
 
-  bool is_KBPsKs(const Position& pos, Color us) {
-    return   pos.non_pawn_material(us) == BishopValueMg
-          && pos.count<BISHOP>(us) == 1
-          && pos.count<PAWN  >(us) >= 1;
-  }
-
-  bool is_KQKRPs(const Position& pos, Color us) {
-    return  !pos.count<PAWN>(us)
-          && pos.non_pawn_material(us) == QueenValueMg
-          && pos.count<QUEEN>(us)  == 1
-          && pos.count<ROOK>(~us) == 1
-          && pos.count<PAWN>(~us) >= 1;
-  }
-
   /// imbalance() calculates the imbalance by comparing the piece count of each
   /// piece type for both colors.
   template<Color Us>
