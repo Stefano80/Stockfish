@@ -59,8 +59,6 @@ namespace {
   // the function maps because they correspond to more than one material hash key.
   Endgame<KXK>    EvaluateKXK[] = { Endgame<KXK>(WHITE),    Endgame<KXK>(BLACK) };
 
-  Endgame<KBPsK>  ScaleKBPsK[]  = { Endgame<KBPsK>(WHITE),  Endgame<KBPsK>(BLACK) };
-
   // Helper used to detect a given material distribution
   bool is_KXK(const Position& pos, Color us) {
     return  !more_than_one(pos.pieces(~us))

@@ -342,17 +342,6 @@ Value Endgame<KQKR>::operator()(const Position& pos) const {
 template<> Value Endgame<KNNK>::operator()(const Position&) const { return VALUE_DRAW; }
 
 
-/// KB and one or more pawns vs K. It checks for draws with rook pawns and
-/// a bishop of the wrong color. If such a draw is detected, SCALE_FACTOR_DRAW
-/// is returned. If not, the return value is SCALE_FACTOR_NONE, i.e. no scaling
-/// will be used.
-template<>
-ScaleFactor Endgame<KBPsK>::operator()(const Position& pos) const {
-
-
-  return SCALE_FACTOR_NONE;
-}
-
 
 
 /// KRP vs KR. This function knows a handful of the most important classes of
