@@ -392,14 +392,6 @@ ScaleFactor Endgame<KRPPKRP>::operator()(const Position& pos) const {
 }
 
 
-/// K and two or more pawns vs K. There is just a single rule here: If all pawns
-/// are on the same rook file and are blocked by the defending king, it's a draw.
-template<>
-ScaleFactor Endgame<KPsK>::operator()(const Position& pos) const {
-
-   return SCALE_FACTOR_NONE;
-}
-
 
 /// KBP vs KB. There are two rules: if the defending king is somewhere along the
 /// path of the pawn, and the square of the king is not of the same color as the
