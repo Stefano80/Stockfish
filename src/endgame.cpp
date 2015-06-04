@@ -354,15 +354,6 @@ ScaleFactor Endgame<KBPsK>::operator()(const Position& pos) const {
 }
 
 
-/// KQ vs KR and one or more pawns. It tests for fortress draws with a rook on
-/// the third rank defended by a pawn.
-template<>
-ScaleFactor Endgame<KQKRPs>::operator()(const Position& pos) const {
-
-    return SCALE_FACTOR_NONE;
-
-}
-
 
 /// KRP vs KR. This function knows a handful of the most important classes of
 /// drawn positions, but is far from perfect. It would probably be a good idea
