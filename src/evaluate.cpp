@@ -179,16 +179,16 @@ namespace {
   int ScaleFactorDen = 4096;
 
   // Offsets
-  int ScaleFactorBase[2] = {109080, -9824}; // Normal, Opposite bishops
+  int ScaleFactorBase[2] = {118437, -219}; // Normal, Opposite bishops
 
-  //                                PawnSpan/sw  PawnCount/sw   King/sw     Threats/sw   Mobility/sw  PassedPawn/sw NonPawn/sw PawnScore Imbalance
+  //                                PawnSpan/sw  PawnCount/sw   King/sw     Threats/sw   Mobility/sw  PassedPawn/sw NonPawn/sw PawnScore Game phase
   // Linear coefficients
-  int ScaleFactorLinear[2][16] =  {{6325, -1401, 77262, -6047, -894,   96,  61, -51,    -251,   7,    58,  46,      54, -51,      8,     -450},  // Normal
-                                   {4115, -6679, 52013, 18586, -698, -502, -27,  -6,      39, -66,    38, -26,      75, -71,    -31,     -650}}; // Opposite bishops
+  int ScaleFactorLinear[2][16] =  {{11260, -4335,   53674, 1332,  -790, -45,   37, -25,    -266, 64,   88, 17,      38, -34,     30,      -1022},  // Normal
+                                   {3239,   1150,   24761, 11639, -151, -265, -27, -4,      -53, -28,   6, -7,      25,  37,    -86,      -6645}}; // Opposite bishops
 
   // Pawncount coefficients:
- int ScaleFactorPC[2][16]      =  {{-1089,  221, -7132,  3961,  171, -23,   -7,   6,      33, -4,      -8, -7,      -7,  7,       0,      46},   // Normal
-                                   {-1524, 1364, -6363, -1722,  139, 129,    1,  -2,     -14, 23,      -8, 10,      -6, 27,      -8,      44}};  // Opposite bishops
+ int ScaleFactorPC[2][16]      =  {{-1913, 839, -3206, 1261, 127, 0, -3, 3, 19, -4, -12, -2, -3, 3, -3, 73},   // Normal
+                                   {-1030, -297, -2756, -1722, 31, 63, 1, 0, 4, 2, 0, 5, 7, 7, 5, -363}};  // Opposite bishops
 
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
@@ -813,7 +813,7 @@ namespace {
         eg_value(passedPawns[strongSide])   , eg_value(passedPawns[~strongSide]),
         pos.non_pawn_material(strongSide)   , pos.non_pawn_material(~strongSide),
         eg_value(ei.pi->pawns_score()),
-        abs(eg_value(ei.mi->imbalance()))};
+        ei.mi->game_phase()};
 
     int PawnCount = pos.count<PAWN >(WHITE) + pos.count<PAWN >(BLACK);
     int sf = ScaleFactorBase[pos.opposite_bishops()];
