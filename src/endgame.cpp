@@ -351,14 +351,14 @@ template<> Value Endgame<KNNK>::operator()(const Position&) const { return VALUE
 /// It would also be nice to rewrite the actual code for this function,
 /// which is mostly copied from Glaurung 1.x, and isn't very pretty.
 template<>
-ScaleFactor Endgame<KRPKR>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KRPKR>::operator()(const Position&) const {
 
     return SCALE_FACTOR_NONE;
 
 }
 
 template<>
-ScaleFactor Endgame<KRPKB>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KRPKB>::operator()(const Position&) const {
 
   return SCALE_FACTOR_NONE;
 }
@@ -366,7 +366,7 @@ ScaleFactor Endgame<KRPKB>::operator()(const Position& pos) const {
 /// KRPP vs KRP. There is just a single rule: if the stronger side has no passed
 /// pawns and the defending king is actively placed, the position is drawish.
 template<>
-ScaleFactor Endgame<KRPPKRP>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KRPPKRP>::operator()(const Position&) const {
 
    return SCALE_FACTOR_NONE;
 }
@@ -378,57 +378,16 @@ ScaleFactor Endgame<KRPPKRP>::operator()(const Position& pos) const {
 /// stronger side's bishop, it's a draw. If the two bishops have opposite color,
 /// it's almost always a draw.
 template<>
-ScaleFactor Endgame<KBPKB>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KBPKB>::operator()(const Position&) const {
 
-  assert(verify_material(pos, strongSide, BishopValueMg, 1));
-  assert(verify_material(pos, weakSide,   BishopValueMg, 0));
+    return SCALE_FACTOR_NONE;
 
-  Square pawnSq = pos.list<PAWN>(strongSide)[0];
-  Square strongBishopSq = pos.list<BISHOP>(strongSide)[0];
-  Square weakBishopSq = pos.list<BISHOP>(weakSide)[0];
-  Square weakKingSq = pos.king_square(weakSide);
-
-  // Case 1: Defending king blocks the pawn, and cannot be driven away
-  if (   file_of(weakKingSq) == file_of(pawnSq)
-      && relative_rank(strongSide, pawnSq) < relative_rank(strongSide, weakKingSq)
-      && (   opposite_colors(weakKingSq, strongBishopSq)
-          || relative_rank(strongSide, weakKingSq) <= RANK_6))
-      return SCALE_FACTOR_DRAW;
-
-  // Case 2: Opposite colored bishops
-  if (opposite_colors(strongBishopSq, weakBishopSq))
-  {
-      // We assume that the position is drawn in the following three situations:
-      //
-      //   a. The pawn is on rank 5 or further back.
-      //   b. The defending king is somewhere in the pawn's path.
-      //   c. The defending bishop attacks some square along the pawn's path,
-      //      and is at least three squares away from the pawn.
-      //
-      // These rules are probably not perfect, but in practice they work
-      // reasonably well.
-
-      if (relative_rank(strongSide, pawnSq) <= RANK_5)
-          return SCALE_FACTOR_DRAW;
-      else
-      {
-          Bitboard path = forward_bb(strongSide, pawnSq);
-
-          if (path & pos.pieces(weakSide, KING))
-              return SCALE_FACTOR_DRAW;
-
-          if (  (pos.attacks_from<BISHOP>(weakBishopSq) & path)
-              && distance(weakBishopSq, pawnSq) >= 3)
-              return SCALE_FACTOR_DRAW;
-      }
-  }
-  return SCALE_FACTOR_NONE;
 }
 
 
 /// KBPP vs KB. It detects a few basic draws with opposite-colored bishops
 template<>
-ScaleFactor Endgame<KBPPKB>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KBPPKB>::operator()(const Position&) const {
  return SCALE_FACTOR_NONE;
 }
 
@@ -437,7 +396,7 @@ ScaleFactor Endgame<KBPPKB>::operator()(const Position& pos) const {
 /// the path of the pawn, and the square of the king is not of the same color as
 /// the stronger side's bishop, it's a draw.
 template<>
-ScaleFactor Endgame<KBPKN>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KBPKN>::operator()(const Position&) const {
 
  return SCALE_FACTOR_NONE;
 }
@@ -446,7 +405,7 @@ ScaleFactor Endgame<KBPKN>::operator()(const Position& pos) const {
 /// KNP vs K. There is a single rule: if the pawn is a rook pawn on the 7th rank
 /// and the defending king prevents the pawn from advancing, the position is drawn.
 template<>
-ScaleFactor Endgame<KNPK>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KNPK>::operator()(const Position&) const {
 
  return SCALE_FACTOR_NONE;
 }
@@ -455,6 +414,6 @@ ScaleFactor Endgame<KNPK>::operator()(const Position& pos) const {
 /// KNP vs KB. If knight can block bishop from taking pawn, it's a win.
 /// Otherwise the position is drawn.
 template<>
-ScaleFactor Endgame<KNPKB>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KNPKB>::operator()(const Position&) const {
  return SCALE_FACTOR_NONE;
 }
