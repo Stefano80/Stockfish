@@ -22,8 +22,6 @@
 #include <cstring>   // For std::memset
 #include <iomanip>
 #include <sstream>
-#include <numeric>
-#include <iostream>
 
 #include "bitcount.h"
 #include "evaluate.h"
