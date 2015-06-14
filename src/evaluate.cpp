@@ -179,16 +179,16 @@ namespace {
   int ScaleFactorDen = 4096;
 
   // Offsets
-  int ScaleFactorBase[2] = {93969, -192}; // Normal, Opposite bishops
+  int ScaleFactorBase[2] = {93990, -193}; // Normal, Opposite bishops
 
   //                                PawnSpan/sw  PawnCount/sw   King/sw     Threats/sw   Mobility/sw  PassedPawn/sw NonPawn/sw PawnScore Game phase
   // Linear coefficients
-  int ScaleFactorLinear[2][16] =  {{12464, -3964,   54656, 1304,  -667, -43,   37, -23,    -238,  63,   93, 15,      29, -34,     23,      -902},  // Normal
-                                   {3102,   1233,   27660, 9872, -140, -254,  -29, -4,      -49, -27,   6, -7,      25,  37,    -89,      -7241}}; // Opposite bishops
+  int ScaleFactorLinear[2][16] =  {{12551, -3968,   55239, 1287,  -664, -43,   37, -23,    -237,  63,   93, 14,      29, -34,     23,      -882},  // Normal
+                                   {3090,   1224,   27781, 10007, -141, -252,  -29, -4,      -50, -26,   6, -7,      25,  37,    -90,      -7210}}; // Opposite bishops
 
   // Pawncount coefficients:
- int ScaleFactorPC[2][16]      =  {{-1722, 968, -3480, 1362, 143, 0, -10, 3, 17, -4, -12, -2, -3, 3, -3, 73},   // Normal
-                                   {-706, -331, -2892, -1601, 28, 69, 1, 1, 4, 2, 0, 5, 7, 7, 5, -347}};  // Opposite bishops
+ int ScaleFactorPC[2][16]      =  {{-1709, 970, -3425, 1372, 144, 0, -10, 3, 17, -4, -12, -2, -3, 3, -3, 72},   // Normal
+                                   {-720, -331, -2875, -1616, 28, 70, 1, 1, 4, 2, 0, 5, 7, 7, 5, -346}};  // Opposite bishops
 
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
