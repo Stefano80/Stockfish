@@ -364,7 +364,7 @@ void MainThread::search() {
       && !Skill(Options["Skill Level"]).enabled())
   {
       for (Thread* th : Threads){
-          confidence = Value(int(th->rootMoves[0].score) + 64 * int(th->completedDepth) - 4 * th->idx);
+          confidence = Value(int(th->rootMoves[0].score) + 512 * int(th->completedDepth) - 2 * th->idx);
           if ( confidence > bestConfidence){
               bestThread = th;
               bestConfidence = confidence;
