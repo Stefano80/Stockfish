@@ -260,6 +260,7 @@ void MainThread::search() {
   Time.init(Limits, us, rootPos.game_ply());
 
   int contempt = Options["Contempt"] * PawnValueEg / 100; // From centipawns
+  int confidence, bestConfidence;
   DrawValue[ us] = VALUE_DRAW - Value(contempt);
   DrawValue[~us] = VALUE_DRAW + Value(contempt);
 
@@ -362,10 +363,12 @@ void MainThread::search() {
       &&  Options["MultiPV"] == 1
       && !Skill(Options["Skill Level"]).enabled())
   {
-      for (Thread* th : Threads)
-          if (   th->completedDepth > bestThread->completedDepth
-              && th->rootMoves[0].score > bestThread->rootMoves[0].score)
+      for (Thread* th : Threads){
+          confidence = int(th->rootMoves[0].score) + 64 * int(th->completedDepth) - 4 * th->idx;
+          bestConfidence = int(bestThread->rootMoves[0].score) + 64 * int(bestThread->completedDepth) - 4 * bestThread->idx;
+          if ( confidence > bestConfidence)
               bestThread = th;
+      }
   }
 
   previousScore = bestThread->rootMoves[0].score;
