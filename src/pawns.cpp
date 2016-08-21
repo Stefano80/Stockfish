@@ -176,7 +176,7 @@ namespace {
             weakPawns++;
     }
 
-    score -= make_score(2*weakPawns*(weakPawns-1), 2*weakPawns*(weakPawns-1));
+    score -= make_score(0, 4*weakPawns*(weakPawns-1));
 
     return score;
   }
