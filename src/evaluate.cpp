@@ -747,7 +747,7 @@ namespace {
             // Endgame with opposite-colored bishops and no other pieces (ignoring pawns)
             // is almost a draw, in case of KBP vs KB, it is even more a draw.
             if (pos.non_pawn_material(strongSide) == BishopValueMg)
-                sf = more_than_one(pos.pieces(PAWN)) ? ScaleFactor(31) : ScaleFactor(9);
+                sf = (more_than_one(pos.pieces(PAWN)) || pos.non_pawn_material(~strongSide) > BishopValueMg) ? ScaleFactor(31) : ScaleFactor(9);
 
             // Endgame with opposite-colored bishops, but also other pieces. Still
             // a bit drawish, but not as drawish as with only the two bishops.
