@@ -1136,6 +1136,9 @@ moves_loop: // When in check search starts from here
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
                   depth, bestMove, ss->staticEval, TT.generation());
 
+    if(PvNode && bestMove)
+      dbg_stats_of(bestValue, ss->staticEval);
+
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
     return bestValue;
@@ -1470,7 +1473,7 @@ moves_loop: // When in check search starts from here
     int elapsed = Time.elapsed();
     TimePoint tick = Limits.startTime + elapsed;
 
-    if (tick - lastInfoTime >= 1000)
+    if (tick - lastInfoTime >= 100)
     {
         lastInfoTime = tick;
         dbg_print();
