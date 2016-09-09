@@ -988,7 +988,7 @@ moves_loop: // When in check search starts from here
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           if (captureOrPromotion)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+              r += r ? ONE_PLY * mp.see_sign() : DEPTH_ZERO;
           else
           {
               // Increase reduction for cut nodes
