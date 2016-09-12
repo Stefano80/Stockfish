@@ -974,6 +974,7 @@ moves_loop: // When in check search starts from here
 
       // Step 14. Make the move
 
+      PieceType movedPiece = type_of(pos.moved_piece(move));
       pos.do_move(move, st, givesCheck);
 
       Pawns::Entry* newPi = Pawns::probe(pos);
@@ -1012,8 +1013,10 @@ moves_loop: // When in check search starts from here
               int rHist = (val - 8000) / 20000;
 
               // Decrease/increase reduction for pawn moves which improves/worsen pawn EG score
-              if(type_of(pos.moved_piece(move)) == PAWN)
-                  r  -= ONE_PLY * int(eg_value(newPi->pawns_score()) - eg_value(currentPi->pawns_score()))/16;
+              if(movedPiece){
+                  int bonus = int(eg_value(newPi->pawns_score()) - eg_value(currentPi->pawns_score()))/8;
+                  r  -= ONE_PLY * bonus;
+              }
 
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - rHist) * ONE_PLY);
           }
