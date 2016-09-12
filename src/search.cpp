@@ -838,6 +838,8 @@ moves_loop: // When in check search starts from here
 
     MovePicker mp(pos, ttMove, depth, ss);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
+    Pawns::Entry* currentPi = Pawns::probe(pos);
+
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
                ||(ss-2)->staticEval == VALUE_NONE;
@@ -971,7 +973,10 @@ moves_loop: // When in check search starts from here
       ss->counterMoves = &CounterMoveHistory[moved_piece][to_sq(move)];
 
       // Step 14. Make the move
+
       pos.do_move(move, st, givesCheck);
+
+      Pawns::Entry* newPi = Pawns::probe(pos);
 
       // Step 15. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
@@ -1005,6 +1010,11 @@ moves_loop: // When in check search starts from here
                          +    (fmh2 ? (*fmh2)[moved_piece][to_sq(move)] : VALUE_ZERO)
                          +    thisThread->fromTo.get(~pos.side_to_move(), move);
               int rHist = (val - 8000) / 20000;
+
+              // Decrease/increase reduction for pawn moves which improves/worsen pawn EG score
+              if(type_of(pos.moved_piece(move)) == PAWN)
+                  r  -= ONE_PLY * int(eg_value(newPi->pawns_score()) - eg_value(currentPi->pawns_score()))/int(PawnValueEg);
+
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - rHist) * ONE_PLY);
           }
 
