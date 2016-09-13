@@ -1013,8 +1013,8 @@ moves_loop: // When in check search starts from here
               int rHist = (val - 8000) / 20000;
 
               // Decrease/increase reduction for pawn moves which improves/worsen pawn EG score
-              if(movedPiece){
-                  int bonus = int(eg_value(newPi->pawns_score()) - eg_value(currentPi->pawns_score()))/8;
+              if(movedPiece == PAWN){
+                  int bonus = int(eg_value(newPi->pawns_score()) - eg_value(currentPi->pawns_score()))/32;
                   r  -= ONE_PLY * bonus;
               }
 
