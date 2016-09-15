@@ -1015,7 +1015,7 @@ moves_loop: // When in check search starts from here
               // Decrease/increase reduction for pawn moves which improves/worsen pawn EG score
               if(movedPiece == PAWN){
                   int bonus = int(eg_value(newPi->pawns_score()) - eg_value(currentPi->pawns_score()))/32 * pos.side_to_move() == WHITE ? -1: +1;
-                  r  -= ONE_PLY * bonus;
+                  r  += ONE_PLY * bonus;
               }
 
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - rHist) * ONE_PLY);
