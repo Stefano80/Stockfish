@@ -582,8 +582,8 @@ ScaleFactor Endgame<KRPKB>::operator()(const Position& pos) const {
   return SCALE_FACTOR_NONE;
 }
 
-/// KRPP vs KRP. There is just a single rule: if the stronger side has no passed
-/// pawns and the defending king is actively placed, the position is drawish.
+/// KRPP vs KRP. There is just a single rule: if the defending king
+/// is actively placed, the position is drawish.
 template<>
 ScaleFactor Endgame<KRPPKRP>::operator()(const Position& pos) const {
 
@@ -593,10 +593,6 @@ ScaleFactor Endgame<KRPPKRP>::operator()(const Position& pos) const {
   Square wpsq1 = pos.squares<PAWN>(strongSide)[0];
   Square wpsq2 = pos.squares<PAWN>(strongSide)[1];
   Square bksq = pos.square<KING>(weakSide);
-
-  // Does the stronger side have a passed pawn?
-  if (pos.pawn_passed(strongSide, wpsq1) || pos.pawn_passed(strongSide, wpsq2))
-      return SCALE_FACTOR_NONE;
 
   Rank r = std::max(relative_rank(strongSide, wpsq1), relative_rank(strongSide, wpsq2));
 
