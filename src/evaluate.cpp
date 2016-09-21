@@ -733,6 +733,7 @@ namespace {
   ScaleFactor evaluate_scale_factor(const Position& pos, const EvalInfo& ei, Value eg) {
 
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
+    Color weakSide = ~strongSide;
     ScaleFactor sf = ei.me->scale_factor(pos, strongSide);
 
     // If we don't already have an unusual scale factor, check for certain
@@ -759,6 +760,17 @@ namespace {
                  &&  pos.count<PAWN>(strongSide) <= 2
                  && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
             sf = ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
+
+        else if(   pos.non_pawn_material(WHITE) == RookValueMg
+                && pos.non_pawn_material(BLACK) == RookValueMg){
+            Square weakKing = pos.square<KING>(weakSide);
+            int a = 37 + relative_rank(weakSide, weakKing);
+            const Square* strongPawns = pos.squares<PAWN>(strongSide);
+            Square s;
+            while ((s = *strongPawns++) != SQ_NONE)
+                a += 1 + distance<File>(s, weakKing) + relative_rank(strongSide, s);
+            sf = ScaleFactor(a);
+        }
     }
 
     return sf;
