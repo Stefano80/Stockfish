@@ -199,6 +199,12 @@ namespace {
   const Score ThreatByPawnPush    = S(38, 22);
   const Score Unstoppable         = S( 0, 20);
 
+  int X = 6460;
+  int Y = 122;
+  int Z = 160;
+  int T = 144;
+  int U = 147;
+
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
   // happen in Chess960 games.
@@ -764,12 +770,12 @@ namespace {
         else if(   pos.non_pawn_material(WHITE) == RookValueMg
                 && pos.non_pawn_material(BLACK) == RookValueMg){
             Square weakKing = pos.square<KING>(weakSide);
-            int a = 37 + relative_rank(weakSide, weakKing);
+            int a = X + Y * relative_rank(weakSide, weakKing);
             const Square* strongPawns = pos.squares<PAWN>(strongSide);
             Square s;
             while ((s = *strongPawns++) != SQ_NONE)
-                a += 1 + distance<File>(s, weakKing) + relative_rank(strongSide, s);
-            sf = ScaleFactor(a);
+                a += Z + T * distance<File>(s, weakKing) + U * relative_rank(strongSide, s);
+            sf = ScaleFactor(a/128);
         }
     }
 
