@@ -199,11 +199,11 @@ namespace {
   const Score ThreatByPawnPush    = S(38, 22);
   const Score Unstoppable         = S( 0, 20);
 
-  int X = 6460;
-  int Y = 122;
-  int Z = 160;
-  int T = 144;
-  int U = 147;
+  int X = 6607;
+  int Y = 119;
+  int Z = 157;
+  int T = 142;
+  int U = 149;
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -775,7 +775,7 @@ namespace {
             Square s;
             while ((s = *strongPawns++) != SQ_NONE)
                 a += Z + T * distance<File>(s, weakKing) + U * relative_rank(strongSide, s);
-            sf = ScaleFactor(a/128);
+            sf = std::min(ScaleFactor(a/128), SCALE_FACTOR_NORMAL);
         }
     }
 
