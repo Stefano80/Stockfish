@@ -768,7 +768,8 @@ namespace {
             sf = ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
 
         else if(   pos.non_pawn_material(WHITE) == RookValueMg
-                && pos.non_pawn_material(BLACK) == RookValueMg){
+                && pos.non_pawn_material(BLACK) == RookValueMg
+                && ei.pi->passedPawns[strongSide]){
             Square weakKing = pos.square<KING>(weakSide);
             int a = X + Y * relative_rank(weakSide, weakKing);
             const Square* strongPawns = pos.squares<PAWN>(strongSide);
