@@ -562,7 +562,7 @@ namespace {
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool criticalPosition, doFullDepthSearch, moveCountPruning;
     Piece moved_piece;
-    int moveCount, quietCount, piecesCount;
+    int moveCount, quietCount;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -654,7 +654,7 @@ namespace {
     // Step 4a. Tablebase probe
     if (!rootNode && TB::Cardinality)
     {
-        piecesCount = pos.count<ALL_PIECES>(WHITE) + pos.count<ALL_PIECES>(BLACK);
+        int piecesCount = pos.count<ALL_PIECES>(WHITE) + pos.count<ALL_PIECES>(BLACK);
 
         if (    piecesCount <= TB::Cardinality
             && (piecesCount <  TB::Cardinality || depth >= TB::ProbeDepth)
@@ -862,7 +862,6 @@ moves_loop: // When in check search starts from here
           (ss+1)->pv = nullptr;
 
       extension = DEPTH_ZERO;
-      piecesCount = pos.count<ALL_PIECES>(WHITE) + pos.count<ALL_PIECES>(BLACK);
       criticalPosition = pos.capture_or_promotion(move) || !pos.non_pawn_material(pos.side_to_move());
       moved_piece = pos.moved_piece(move);
 
