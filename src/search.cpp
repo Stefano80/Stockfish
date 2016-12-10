@@ -87,6 +87,11 @@ namespace {
     Move best = MOVE_NONE;
   };
 
+  struct SearchInfo {
+    int a = 0;
+  };
+
+
   // EasyMoveManager structure is used to detect an 'easy move'. When the PV is
   // stable across multiple search iterations, we can quickly return the best move.
   struct EasyMoveManager {
@@ -162,7 +167,7 @@ namespace {
   Value DrawValue[COLOR_NB];
 
   template <NodeType NT>
-  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode);
+  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, const SearchInfo& si);
 
   template <NodeType NT, bool InCheck>
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth);
@@ -342,6 +347,7 @@ void Thread::search() {
   Value bestValue, alpha, beta, delta;
   Move easyMove = MOVE_NONE;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
+  SearchInfo si;
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
 
@@ -407,7 +413,7 @@ void Thread::search() {
           // high/low anymore.
           while (true)
           {
-              bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false);
+              bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, si);
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
@@ -541,7 +547,7 @@ namespace {
   // search<>() is the main search function for both PV and non-PV nodes
 
   template <NodeType NT>
-  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
+  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, const SearchInfo& si) {
 
     const bool PvNode = NT == PV;
     const bool rootNode = PvNode && (ss-1)->ply == 0;
@@ -755,7 +761,7 @@ namespace {
         pos.do_null_move(st);
         (ss+1)->skipEarlyPruning = true;
         nullValue = depth-R < ONE_PLY ? -qsearch<NonPV, false>(pos, ss+1, -beta, -beta+1, DEPTH_ZERO)
-                                      : - search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
+                                      : - search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode, si);
         (ss+1)->skipEarlyPruning = false;
         pos.undo_null_move();
 
@@ -771,7 +777,7 @@ namespace {
             // Do verification search at high depths
             ss->skipEarlyPruning = true;
             Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta, DEPTH_ZERO)
-                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false);
+                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, si);
             ss->skipEarlyPruning = false;
 
             if (v >= beta)
@@ -801,7 +807,7 @@ namespace {
                 ss->currentMove = move;
                 ss->counterMoves = &thisThread->counterMoveHistory[pos.moved_piece(move)][to_sq(move)];
                 pos.do_move(move, st);
-                value = -search<NonPV>(pos, ss+1, -rbeta, -rbeta+1, rdepth, !cutNode);
+                value = -search<NonPV>(pos, ss+1, -rbeta, -rbeta+1, rdepth, !cutNode, si);
                 pos.undo_move(move);
                 if (value >= rbeta)
                     return value;
@@ -815,7 +821,7 @@ namespace {
     {
         Depth d = (3 * depth / (4 * ONE_PLY) - 2) * ONE_PLY;
         ss->skipEarlyPruning = true;
-        search<NT>(pos, ss, alpha, beta, d, cutNode);
+        search<NT>(pos, ss, alpha, beta, d, cutNode, si);
         ss->skipEarlyPruning = false;
 
         tte = TT.probe(posKey, ttHit);
@@ -899,7 +905,7 @@ moves_loop: // When in check search starts from here
           Depth d = (depth / (2 * ONE_PLY)) * ONE_PLY;
           ss->excludedMove = move;
           ss->skipEarlyPruning = true;
-          value = search<NonPV>(pos, ss, rBeta - 1, rBeta, d, cutNode);
+          value = search<NonPV>(pos, ss, rBeta - 1, rBeta, d, cutNode, si);
           ss->skipEarlyPruning = false;
           ss->excludedMove = MOVE_NONE;
 
@@ -1014,7 +1020,7 @@ moves_loop: // When in check search starts from here
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, si);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
@@ -1026,7 +1032,7 @@ moves_loop: // When in check search starts from here
           value = newDepth <   ONE_PLY ?
                             givesCheck ? -qsearch<NonPV,  true>(pos, ss+1, -(alpha+1), -alpha, DEPTH_ZERO)
                                        : -qsearch<NonPV, false>(pos, ss+1, -(alpha+1), -alpha, DEPTH_ZERO)
-                                       : - search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode);
+                                       : - search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, si);
 
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
@@ -1039,7 +1045,7 @@ moves_loop: // When in check search starts from here
           value = newDepth <   ONE_PLY ?
                             givesCheck ? -qsearch<PV,  true>(pos, ss+1, -beta, -alpha, DEPTH_ZERO)
                                        : -qsearch<PV, false>(pos, ss+1, -beta, -alpha, DEPTH_ZERO)
-                                       : - search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
+                                       : - search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, si);
       }
 
       // Step 17. Undo move
