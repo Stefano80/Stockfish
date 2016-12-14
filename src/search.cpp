@@ -862,7 +862,7 @@ moves_loop: // When in check search starts from here
           (ss+1)->pv = nullptr;
 
       extension = DEPTH_ZERO;
-      criticalPosition = pos.capture_or_promotion(move);
+      criticalPosition = pos.capture_or_promotion(move) || pos.advanced_pawn_push(move);
       moved_piece = pos.moved_piece(move);
 
       givesCheck =  type_of(move) == NORMAL && !pos.discovered_check_candidates()
@@ -906,8 +906,7 @@ moves_loop: // When in check search starts from here
           && bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           if (   !criticalPosition
-              && !givesCheck
-              && !pos.advanced_pawn_push(move))
+              && !givesCheck)
           {
               // Move count based pruning
               if (moveCountPruning)
