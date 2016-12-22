@@ -562,12 +562,12 @@ namespace {
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning;
     Piece moved_piece;
-    int moveCount, quietCount, searchCount;
+    int moveCount, quietCount, totalDepth;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
-    moveCount = quietCount =  searchCount = ss->moveCount = 0;
+    moveCount = quietCount =  totalDepth = ss->moveCount = 0;
     ss->history = VALUE_ZERO;
     bestValue = -VALUE_INFINITE;
     ss->ply = (ss-1)->ply + 1;
@@ -955,7 +955,6 @@ moves_loop: // When in check search starts from here
 
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
-      searchCount++;
 
       // Step 15. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
@@ -1001,6 +1000,7 @@ moves_loop: // When in check search starts from here
           Depth d = std::max(newDepth - r, ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
+          totalDepth += int(d);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
@@ -1013,6 +1013,8 @@ moves_loop: // When in check search starts from here
                             givesCheck ? -qsearch<NonPV,  true>(pos, ss+1, -(alpha+1), -alpha)
                                        : -qsearch<NonPV, false>(pos, ss+1, -(alpha+1), -alpha)
                                        : - search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, false);
+      if(newDepth >= ONE_PLY)
+          totalDepth += int(newDepth);
 
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
@@ -1026,6 +1028,9 @@ moves_loop: // When in check search starts from here
                             givesCheck ? -qsearch<PV,  true>(pos, ss+1, -beta, -alpha)
                                        : -qsearch<PV, false>(pos, ss+1, -beta, -alpha)
                                        : - search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, false);
+
+          if(newDepth >= ONE_PLY)
+              totalDepth += int(newDepth);
       }
 
       // Step 17. Undo move
@@ -1131,8 +1136,8 @@ moves_loop: // When in check search starts from here
             update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, penalty(depth));
 
         // Extra stats bonus depending on how many moves have been searched
-        if((ss-1)->moveCount == 1 && searchCount)
-            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, Value(-int(depth) * searchCount));
+        if((ss-1)->moveCount == 1 && totalDepth)
+            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, Value(-totalDepth));
 
     }
     // Bonus for prior countermove that caused the fail low
