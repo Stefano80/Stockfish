@@ -562,12 +562,12 @@ namespace {
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning;
     Piece moved_piece;
-    int moveCount, quietCount;
+    int moveCount, quietCount, searchCount;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
-    moveCount = quietCount =  ss->moveCount = 0;
+    moveCount = quietCount =  searchCount = ss->moveCount = 0;
     ss->history = VALUE_ZERO;
     bestValue = -VALUE_INFINITE;
     ss->ply = (ss-1)->ply + 1;
@@ -955,6 +955,7 @@ moves_loop: // When in check search starts from here
 
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
+      searchCount++;
 
       // Step 15. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
@@ -1128,6 +1129,11 @@ moves_loop: // When in check search starts from here
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
             update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, penalty(depth));
+
+        // Extra stats bonus depending on how many moves have been searched
+        if((ss-1)->moveCount == 1 && searchCount)
+            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, Value(-int(depth) * searchCount / 16));
+
     }
     // Bonus for prior countermove that caused the fail low
     else if (    depth >= 3 * ONE_PLY
