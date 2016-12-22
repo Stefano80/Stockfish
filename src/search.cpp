@@ -985,7 +985,7 @@ moves_loop: // When in check search starts from here
                            +    (fmh  ? (*fmh )[moved_piece][to_sq(move)] : VALUE_ZERO)
                            +    (fmh2 ? (*fmh2)[moved_piece][to_sq(move)] : VALUE_ZERO)
                            +    thisThread->fromTo.get(~pos.side_to_move(), move)
-                           -    8000; // Correction factor
+                           -    7000; // Correction factor
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->history > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
@@ -1132,7 +1132,7 @@ moves_loop: // When in check search starts from here
 
         // Extra stats bonus depending on how many moves have been searched
         if((ss-1)->moveCount == 1 && searchCount)
-            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, Value(-int(depth) * searchCount / 16));
+            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, Value(-int(depth) * searchCount));
 
     }
     // Bonus for prior countermove that caused the fail low
