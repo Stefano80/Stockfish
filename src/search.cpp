@@ -1137,7 +1137,7 @@ moves_loop: // When in check search starts from here
 
         // Extra stats bonus depending on how many moves have been searched
         if((ss-1)->moveCount == 1 && totalDepth)
-            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, Value(-totalDepth));
+            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, Value(-totalDepth/8));
 
     }
     // Bonus for prior countermove that caused the fail low
