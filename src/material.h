@@ -42,6 +42,7 @@ struct Entry {
   Score imbalance() const { return make_score(value, value); }
   Phase game_phase() const { return gamePhase; }
   bool specialized_eval_exists() const { return evaluationFunction != nullptr; }
+  bool specialized_scaling_exists() const { return scalingFunction != nullptr;}
   Value evaluate(const Position& pos) const { return (*evaluationFunction)(pos); }
 
   // scale_factor takes a position and a color as input and returns a scale factor

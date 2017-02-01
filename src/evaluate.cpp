@@ -756,10 +756,9 @@ namespace {
   ScaleFactor evaluate_scale_factor(const Position& pos, const EvalInfo& ei, Value eg) {
 
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
-    ScaleFactor sf = ei.me->scale_factor(pos, strongSide);
 
-    if(sf != SCALE_FACTOR_NORMAL && sf != SCALE_FACTOR_ONEPAWN)
-            return sf;
+    if(ei.me->specialized_scaling_exists())
+        return ei.me->scale_factor(pos, strongSide);
 
     // If we don't already have an unusual scale factor, check for certain
     // types of endgames, and use a lower scale for those.
@@ -784,8 +783,10 @@ namespace {
              && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
         return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
 
-    return sf;
+  return ei.me->scale_factor(pos, strongSide);
   }
+
+
 
 } // namespace
 
