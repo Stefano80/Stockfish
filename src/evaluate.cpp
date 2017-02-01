@@ -758,11 +758,11 @@ namespace {
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
     ScaleFactor sf = ei.me->scale_factor(pos, strongSide);
 
+    if(sf != SCALE_FACTOR_NORMAL && sf != SCALE_FACTOR_ONEPAWN)
+            return sf;
+
     // If we don't already have an unusual scale factor, check for certain
     // types of endgames, and use a lower scale for those.
-
-    if (sf == SCALE_FACTOR_NORMAL || sf == SCALE_FACTOR_ONEPAWN)
-    {
         if (pos.opposite_bishops())
         {
             // Endgame with opposite-colored bishops and no other pieces (ignoring pawns)
@@ -782,7 +782,7 @@ namespace {
                  &&  pos.count<PAWN>(strongSide) <= 2
                  && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
             sf = ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
-    }
+
 
     return sf;
   }
