@@ -563,7 +563,8 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
-    Depth extension, newDepth;
+    Depth extension, newDepth, relativeDepth = depth;
+;
     Value bestValue, value, ttValue, eval, nullValue;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning;
@@ -716,6 +717,9 @@ namespace {
         if (ttValue != VALUE_NONE)
             if (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER))
                 eval = ttValue;
+
+        if (tte->depth() > DEPTH_ZERO)
+             relativeDepth -= tte->depth();
     }
     else
     {
