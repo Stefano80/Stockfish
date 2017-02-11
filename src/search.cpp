@@ -563,7 +563,7 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
-    Depth extension, newDepth, relativeDepth = depth;
+    Depth extension, newDepth, depthGain = depth;
 ;
     Value bestValue, value, ttValue, eval, nullValue;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
@@ -719,7 +719,7 @@ namespace {
                 eval = ttValue;
 
         if (tte->depth() > DEPTH_ZERO)
-             relativeDepth -= tte->depth();
+             depthGain -= tte->depth();
     }
     else
     {
@@ -736,14 +736,14 @@ namespace {
 
     // Step 6. Razoring (skipped when in check)
     if (   !PvNode
-        &&  relativeDepth < 3 * ONE_PLY
+        &&  depthGain < 3 * ONE_PLY
         &&  ttMove == MOVE_NONE
-        &&  eval + razor_margin[relativeDepth / ONE_PLY] <= alpha)
+        &&  eval + razor_margin[depthGain / ONE_PLY] <= alpha)
     {
         if (depth <= ONE_PLY)
             return qsearch<NonPV, false>(pos, ss, alpha, alpha+1);
 
-        Value ralpha = alpha - razor_margin[relativeDepth / ONE_PLY];
+        Value ralpha = alpha - razor_margin[depthGain / ONE_PLY];
         Value v = qsearch<NonPV, false>(pos, ss, ralpha, ralpha+1);
         if (v <= ralpha)
             return v;
