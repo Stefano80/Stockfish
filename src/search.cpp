@@ -718,8 +718,11 @@ namespace {
             if (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER))
                 eval = ttValue;
 
-        if (tte->depth() > DEPTH_ZERO)
-             depthGain -= tte->depth();
+        if (tte->depth() > DEPTH_ZERO && tte->depth() < depth)
+            depthGain -= tte->depth();
+
+        else if (tte->depth() > DEPTH_ZERO && tte->depth() >= depth)
+            depthGain = DEPTH_ZERO;
     }
     else
     {
