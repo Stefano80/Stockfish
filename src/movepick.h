@@ -35,9 +35,9 @@ struct HistoryStats {
 
   static const Value Max = Value(1 << 28);
 
-  Value get(Color c, Move m) const { return table[c][from_sq(m)][to_sq(m)]; }
+  Value get(Color c, Move m, bool isPawn) const { return table[c][from_sq(m)][to_sq(m)][isPawn]; }
   void clear() { std::memset(table, 0, sizeof(table)); }
-  void update(Color c, Move m, Value v) {
+  void update(Color c, Move m, Value v, bool isPawn) {
 
     if (abs(int(v)) >= 324)
         return;
@@ -45,12 +45,12 @@ struct HistoryStats {
     Square from = from_sq(m);
     Square to = to_sq(m);
 
-    table[c][from][to] -= table[c][from][to] * abs(int(v)) / 324;
-    table[c][from][to] += int(v) * 32;
+    table[c][from][to][isPawn] -= table[c][from][to][isPawn] * abs(int(v)) / 324;
+    table[c][from][to][isPawn] += int(v) * 32;
   }
 
 private:
-  Value table[COLOR_NB][SQUARE_NB][SQUARE_NB];
+  Value table[COLOR_NB][SQUARE_NB][SQUARE_NB][2];
 };
 
 
