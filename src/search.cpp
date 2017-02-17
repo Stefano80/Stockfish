@@ -175,6 +175,7 @@ namespace {
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_cm_stats(Stack* ss, Piece pc, Square s, Value bonus);
   void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, Value bonus);
+  void update_piece_stats(const Position& pos, Move move, Value bonus);
   void check_time();
 
 } // namespace
@@ -567,7 +568,7 @@ namespace {
     Value bestValue, value, ttValue, eval;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning;
-    Piece moved_piece;
+    Piece moved_piece, captured_piece;
     int moveCount, quietCount;
 
     // Step 1. Initialize node
@@ -655,6 +656,10 @@ namespace {
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
                     update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+
+                if (pos.capture_or_promotion(ttMove))
+                    update_piece_stats(pos, ttMove, stat_bonus(depth));
+
             }
             // Penalty for a quiet ttMove that fails low
             else if (!pos.capture_or_promotion(ttMove))
@@ -878,8 +883,9 @@ moves_loop: // When in check search starts from here
           (ss+1)->pv = nullptr;
 
       extension = DEPTH_ZERO;
-      captureOrPromotion = pos.capture_or_promotion(move);
       moved_piece = pos.moved_piece(move);
+      captureOrPromotion = pos.capture_or_promotion(move);
+      captured_piece = pos.piece_on(to_sq(move));
 
       givesCheck =  type_of(move) == NORMAL && !pos.discovered_check_candidates()
                   ? pos.check_squares(type_of(pos.piece_on(from_sq(move)))) & to_sq(move)
@@ -982,8 +988,18 @@ moves_loop: // When in check search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-          if (captureOrPromotion)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+          if (captureOrPromotion){
+              r -= ONE_PLY;
+
+              Value tradeHistory = thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece);
+              if (tradeHistory > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
+                  r -= ONE_PLY;
+
+              else if (tradeHistory < VALUE_ZERO && (ss-1)->history > VALUE_ZERO)
+                  r += ONE_PLY;
+
+              r = std::max(DEPTH_ZERO, r);
+          }
           else
           {
               // Increase reduction for cut nodes
@@ -1138,6 +1154,9 @@ moves_loop: // When in check search starts from here
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
             update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+
+        if (pos.capture_or_promotion(bestMove))
+            update_piece_stats(pos, bestMove, stat_bonus(depth));
     }
     // Bonus for prior countermove that caused the fail low
     else if (    depth >= 3 * ONE_PLY
@@ -1447,6 +1466,16 @@ moves_loop: // When in check search starts from here
     }
   }
 
+  // update_stats() updates move sorting heuristics when a new capture best move is found
+
+  void update_piece_stats(const Position& pos, Move move, Value bonus) {
+
+    Piece capturing = pos.moved_piece(move);
+    Piece captured = pos.piece_on(to_sq(move));
+
+    Thread* thisThread = pos.this_thread();
+    thisThread->pieces.update(capturing, captured, bonus);
+  }
 
   // When playing with strength handicap, choose best move among a set of RootMoves
   // using a statistical rule dependent on 'level'. Idea by Heinz van Saanen.

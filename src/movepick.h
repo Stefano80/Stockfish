@@ -28,6 +28,27 @@
 #include "position.h"
 #include "types.h"
 
+/// PieceStats records how often capturing a piece was successfull.
+/// This used for reduction and move ordering decisions.
+
+struct PieceStats {
+
+  Value get(Piece pc) const { return table[pc]; }
+  void clear() { std::memset(table, 0, sizeof(table)); }
+  void update(Piece capturing, Piece captured, Value v) {
+
+    table[captured] -= table[captured] * abs(int(v)) / 324;
+    table[captured] += int(v) * 32;
+
+    table[capturing] -= table[capturing] * abs(int(v)) / 324;
+    table[capturing] -= int(v) * 32;
+  }
+
+private:
+  Value table[PIECE_NB];
+};
+
+
 
 /// HistoryStats records how often quiet moves have been successful or unsuccessful
 /// during the current search, and is used for reduction and move ordering decisions.
