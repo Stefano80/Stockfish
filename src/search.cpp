@@ -991,7 +991,8 @@ moves_loop: // When in check search starts from here
           if (captureOrPromotion){
               r -= ONE_PLY;
 
-              Value tradeHistory = thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece);
+              Value tradeHistory = Value(5000) + thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece);
+
               if (tradeHistory > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
                   r -= ONE_PLY;
 
