@@ -657,7 +657,7 @@ namespace {
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
                     update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
 
-                if (pos.capture_or_promotion(ttMove))
+                if (pos.capture(ttMove))
                     update_piece_stats(pos, ttMove, stat_bonus(depth));
 
             }
@@ -991,13 +991,15 @@ moves_loop: // When in check search starts from here
           if (captureOrPromotion){
               r -= ONE_PLY;
 
-              Value tradeHistory = Value(5000) + thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece);
+              if(pos.capture(move)){
+                  Value tradeHistory = thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece);
 
-              if (tradeHistory > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
-                  r -= ONE_PLY;
+                  if (tradeHistory > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
+                      r -= ONE_PLY;
 
-              else if (tradeHistory < VALUE_ZERO && (ss-1)->history > VALUE_ZERO)
-                  r += ONE_PLY;
+                  else if (tradeHistory < VALUE_ZERO && (ss-1)->history > VALUE_ZERO)
+                      r += ONE_PLY;
+              }
 
               r = std::max(DEPTH_ZERO, r);
           }
@@ -1156,7 +1158,7 @@ moves_loop: // When in check search starts from here
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
             update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
 
-        if (pos.capture_or_promotion(bestMove))
+        if (pos.capture(bestMove))
             update_piece_stats(pos, bestMove, stat_bonus(depth));
     }
     // Bonus for prior countermove that caused the fail low
@@ -1467,15 +1469,11 @@ moves_loop: // When in check search starts from here
     }
   }
 
-  // update_stats() updates move sorting heuristics when a new capture best move is found
+  // update_piece_stats() updates piece value history
 
   void update_piece_stats(const Position& pos, Move move, Value bonus) {
-
-    Piece capturing = pos.moved_piece(move);
-    Piece captured = pos.piece_on(to_sq(move));
-
     Thread* thisThread = pos.this_thread();
-    thisThread->pieces.update(capturing, captured, bonus);
+    thisThread->pieces.update(pos.moved_piece(move), pos.piece_on(to_sq(move)), bonus);
   }
 
   // When playing with strength handicap, choose best move among a set of RootMoves
