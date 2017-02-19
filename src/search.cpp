@@ -657,7 +657,7 @@ namespace {
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
                     update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
 
-                if (pos.capture(ttMove))
+                if (pos.capture_or_promotion(ttMove))
                     update_piece_stats(pos, ttMove, stat_bonus(depth));
 
             }
@@ -991,15 +991,14 @@ moves_loop: // When in check search starts from here
           if (captureOrPromotion){
               r -= ONE_PLY;
 
-              if(pos.capture(move)){
-                  Value tradeHistory = thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece);
+              Value tradeHistory = thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece);
 
-                  if (tradeHistory > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
-                      r -= ONE_PLY;
+              if (tradeHistory > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
+                  r -= ONE_PLY;
 
-                  else if (tradeHistory < VALUE_ZERO && (ss-1)->history > VALUE_ZERO)
-                      r += ONE_PLY;
-              }
+              else if (tradeHistory < VALUE_ZERO && (ss-1)->history > VALUE_ZERO)
+                  r += ONE_PLY;
+
 
               r = std::max(DEPTH_ZERO, r);
           }
@@ -1158,7 +1157,7 @@ moves_loop: // When in check search starts from here
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
             update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
 
-        if (pos.capture(bestMove))
+        if (pos.capture_or_promotion(bestMove))
             update_piece_stats(pos, bestMove, stat_bonus(depth));
     }
     // Bonus for prior countermove that caused the fail low
