@@ -37,11 +37,13 @@ struct PieceStats {
   void clear() { std::memset(table, 0, sizeof(table)); }
   void update(Piece capturing, Piece captured, Value v) {
 
-    table[captured] -= table[captured] * abs(int(v)) / 324;
-    table[captured] += int(v) * 32;
+    int u = std::min(abs(int(v)), 324);
 
-    table[capturing] -= table[capturing] * abs(int(v)) / 324;
-    table[capturing] -= int(v) * 32;
+    table[captured] -= table[captured] * u / 324;
+    table[captured] += u * 32;
+
+    table[capturing] -= table[capturing] * u / 324;
+    table[capturing] -= u * 32;
   }
 
 private:

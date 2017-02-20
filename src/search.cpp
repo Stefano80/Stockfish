@@ -219,6 +219,7 @@ void Search::clear() {
       th->history.clear();
       th->counterMoveHistory.clear();
       th->resetCalls = true;
+      th->pieces.clear();
   }
 
   Threads.main()->previousScore = VALUE_INFINITE;
@@ -991,7 +992,7 @@ moves_loop: // When in check search starts from here
           if (captureOrPromotion){
               r -= ONE_PLY;
 
-              Value tradeHistory = thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece) - Value(5000);
+              Value tradeHistory = thisThread->pieces.get(captured_piece) - thisThread->pieces.get(moved_piece) - Value(2500);
 
               if (tradeHistory > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
                   r -= ONE_PLY;
