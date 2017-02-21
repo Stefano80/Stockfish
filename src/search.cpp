@@ -644,21 +644,20 @@ namespace {
         && (ttValue >= beta ? (tte->bound() & BOUND_LOWER)
                             : (tte->bound() & BOUND_UPPER)))
     {
-        // If ttMove is quiet, update move sorting heuristics on TT hit
+        // If ttMove update move sorting heuristics on TT hit
         if (ttMove)
         {
             if (ttValue >= beta)
             {
-                if (!pos.capture_or_promotion(ttMove))
-                    update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
 
-                // Extra penalty for a quiet TT move in previous ply when it gets refuted
-                if ((ss-1)->moveCount == 1 && !pos.captured_piece())
+                update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
+
+                // Extra penalty for a TT move in previous ply when it gets refuted
+                if ((ss-1)->moveCount == 1)
                     update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
             }
-            // Penalty for a quiet ttMove that fails low
-            else if (!pos.capture_or_promotion(ttMove))
-            {
+            // Penalty for a ttMove that fails low
+            else{
                 Value penalty = -stat_bonus(depth + ONE_PLY);
                 thisThread->history.update(pos.side_to_move(), ttMove, penalty);
                 update_cm_stats(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
@@ -1128,17 +1127,15 @@ moves_loop: // When in check search starts from here
     else if (bestMove)
     {
 
-        // Quiet best move: update move sorting heuristics
-        if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
 
-        // Extra penalty for a quiet TT move in previous ply when it gets refuted
-        if ((ss-1)->moveCount == 1 && !pos.captured_piece())
+        update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
+
+        // Extra penalty for a TT move in previous ply when it gets refuted
+        if ((ss-1)->moveCount == 1)
             update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
     }
     // Bonus for prior countermove that caused the fail low
     else if (    depth >= 3 * ONE_PLY
-             && !pos.captured_piece()
              && is_ok((ss-1)->currentMove))
         update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
 
