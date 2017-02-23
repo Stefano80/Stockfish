@@ -994,7 +994,7 @@ moves_loop: // When in check search starts from here
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, ss->history > Value(20 * int(d) * d));
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
