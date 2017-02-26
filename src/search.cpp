@@ -172,7 +172,7 @@ void Search::init() {
       for (int d = 1; d < 64; ++d)
           for (int mc = 1; mc < 64; ++mc)
           {
-              double r = log(d) * log(mc) / 2;
+              double r = log(d) * log(mc) / 1.8;
 
               Reductions[NonPV][imp][d][mc] = int(std::round(r));
               Reductions[PV][imp][d][mc] = std::max(Reductions[NonPV][imp][d][mc] - 1, 0);
@@ -979,7 +979,7 @@ moves_loop: // When in check search starts from here
                            + (fmh  ? (*fmh )[moved_piece][to_sq(move)] : VALUE_ZERO)
                            + (fmh2 ? (*fmh2)[moved_piece][to_sq(move)] : VALUE_ZERO)
                            + thisThread->history.get(~pos.side_to_move(), move)
-                           - 8000;
+                           - 4000;
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->history > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
