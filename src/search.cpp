@@ -172,7 +172,7 @@ void Search::init() {
       for (int d = 1; d < 64; ++d)
           for (int mc = 1; mc < 64; ++mc)
           {
-              double r = log(d) * log(mc) / 2;
+              double r = log(d) * log(mc) / 1.9;
 
               Reductions[NonPV][imp][d][mc] = int(std::round(r));
               Reductions[PV][imp][d][mc] = std::max(Reductions[NonPV][imp][d][mc] - 1, 0);
@@ -993,8 +993,16 @@ moves_loop: // When in check search starts from here
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
-
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
+
+          if(newDepth > r){
+              while(  r > 3 * ONE_PLY
+                   && value > alpha){
+                  r = std::max(3 * ONE_PLY, r - 2*ONE_PLY);
+                  d = std::max(newDepth - r, ONE_PLY);
+                  value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
+              }
+          }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
