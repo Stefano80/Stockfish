@@ -996,8 +996,8 @@ moves_loop: // When in check search starts from here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
 
-          if (value > alpha && r > 6 * ONE_PLY && newDepth > r){
-              d = std::max(newDepth - (r - 4 * ONE_PLY), ONE_PLY);
+          if (value > alpha && r > 5 * ONE_PLY && newDepth > r && ss->history < VALUE_ZERO){
+              d = std::max(newDepth - (r - 3 * ONE_PLY), ONE_PLY);
               value =  -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
           }
 
