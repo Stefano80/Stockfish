@@ -217,7 +217,8 @@ namespace {
   const int KnightCheck       = 924;
 
   // Threshold for lazy evaluation
-  const Value LazyThreshold = Value(1500);
+  const Value LazyThreshold = Value(2132);
+  const Value RandomLazy = Value(100);
 
   // eval_init() initializes king and attack bitboards for a given color
   // adding pawn attacks. To be done at the beginning of the evaluation.
@@ -813,9 +814,9 @@ Value Eval::evaluate(const Position& pos) {
   ei.pe = Pawns::probe(pos);
   score += ei.pe->pawns_score();
 
-  // Early exit if score is high
+  // Early exit if score is high with a random threshold
   v = (mg_value(score) + eg_value(score)) / 2;
-  if (abs(v) > LazyThreshold)
+  if (abs(v) > (LazyThreshold + Value(pos.key() % RandomLazy)))
      return pos.side_to_move() == WHITE ? v : -v;
 
   // Initialize attack and king safety bitboards
