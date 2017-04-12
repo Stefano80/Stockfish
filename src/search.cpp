@@ -342,14 +342,13 @@ void Thread::search() {
   }
 
   size_t multiPV = Options["MultiPV"];
+  size_t mpv = rootMoves.size();
   Skill skill(Options["Skill Level"]);
 
   // When playing with strength handicap enable MultiPV search that we will
   // use behind the scenes to retrieve a set of possible moves.
   if (skill.enabled())
       multiPV = std::max(multiPV, (size_t)4);
-
-  multiPV = std::min(multiPV, rootMoves.size());
 
   // Iterative deepening loop until requested to stop or the target depth is reached
   while (   (rootDepth += ONE_PLY) < DEPTH_MAX
@@ -374,7 +373,7 @@ void Thread::search() {
           rm.previousScore = rm.score;
 
       // MultiPV loop. We perform a full root search for each PV line
-      for (PVIdx = 0; PVIdx < multiPV && !Signals.stop; ++PVIdx)
+      for (PVIdx = 0; PVIdx < mpv && !Signals.stop; ++PVIdx)
       {
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
@@ -445,8 +444,17 @@ void Thread::search() {
           if (!mainThread)
               continue;
 
-          if (Signals.stop || PVIdx + 1 == multiPV || Time.elapsed() > 3000)
+          if (Signals.stop || PVIdx + 1 == mpv || Time.elapsed() > 3000)
               sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
+      }
+
+      if (mainThread){
+          size_t n;
+          for (n = 1; n <= mpv ; ++n){
+            if (rootMoves[0].score - rootMoves[n].score > Value(15)/(int)rootDepth)
+                break;
+          }
+          mpv = n;
       }
 
       if (!Signals.stop)
