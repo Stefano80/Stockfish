@@ -450,7 +450,7 @@ void Thread::search() {
 
       if (mainThread){
           size_t n;
-          for (n = 1; n <= mpv ; ++n){
+          for (n = 1; n < mpv ; ++n){
             if (rootMoves[0].score - rootMoves[n].score > Value(15)/(int)rootDepth)
                 break;
           }
