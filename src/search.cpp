@@ -152,6 +152,11 @@ namespace {
   void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, Value bonus);
   void check_time();
 
+  Value psq_gradient(const Position& pos){
+      return pos.side_to_move() == WHITE? eg_value(pos.psq_score()) - mg_value(pos.psq_score())
+                                        : mg_value(pos.psq_score()) - eg_value(pos.psq_score());
+  }
+
 } // namespace
 
 
