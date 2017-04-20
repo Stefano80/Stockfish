@@ -958,42 +958,39 @@ moves_loop: // When in check search starts from here
       // Step 15. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
-          &&  moveCount > 1
-          && (!captureOrPromotion || moveCountPruning))
+          &&  moveCount > 1)
       {
-          Depth r = reduction<PvNode>(improving, depth, moveCount);
+          int mc = captureOrPromotion? std::max(1, moveCount - 2): moveCount;
+          Depth r = reduction<PvNode>(improving, depth, mc);
 
-          if (captureOrPromotion)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
-          else
-          {
-              // Increase reduction for cut nodes
-              if (cutNode)
-                  r += 2 * ONE_PLY;
+          // Increase reduction for cut nodes
+          if (cutNode)
+              r += 2 * ONE_PLY;
 
-              // Decrease reduction for moves that escape a capture. Filter out
-              // castling moves, because they are coded as "king captures rook" and
-              // hence break make_move().
-              else if (   type_of(move) == NORMAL
-                       && !pos.see_ge(make_move(to_sq(move), from_sq(move)),  VALUE_ZERO))
-                  r -= 2 * ONE_PLY;
+          // Decrease reduction for moves that escape a capture. Filter out
+          // castling moves, because they are coded as "king captures rook" and
+          // hence break make_move().
+          else if (   type_of(move) == NORMAL
+                   && !pos.see_ge(make_move(to_sq(move), from_sq(move)),  VALUE_ZERO))
+              r -= 2 * ONE_PLY;
 
-              ss->history =  cmh[moved_piece][to_sq(move)]
-                           + fmh[moved_piece][to_sq(move)]
-                           + fm2[moved_piece][to_sq(move)]
-                           + thisThread->history.get(~pos.side_to_move(), move)
-                           - 4000; // Correction factor
+          ss->history =  captureOrPromotion? VALUE_ZERO
+                       : cmh[moved_piece][to_sq(move)]
+                       + fmh[moved_piece][to_sq(move)]
+                       + fm2[moved_piece][to_sq(move)]
+                       + thisThread->history.get(~pos.side_to_move(), move)
+                       - 4000; // Correction factor
 
-              // Decrease/increase reduction by comparing opponent's stat score
-              if (ss->history > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
-                  r -= ONE_PLY;
+          // Decrease/increase reduction by comparing opponent's stat score
+          if (ss->history > VALUE_ZERO && (ss-1)->history < VALUE_ZERO)
+              r -= ONE_PLY;
 
-              else if (ss->history < VALUE_ZERO && (ss-1)->history > VALUE_ZERO)
-                  r += ONE_PLY;
+          else if (ss->history < VALUE_ZERO && (ss-1)->history > VALUE_ZERO)
+              r += ONE_PLY;
 
-              // Decrease/increase reduction for moves with a good/bad history
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->history / 20000) * ONE_PLY);
-          }
+          // Decrease/increase reduction for moves with a good/bad history
+          r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->history / 20000) * ONE_PLY);
+
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
