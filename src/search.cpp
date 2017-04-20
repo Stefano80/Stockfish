@@ -960,7 +960,7 @@ moves_loop: // When in check search starts from here
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1)
       {
-          int mc = captureOrPromotion? std::max(1, moveCount/2): moveCount;
+          int mc = captureOrPromotion? std::max(1, moveCount/4): moveCount;
           Depth r = reduction<PvNode>(improving, depth, mc);
 
           // Increase reduction for cut nodes
