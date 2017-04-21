@@ -1210,7 +1210,7 @@ moves_loop: // When in check search starts from here
         {
             // Never assume anything on values stored in TT
             if ((ss->staticEval = bestValue = tte->eval()) == VALUE_NONE)
-                ss->staticEval = bestValue = evaluate(pos, true);
+                ss->staticEval = bestValue = evaluate(pos, false);
 
             // Can ttValue be used as a better position evaluation?
             if (ttValue != VALUE_NONE)
@@ -1219,7 +1219,7 @@ moves_loop: // When in check search starts from here
         }
         else
             ss->staticEval = bestValue =
-            (ss-1)->currentMove != MOVE_NULL ? evaluate(pos, true)
+            (ss-1)->currentMove != MOVE_NULL ? evaluate(pos, false)
                                              : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
         // Stand pat. Return immediately if static value is at least beta
