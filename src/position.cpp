@@ -1015,15 +1015,18 @@ bool Position::see_ge(Move m, Value v) const {
   Color stm = ~color_of(piece_on(from)); // First consider opponent's move
   Value balance; // Values of the pieces taken by us minus opponent's ones
   Bitboard occupied, stmAttackers;
+  int phase = game_phase();
+
+  v *= PHASE_MIDGAME;
 
   if (type_of(m) == ENPASSANT)
   {
       occupied = SquareBB[to - pawn_push(~stm)]; // Remove the captured pawn
-      balance = PieceValue[MG][PAWN];
+      balance = phase * PieceValue[MG][PAWN] + int(PHASE_MIDGAME - phase) * PieceValue[EG][PAWN];
   }
   else
   {
-      balance = PieceValue[MG][piece_on(to)];
+      balance = phase * PieceValue[MG][piece_on(to)] + int(PHASE_MIDGAME - phase) * PieceValue[EG][piece_on(to)];
       occupied = 0;
   }
 
@@ -1033,7 +1036,7 @@ bool Position::see_ge(Move m, Value v) const {
   if (nextVictim == KING)
       return true;
 
-  balance -= PieceValue[MG][nextVictim];
+  balance -= phase * PieceValue[MG][nextVictim] + int(PHASE_MIDGAME - phase) * PieceValue[EG][nextVictim];
 
   if (balance >= v)
       return true;
@@ -1063,8 +1066,8 @@ bool Position::see_ge(Move m, Value v) const {
       if (nextVictim == KING)
           return relativeStm == bool(attackers & pieces(~stm));
 
-      balance += relativeStm ?  PieceValue[MG][nextVictim]
-                             : -PieceValue[MG][nextVictim];
+      balance += relativeStm ?  phase * PieceValue[MG][nextVictim] + int(PHASE_MIDGAME - phase) * PieceValue[EG][nextVictim]
+                             : -phase * PieceValue[MG][nextVictim] + int(PHASE_MIDGAME - phase) * PieceValue[EG][nextVictim];
 
       relativeStm = !relativeStm;
 
