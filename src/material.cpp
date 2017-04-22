@@ -53,11 +53,6 @@ namespace {
     { 101,  100, -37,   141,  268,    0 }  // Queen
   };
 
-  // PawnsSet[count] contains a bonus/malus indexed by number of pawns
-  const int PawnsSet[FILE_NB + 1] = {
-     24, -32, 107, -51, 117, -9, -126, -21, 31
-  };
-
   // Endgame evaluation and scaling functions are accessed directly and not through
   // the function maps because they correspond to more than one material hash key.
   Endgame<KXK>    EvaluateKXK[] = { Endgame<KXK>(WHITE),    Endgame<KXK>(BLACK) };
@@ -94,7 +89,7 @@ namespace {
 
     const Color Them = (Us == WHITE ? BLACK : WHITE);
 
-    int bonus = PawnsSet[pieceCount[Us][PAWN]];
+    int bonus = VALUE_ZERO;
 
     // Second-degree polynomial material imbalance by Tord Romstad
     for (int pt1 = NO_PIECE_TYPE; pt1 <= QUEEN; ++pt1)

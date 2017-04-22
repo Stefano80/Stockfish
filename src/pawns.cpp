@@ -226,6 +226,10 @@ Entry* probe(const Position& pos) {
 
   e->key = key;
   e->score = evaluate<WHITE>(pos, e) - evaluate<BLACK>(pos, e);
+
+  Score diminishingReturn = make_score(0, -5*std::max(pos.count<PAWN>(WHITE), pos.count<PAWN>(BLACK)));
+  e->score -= pos.count<PAWN>(WHITE) > pos.count<PAWN>(BLACK)? diminishingReturn: -diminishingReturn;
+
   e->asymmetry = popcount(e->semiopenFiles[WHITE] ^ e->semiopenFiles[BLACK]);
   e->openFiles = popcount(e->semiopenFiles[WHITE] & e->semiopenFiles[BLACK]);
   return e;
