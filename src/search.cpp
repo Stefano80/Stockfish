@@ -966,9 +966,8 @@ moves_loop: // When in check search starts from here
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           if (captureOrPromotion){
-
               if(r){
-                  calpha = alpha - Value(int(depth) * int(depth) * 35);
+                  calpha = alpha - Value(int(depth) * int(depth) * 50);
                   captureValue = givesCheck ? -qsearch<NonPV,  true>(pos, ss+1, -(calpha+1), -calpha, DEPTH_ZERO, LAZY_FORCED)
                                             : -qsearch<NonPV, false>(pos, ss+1, -(calpha+1), -calpha, DEPTH_ZERO, LAZY_FORCED);
                   if (captureValue > calpha)
