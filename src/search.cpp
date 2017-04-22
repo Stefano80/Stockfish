@@ -1329,8 +1329,9 @@ moves_loop: // When in check search starts from here
               }
               else // Fail high
               {
-                  tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
-                            ttDepth, move, ss->staticEval, TT.generation());
+                  if(lazy != LAZY_FORCED)
+                      tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
+                                ttDepth, move, ss->staticEval, TT.generation());
 
                   return value;
               }
@@ -1343,9 +1344,10 @@ moves_loop: // When in check search starts from here
     if (InCheck && bestValue == -VALUE_INFINITE)
         return mated_in(ss->ply); // Plies to mate from the root
 
-    tte->save(posKey, value_to_tt(bestValue, ss->ply),
-              PvNode && bestValue > oldAlpha ? BOUND_EXACT : BOUND_UPPER,
-              ttDepth, bestMove, ss->staticEval, TT.generation());
+    if(lazy != LAZY_FORCED)
+        tte->save(posKey, value_to_tt(bestValue, ss->ply),
+                  PvNode && bestValue > oldAlpha ? BOUND_EXACT : BOUND_UPPER,
+                  ttDepth, bestMove, ss->staticEval, TT.generation());
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
