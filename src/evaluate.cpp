@@ -787,7 +787,7 @@ namespace {
 /// of the position from the point of view of the side to move.
 
 template<bool DoTrace>
-Value Eval::evaluate(const Position& pos, bool Lazy) {
+Value Eval::evaluate(const Position& pos, Lazy lazy) {
 
   assert(!pos.checkers());
 
@@ -814,7 +814,7 @@ Value Eval::evaluate(const Position& pos, bool Lazy) {
 
   // Early exit if score is high
   v = (mg_value(score) + eg_value(score)) / 2;
-  if (Lazy && abs(v) > LazyThreshold)
+  if (lazy == LAZY_FORCED || (lazy == LAZY && abs(v) > LazyThreshold))
      return pos.side_to_move() == WHITE ? v : -v;
 
   // Initialize attack and king safety bitboards
@@ -872,8 +872,8 @@ Value Eval::evaluate(const Position& pos, bool Lazy) {
 }
 
 // Explicit template instantiations
-template Value Eval::evaluate<true >(const Position&, bool Lazy);
-template Value Eval::evaluate<false>(const Position&, bool Lazy);
+template Value Eval::evaluate<true >(const Position&, Lazy lazy);
+template Value Eval::evaluate<false>(const Position&, Lazy lazy);
 
 
 /// trace() is like evaluate(), but instead of returning a value, it returns
@@ -884,7 +884,7 @@ std::string Eval::trace(const Position& pos) {
 
   std::memset(scores, 0, sizeof(scores));
 
-  Value v = evaluate<true>(pos, false);
+  Value v = evaluate<true>(pos, LAZY_NONE);
   v = pos.side_to_move() == WHITE ? v : -v; // White's point of view
 
   std::stringstream ss;

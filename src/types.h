@@ -192,6 +192,12 @@ enum Value : int {
   MidgameLimit  = 15258, EndgameLimit  = 3915
 };
 
+enum Lazy {
+    LAZY_NONE,
+    LAZY,
+    LAZY_FORCED
+};
+
 enum PieceType {
   NO_PIECE_TYPE, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING,
   ALL_PIECES = 0,
