@@ -544,7 +544,7 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, ttValue, eval;
+    Value bestValue, value, captureValue, ttValue, eval, calpha;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets;
     Piece moved_piece;
@@ -556,6 +556,8 @@ namespace {
     moveCount = quietCount =  ss->moveCount = 0;
     ss->history = VALUE_ZERO;
     bestValue = -VALUE_INFINITE;
+    captureValue = -VALUE_INFINITE;
+    calpha = alpha;
     ss->ply = (ss-1)->ply + 1;
 
     // Check for the available remaining time
@@ -963,8 +965,14 @@ moves_loop: // When in check search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-          if (captureOrPromotion)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+          if (captureOrPromotion){
+
+              calpha = alpha - Value(int(depth) * int(depth) * 35);
+              captureValue = givesCheck ? -qsearch<NonPV,  true>(pos, ss+1, -(calpha+1), -calpha, DEPTH_ZERO, LAZY_FORCED)
+                                        : -qsearch<NonPV, false>(pos, ss+1, -(calpha+1), -calpha, DEPTH_ZERO, LAZY_FORCED);
+              if (captureValue > calpha)
+                r -= r ? ONE_PLY : DEPTH_ZERO;
+          }
           else
           {
               // Increase reduction for cut nodes
