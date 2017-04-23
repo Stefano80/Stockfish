@@ -227,8 +227,11 @@ Entry* probe(const Position& pos) {
   e->key = key;
   e->score = evaluate<WHITE>(pos, e) - evaluate<BLACK>(pos, e);
 
-  Score diminishingReturn = make_score(0, -5*std::max(pos.count<PAWN>(WHITE), pos.count<PAWN>(BLACK)));
-  e->score -= pos.count<PAWN>(WHITE) > pos.count<PAWN>(BLACK)? diminishingReturn: -diminishingReturn;
+  int maxPawns = std::max(pos.count<PAWN>(WHITE), pos.count<PAWN>(BLACK));
+  Score diminishingReturn = make_score(-2*maxPawns, -5*maxPawns);
+  e->score -= pos.count<PAWN>(WHITE) > pos.count<PAWN>(BLACK)?  diminishingReturn:
+              pos.count<PAWN>(BLACK) > pos.count<PAWN>(WHITE)? -diminishingReturn
+                                                             :  make_score(0, 0);
 
   e->asymmetry = popcount(e->semiopenFiles[WHITE] ^ e->semiopenFiles[BLACK]);
   e->openFiles = popcount(e->semiopenFiles[WHITE] & e->semiopenFiles[BLACK]);
