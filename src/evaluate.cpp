@@ -480,7 +480,6 @@ namespace {
         if (kingDanger > 0)
             score -= make_score(kingDanger * kingDanger / 4096, 0);
 
-        dbg_hit_on(kingDanger < -100);
         // If we are safe, it is desirable to avoid blocked king surprises
         if (kingDanger < -100)
             score += make_score(2*popcount(ei.kingRing[Us] && ~pos.pieces(Us)) - 10, 0);
