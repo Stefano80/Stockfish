@@ -482,7 +482,7 @@ namespace {
 
         // If we are safe, it is desirable to avoid blocked king surprises
         if (kingDanger < -100)
-            score += make_score(2*popcount(ei.kingRing[Us] && ~pos.pieces(Us)) - 10, 0);
+            score += make_score(2*popcount(ei.kingRing[Us] & ~pos.pieces(Us)) - 10, 0);
     }
 
     // King tropism: firstly, find squares that opponent attacks in our king flank
