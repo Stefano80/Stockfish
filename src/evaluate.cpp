@@ -480,9 +480,11 @@ namespace {
         if (kingDanger > 0)
             score -= make_score(kingDanger * kingDanger / 4096, 0);
 
-        // If we are safe, it is desirable to avoid blocked king surprises
-        if (kingDanger < -100)
-            score += make_score(2*popcount(ei.kingRing[Us] & ~pos.pieces(Us)) - 10, 0);
+        // If we are safe, we can allow us to leave the king by itself
+        else if (kingDanger < 0){
+            int bonus = - kingDanger * popcount(ei.kingRing[Us] & ~pos.pieces(Us)) / 64;
+            score += make_score(bonus, 0);
+        }
     }
 
     // King tropism: firstly, find squares that opponent attacks in our king flank
