@@ -482,7 +482,7 @@ namespace {
 
         // If we are safe, we can allow us to leave the king by itself
         else if (kingDanger < 0){
-            int bonus = - kingDanger * popcount(ei.kingRing[Us] & ~pos.pieces(Us)) / 32;
+            int bonus = - kingDanger * popcount(ei.kingRing[Us] & ~pos.pieces(Us)) / 128;
             score += make_score(bonus, 0);
         }
     }
