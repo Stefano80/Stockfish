@@ -983,11 +983,11 @@ moves_loop: // When in check search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move)),  VALUE_ZERO))
                   r -= 2 * ONE_PLY;
 
-              ss->history =  cmh[moved_piece][to_sq(move)]
-                           + fmh[moved_piece][to_sq(move)]
-                           + fm2[moved_piece][to_sq(move)]
-                           + thisThread->history.get(~pos.side_to_move(), move)
-                           - 4000; // Correction factor
+              ss->history = 3*(thisThread->history.get(~pos.side_to_move(), move)
+                             + cmh[moved_piece][to_sq(move)])/2
+                             + fmh[moved_piece][to_sq(move)]
+                             + fm2[moved_piece][to_sq(move)]
+                             - 6000; // Correction factor
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->history > 0 && (ss-1)->history < 0)
