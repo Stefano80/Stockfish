@@ -102,7 +102,7 @@ namespace {
     Bitboard lever, leverPush, connected;
     Square s;
     bool opposed, backward;
-    Score score = SCORE_ZERO;
+    Score positiveScore = SCORE_ZERO, negativeScore = SCORE_ZERO;
     const Square* pl = pos.squares<PAWN>(Us);
 
     Bitboard ourPawns   = pos.pieces(Us  , PAWN);
@@ -174,25 +174,30 @@ namespace {
 
         // Score this pawn
         if (!neighbours)
-            score -= Isolated[opposed];
+            negativeScore += Isolated[opposed];
 
         else if (backward)
-            score -= Backward[opposed];
+            negativeScore += Backward[opposed];
 
         else if (!supported)
-            score -= Unsupported;
+            negativeScore += Unsupported;
 
         if (connected)
-            score += Connected[opposed][!!phalanx][more_than_one(supported)][relative_rank(Us, s)];
+            positiveScore += Connected[opposed][!!phalanx][more_than_one(supported)][relative_rank(Us, s)];
 
         if (doubled && !supported)
-            score -= Doubled;
+            negativeScore += Doubled;
 
         if (lever)
-            score += Lever[relative_rank(Us, s)];
+            positiveScore += Lever[relative_rank(Us, s)];
     }
 
-    return score;
+    int mV = mg_value(negativeScore);
+    int eV = eg_value(negativeScore);
+
+    negativeScore = negativeScore/2 + make_score(mV * mV / 245, eV * eV / 200);
+
+    return positiveScore - negativeScore;
   }
 
 } // namespace
