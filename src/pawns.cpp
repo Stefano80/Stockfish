@@ -195,7 +195,7 @@ namespace {
     int mV = mg_value(negativeScore);
     int eV = eg_value(negativeScore);
 
-    negativeScore = make_score(33*mV/32 - mV*mV/1000, 31*eV/32 + eV*eV/1000);
+    negativeScore += make_score(-mV*mV/1000, eV*eV/1000);
 
     return positiveScore - negativeScore;
   }
