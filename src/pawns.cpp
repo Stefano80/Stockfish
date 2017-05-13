@@ -87,6 +87,11 @@ namespace {
   // in front of the king and no enemy pawn on the horizon.
   const Value MaxSafetyBonus = V(258);
 
+  int A = 1000;
+  int B = 1000;
+
+  TUNE(SetRange(1, 2000), A, B);
+
   #undef S
   #undef V
 
@@ -195,7 +200,7 @@ namespace {
     int mV = mg_value(negativeScore);
     int eV = eg_value(negativeScore);
 
-    negativeScore += make_score(mV*mV/1000, -eV*eV/1000);
+    negativeScore += make_score(mV*mV/A, -eV*eV/B);
 
     return positiveScore - negativeScore;
   }
