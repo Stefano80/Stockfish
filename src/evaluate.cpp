@@ -806,10 +806,13 @@ Value Eval::evaluate(const Position& pos) {
   // the position object (material + piece square tables) and the material
   // imbalance. Score is computed internally from the white point of view.
   Score score = pos.psq_score() + ei.me->imbalance();
+  Score scoreVariance = make_score(abs(mg_value(score)), abs(eg_value(score)));
+
 
   // Probe the pawn hash table
   ei.pe = Pawns::probe(pos);
   score += ei.pe->pawns_score();
+  scoreVariance += abs(ei.pe->pawns_score());
 
   // Early exit if score is high
   v = (mg_value(score) + eg_value(score)) / 2;
@@ -821,26 +824,42 @@ Value Eval::evaluate(const Position& pos) {
   eval_init<BLACK>(pos, ei);
 
   // Evaluate all pieces but king and pawns
-  score += evaluate_pieces<DoTrace>(pos, ei, mobility);
-  score += mobility[WHITE] - mobility[BLACK];
+  Score pieceScore = evaluate_pieces<DoTrace>(pos, ei, mobility);
+  Score mobilityScore = mobility[WHITE] - mobility[BLACK];
+  score += pieceScore + mobilityScore;
+  scoreVariance += abs(pieceScore) + abs(mobilityScore);
+
 
   // Evaluate kings after all other pieces because we need full attack
   // information when computing the king safety evaluation.
-  score +=  evaluate_king<WHITE, DoTrace>(pos, ei)
+  Score kingScore =  evaluate_king<WHITE, DoTrace>(pos, ei)
           - evaluate_king<BLACK, DoTrace>(pos, ei);
 
+  score += kingScore;
+  scoreVariance += abs(kingScore);
+
   // Evaluate tactical threats, we need full attack information including king
-  score +=  evaluate_threats<WHITE, DoTrace>(pos, ei)
+  Score threatsScore =  evaluate_threats<WHITE, DoTrace>(pos, ei)
           - evaluate_threats<BLACK, DoTrace>(pos, ei);
 
+  score += threatsScore;
+  scoreVariance += abs(threatsScore);
+
   // Evaluate passed pawns, we need full attack information including king
-  score +=  evaluate_passer_pawns<WHITE, DoTrace>(pos, ei)
+  Score passedScore =  evaluate_passer_pawns<WHITE, DoTrace>(pos, ei)
           - evaluate_passer_pawns<BLACK, DoTrace>(pos, ei);
 
+  score += passedScore;
+  scoreVariance += abs(passedScore);
+
   // Evaluate space for both sides, only during opening
-  if (pos.non_pawn_material() >= SpaceThreshold)
-      score +=  evaluate_space<WHITE>(pos, ei)
-              - evaluate_space<BLACK>(pos, ei);
+  if (pos.non_pawn_material() >= SpaceThreshold){
+      Score spaceScore =  evaluate_space<WHITE>(pos, ei)
+                        - evaluate_space<BLACK>(pos, ei);
+
+      score += spaceScore;
+      scoreVariance += abs(spaceScore);
+  }
 
   // Evaluate position potential for the winning side
   score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), eg_value(score));

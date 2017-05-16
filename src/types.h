@@ -339,6 +339,10 @@ inline Score operator*(Score s, int i) {
   return result;
 }
 
+inline Score abs(Score s){
+    return make_score(abs(mg_value(s)), abs(eg_value(s)));
+}
+
 inline Color operator~(Color c) {
   return Color(c ^ BLACK); // Toggle color
 }
