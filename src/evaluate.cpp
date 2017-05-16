@@ -728,14 +728,16 @@ namespace {
   // evaluate_initiative() computes the initiative correction value for the
   // position, i.e., second order bonus/malus based on the known attacking/defending
   // status of the players.
-  Score evaluate_initiative(const Position& pos, int asymmetry, Value eg) {
+  Score evaluate_initiative(const Position& pos, int asymmetry, Value eg, Value eg_var) {
 
     int kingDistance =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                       - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
     bool bothFlanks = (pos.pieces(PAWN) & QueenSide) && (pos.pieces(PAWN) & KingSide);
 
+    int variance = eg? eg_var/abs(eg): 0;
+
     // Compute the initiative bonus for the attacking side
-    int initiative = 8 * (asymmetry + kingDistance - 17) + 12 * pos.count<PAWN>() + 16 * bothFlanks;
+    int initiative = 8 * (asymmetry + kingDistance - 17) + 12 * pos.count<PAWN>() + 16 * bothFlanks + variance;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
@@ -862,7 +864,7 @@ Value Eval::evaluate(const Position& pos) {
   }
 
   // Evaluate position potential for the winning side
-  score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), eg_value(score));
+  score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), eg_value(score), eg_value(scoreVariance));
 
   // Evaluate scale factor for the winning side
   ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
