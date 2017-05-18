@@ -192,10 +192,11 @@ namespace {
             positiveScore += Lever[relative_rank(Us, s)];
     }
 
-    int mV = mg_value(negativeScore);
-    int eV = eg_value(negativeScore);
+    int pV = mg_value(positiveScore);
+    int nV = mg_value(negativeScore);
 
-    negativeScore += make_score(mV*mV/1069, -eV*eV/1059);
+    positiveScore += make_score(pV/16, 0);
+    negativeScore += make_score(nV * nV / 1024, 0);
 
     return positiveScore - negativeScore;
   }
