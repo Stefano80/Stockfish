@@ -346,6 +346,17 @@ namespace {
             if (ei.pe->semiopen_file(Us, file_of(s)))
                 score += RookOnFile[!!ei.pe->semiopen_file(Them, file_of(s))];
 
+            // Bonus for threatening of sacrificing a quality for a double pawn
+            if (b & pos.pieces(Them, BISHOP)
+                  & ei.pe->semiopen_file(Us, file_of(s))
+                  & ei.attackedBy[Them][PAWN]
+                  & ~ei.attackedBy[Them][BISHOP]
+                  & ~ei.attackedBy[Them][KNIGHT]
+                  & ~ei.attackedBy[Them][ROOK]
+                  & ~ei.attackedBy[Them][QUEEN]){
+                score += make_score(10, 0);
+            }
+
             // Penalty when trapped by the king, even more if the king cannot castle
             else if (mob <= 3)
             {
