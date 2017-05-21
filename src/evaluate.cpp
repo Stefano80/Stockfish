@@ -734,7 +734,7 @@ namespace {
                       - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
     bool bothFlanks = (pos.pieces(PAWN) & QueenSide) && (pos.pieces(PAWN) & KingSide);
 
-    int variance = eg? eg_var/abs(eg): 0;
+    int variance = (eg_var - 650)/16;
 
     // Compute the initiative bonus for the attacking side
     int initiative = 8 * (asymmetry + kingDistance - 17) + 12 * pos.count<PAWN>() + 16 * bothFlanks - variance;
