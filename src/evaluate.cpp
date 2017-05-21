@@ -198,6 +198,12 @@ namespace {
   // happen in Chess960 games.
   const Score TrappedBishopA1H1 = S(50, 50);
 
+  int A = 0;
+  int B = 650;
+  int C = 80;
+
+  TUNE(B, C, SetRange(-32, 32), A);
+
   #undef S
   #undef V
 
@@ -734,8 +740,8 @@ namespace {
                       - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
     bool bothFlanks = (pos.pieces(PAWN) & QueenSide) && (pos.pieces(PAWN) & KingSide);
 
-    int variance = (eg_var - 650)/16;
-    variance = abs(variance) < 80? variance: ((variance > 0) - (variance < 0)) * 80;
+    int variance = A * (eg_var - B)/256;
+    variance = abs(variance) < C? variance: ((variance > 0) - (variance < 0)) * C;
 
     // Compute the initiative bonus for the attacking side
     int initiative = 8 * (asymmetry + kingDistance - 17) + 12 * pos.count<PAWN>() + 16 * bothFlanks + variance;
