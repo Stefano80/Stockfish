@@ -1312,8 +1312,11 @@ moves_loop: // When in check search starts from here
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
-      value = givesCheck ? -qsearch<NT,  true>(pos, ss+1, -beta, -alpha, depth - ONE_PLY)
-                         : -qsearch<NT, false>(pos, ss+1, -beta, -alpha, depth - ONE_PLY);
+
+      Depth r = evasionPrunable? ONE_PLY: DEPTH_ZERO;
+
+      value = givesCheck ? -qsearch<NT,  true>(pos, ss+1, -beta, -alpha, depth - ONE_PLY - r)
+                         : -qsearch<NT, false>(pos, ss+1, -beta, -alpha, depth - ONE_PLY - r);
       pos.undo_move(move);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
