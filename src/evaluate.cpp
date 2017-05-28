@@ -811,8 +811,14 @@ Value Eval::evaluate(const Position& pos) {
   ei.pe = Pawns::probe(pos);
   score += ei.pe->pawns_score();
 
-  // Early exit if score is high
+  // Early exit if score is high or if a draw is predicted
   v = (mg_value(score) + eg_value(score)) / 2;
+
+  Color strongSide = v > VALUE_DRAW ? WHITE : BLACK;
+
+  if (ei.me->scale_factor(pos, strongSide) == SCALE_FACTOR_DRAW)
+      return VALUE_DRAW;
+
   if (abs(v) > LazyThreshold)
      return pos.side_to_move() == WHITE ? v : -v;
 
