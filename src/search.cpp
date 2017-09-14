@@ -972,8 +972,8 @@ moves_loop: // When in check search starts from here
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
-                             + 512*(ss-1)->moveCount
-                             - 6000;
+                             + 200*(ss-1)->moveCount
+                             - 4500;
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->statScore > 0 && (ss-1)->statScore < 0)
