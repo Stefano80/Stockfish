@@ -786,7 +786,7 @@ namespace {
     }
 
     // Step 10. Internal iterative deepening (skipped when in check)
-    if (    depth >= 5 * ONE_PLY
+    if (   preliminary_depth(depth)
         && !ttMove
         && (PvNode || ss->staticEval + 256 >= beta))
     {
@@ -864,13 +864,13 @@ moves_loop: // When in check search starts from here
       // ttValue minus a margin then we will extend the ttMove.
       if (    singularExtensionNode
           &&  move == ttMove
-          &&  pos.legal(move))
+          &&  pos.legal(move)
+          &&  preliminary_depth(depth))
       {
-          Depth d = std::max(depth - 6*ONE_PLY, std::max(DEPTH_ZERO,  preliminary_depth(depth)));
-          Value rBeta = std::max(ttValue - 4 * d / ONE_PLY, -VALUE_MATE);
-
+          Value margin = Value(3 * depth / ONE_PLY)  - Value(8);
+          Value rBeta = std::max(ttValue - margin, -VALUE_MATE);
           ss->excludedMove = move;
-          value = search<NonPV>(pos, ss, rBeta - 1, rBeta, d, cutNode, true);
+          value = search<NonPV>(pos, ss, rBeta - 1, rBeta, preliminary_depth(depth), cutNode, true);
           ss->excludedMove = MOVE_NONE;
 
           if (value < rBeta)
