@@ -80,7 +80,7 @@ namespace {
   }
 
   Depth preliminary_depth(Depth d) {
-      return (3 * d / (4 * ONE_PLY) - 2) * ONE_PLY;
+      return std::max(DEPTH_ZERO, (3 * d / (4 * ONE_PLY) - 2) * ONE_PLY);
   }
 
   // History and stats update bonus, based on depth
