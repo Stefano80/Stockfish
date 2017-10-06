@@ -859,7 +859,8 @@ namespace {
     score += evaluate_pieces<WHITE, ROOK  >() - evaluate_pieces<BLACK, ROOK  >();
     score += evaluate_pieces<WHITE, QUEEN >() - evaluate_pieces<BLACK, QUEEN >();
 
-    score += mobility[WHITE] - mobility[BLACK];
+    Score m = mobility[WHITE] - mobility[BLACK];
+    score += m;
 
     score +=  evaluate_king<WHITE>()
             - evaluate_king<BLACK>();
@@ -870,7 +871,7 @@ namespace {
     score +=  evaluate_passed_pawns<WHITE>()
             - evaluate_passed_pawns<BLACK>();
 
-    if (pos.non_pawn_material() >= SpaceThreshold)
+    if (pos.non_pawn_material() >= SpaceThreshold + mg_value(m) - Value(50))
         score +=  evaluate_space<WHITE>()
                 - evaluate_space<BLACK>();
 
