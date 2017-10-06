@@ -57,7 +57,6 @@ namespace {
 
   // Tables used to drive a piece towards or away from another piece
   const int PushClose[8] = { 0, 0, 100, 80, 60, 40, 20, 10 };
-  const int PushAway [8] = { 0, 5, 20, 40, 60, 80, 90, 100 };
 
   // Pawn Rank based scaling factors used in KRPPKRP endgame
   const int KRPPKRPScaleFactors[RANK_NB] = { 0, 9, 10, 14, 21, 44, 0, 0 };
@@ -95,7 +94,6 @@ Endgames::Endgames() {
   add<KBNK>("KBNK");
   add<KRKP>("KRKP");
   add<KRKB>("KRKB");
-  add<KRKN>("KRKN");
   add<KQKP>("KQKP");
   add<KQKR>("KQKR");
 
@@ -251,22 +249,6 @@ Value Endgame<KRKB>::operator()(const Position& pos) const {
   Value result = Value(PushToEdges[pos.square<KING>(weakSide)]);
   return strongSide == pos.side_to_move() ? result : -result;
 }
-
-
-/// KR vs KN. The attacking side has slightly better winning chances than
-/// in KR vs KB, particularly if the king and the knight are far apart.
-template<>
-Value Endgame<KRKN>::operator()(const Position& pos) const {
-
-  assert(verify_material(pos, strongSide, RookValueMg, 0));
-  assert(verify_material(pos, weakSide, KnightValueMg, 0));
-
-  Square bksq = pos.square<KING>(weakSide);
-  Square bnsq = pos.square<KNIGHT>(weakSide);
-  Value result = Value(PushToEdges[bksq] + PushAway[distance(bksq, bnsq)]);
-  return strongSide == pos.side_to_move() ? result : -result;
-}
-
 
 /// KQ vs KP. In general, this is a win for the stronger side, but there are a
 /// few important exceptions. A pawn on 7th rank and on the A,C,F or H files
