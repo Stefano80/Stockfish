@@ -839,13 +839,13 @@ namespace {
                  &&  pos.count<PAWN>(strongSide) <= 2
                  && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
             return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
-    }
 
-    if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + Value(100)
-       && !pos.count<PAWN>(~strongSide)){
-           Square winnerKSq = pos.square<KING>(strongSide);
-           Square loserKSq = pos.square<KING>(~strongSide);
-           sf =  ScaleFactor(PushToEdges[loserKSq]/8 + PushToCorners[loserKSq]/8 + PushClose[distance(winnerKSq, loserKSq)]/8);
+        else if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + Value(100)
+                && !pos.count<PAWN>(~strongSide)){
+            Square winnerKSq = pos.square<KING>(strongSide);
+            Square loserKSq = pos.square<KING>(~strongSide);
+            sf =  ScaleFactor((PushToEdges[loserKSq] + PushToCorners[loserKSq] + PushClose[distance(winnerKSq, loserKSq)])/8);
+        }
     }
     return sf;
   }
