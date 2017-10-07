@@ -817,6 +817,14 @@ namespace {
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
     ScaleFactor sf = me->scale_factor(pos, strongSide);
 
+    if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + Value(100)
+       &&  pos.non_pawn_material(~strongSide)
+       && !pos.count<PAWN>(~strongSide)){
+       Square winnerKSq = pos.square<KING>(strongSide);
+       Square loserKSq = pos.square<KING>(~strongSide);
+       return  ScaleFactor((PushToEdges[loserKSq] + PushToCorners[loserKSq] + PushClose[distance(winnerKSq, loserKSq)])/8);
+    }
+
     // If we don't already have an unusual scale factor, check for certain
     // types of endgames, and use a lower scale for those.
     if (sf == SCALE_FACTOR_NORMAL || sf == SCALE_FACTOR_ONEPAWN)
@@ -839,13 +847,6 @@ namespace {
                  &&  pos.count<PAWN>(strongSide) <= 2
                  && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
             return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
-
-        else if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + Value(100)
-                && !pos.count<PAWN>(~strongSide)){
-            Square winnerKSq = pos.square<KING>(strongSide);
-            Square loserKSq = pos.square<KING>(~strongSide);
-            sf =  ScaleFactor((PushToEdges[loserKSq] + PushToCorners[loserKSq] + PushClose[distance(winnerKSq, loserKSq)])/8);
-        }
     }
     return sf;
   }
