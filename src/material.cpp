@@ -66,18 +66,11 @@ namespace {
 
   // Endgame evaluation and scaling functions are accessed directly and not through
   // the function maps because they correspond to more than one material hash key.
-  Endgame<KXK>    EvaluateKXK[] = { Endgame<KXK>(WHITE),    Endgame<KXK>(BLACK) };
 
   Endgame<KBPsK>  ScaleKBPsK[]  = { Endgame<KBPsK>(WHITE),  Endgame<KBPsK>(BLACK) };
   Endgame<KQKRPs> ScaleKQKRPs[] = { Endgame<KQKRPs>(WHITE), Endgame<KQKRPs>(BLACK) };
   Endgame<KPsK>   ScaleKPsK[]   = { Endgame<KPsK>(WHITE),   Endgame<KPsK>(BLACK) };
   Endgame<KPKP>   ScaleKPKP[]   = { Endgame<KPKP>(WHITE),   Endgame<KPKP>(BLACK) };
-
-  // Helper used to detect a given material distribution
-  bool is_KXK(const Position& pos, Color us) {
-    return  !more_than_one(pos.pieces(~us))
-          && pos.non_pawn_material(us) >= RookValueMg;
-  }
 
   bool is_KBPsKs(const Position& pos, Color us) {
     return   pos.non_pawn_material(us) == BishopValueMg
@@ -157,13 +150,6 @@ Entry* probe(const Position& pos) {
   // for a generic one if the previous search failed.
   if ((e->evaluationFunction = pos.this_thread()->endgames.probe<Value>(key)) != nullptr)
       return e;
-
-  for (Color c = WHITE; c <= BLACK; ++c)
-      if (is_KXK(pos, c))
-      {
-          e->evaluationFunction = &EvaluateKXK[c];
-          return e;
-      }
 
   // OK, we didn't find any special evaluation function for the current material
   // configuration. Is there a suitable specialized scaling function?
