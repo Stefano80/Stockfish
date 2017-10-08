@@ -244,7 +244,7 @@ namespace {
 
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
-  const Value SpaceThreshold = Value(12322);
+  const Value SpaceThreshold = Value(12422);
 
 
   // initialize() computes king and pawn attacks, and the king ring bitboard
@@ -871,7 +871,7 @@ namespace {
     score +=  evaluate_passed_pawns<WHITE>()
             - evaluate_passed_pawns<BLACK>();
 
-    if (pos.non_pawn_material() >= SpaceThreshold - 2*abs(mg_value(m)))
+    if (pos.non_pawn_material() >= SpaceThreshold - 4*abs(mg_value(m)))
         score +=  evaluate_space<WHITE>()
                 - evaluate_space<BLACK>();
 
