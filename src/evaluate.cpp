@@ -245,6 +245,7 @@ namespace {
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
   const Value SpaceThreshold = Value(12222);
+  const Value SpaceMobility  = KnightValueMg;
 
 
   // initialize() computes king and pawn attacks, and the king ring bitboard
@@ -871,11 +872,11 @@ namespace {
     score +=  evaluate_passed_pawns<WHITE>()
             - evaluate_passed_pawns<BLACK>();
 
-    if (pos.non_pawn_material() >= SpaceThreshold - 4*abs(mg_value(m))){
+    if (pos.non_pawn_material() >= SpaceThreshold - SpaceMobility){
         int s = mg_value(evaluate_space<WHITE>() - evaluate_space<BLACK>());
         score += pos.non_pawn_material() >= SpaceThreshold?
                     make_score(s, 0):
-                    make_score(s*(RookValueMg - 4*abs(mg_value(m)))/RookValueMg, 0);
+                    make_score(s*(SpaceMobility - 3*abs(mg_value(m)))/SpaceMobility, 0);
     }
 
     score += evaluate_initiative(eg_value(score));
