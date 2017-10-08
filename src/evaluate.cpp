@@ -876,7 +876,7 @@ namespace {
         int s = mg_value(evaluate_space<WHITE>() - evaluate_space<BLACK>());
         score += pos.non_pawn_material() >= SpaceThreshold?
                     make_score(s, 0):
-                    make_score(s*(SpaceMobility - 3*abs(mg_value(m)))/SpaceMobility, 0);
+                    make_score(std::max(0, s*(SpaceMobility - 3*abs(mg_value(m)))/SpaceMobility), 0);
     }
 
     score += evaluate_initiative(eg_value(score));
