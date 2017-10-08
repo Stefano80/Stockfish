@@ -815,15 +815,17 @@ namespace {
   ScaleFactor Evaluation<T>::evaluate_scale_factor(Value eg) {
 
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
-    ScaleFactor sf = me->scale_factor(pos, strongSide);
 
-    if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + Value(100)
+    if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + PawnValueMg
        &&  pos.non_pawn_material(~strongSide)
-       && !pos.count<PAWN>(~strongSide)){
+       && !pos.count<PAWN>(~strongSide)
+       &&  pos.non_pawn_material(strongSide) <= QueenValueMg){
        Square winnerKSq = pos.square<KING>(strongSide);
        Square loserKSq = pos.square<KING>(~strongSide);
        return  ScaleFactor((PushToEdges[loserKSq] + PushToCorners[loserKSq] + PushClose[distance(winnerKSq, loserKSq)])/8);
     }
+
+    ScaleFactor sf = me->scale_factor(pos, strongSide);
 
     // If we don't already have an unusual scale factor, check for certain
     // types of endgames, and use a lower scale for those.
