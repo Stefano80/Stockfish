@@ -246,33 +246,18 @@ namespace {
   const Value LazyThreshold  = Value(1500);
   const Value SpaceThreshold = Value(12222);
 
-  // Table used to drive the king towards the edge of the board
-  // in KX vs K and KQ vs KR endgames.
-  const int PushToEdges[SQUARE_NB] = {
-    100, 90, 80, 70, 70, 80, 90, 100,
-     90, 70, 60, 50, 50, 60, 70,  90,
-     80, 60, 40, 30, 30, 40, 60,  80,
-     70, 50, 30, 20, 20, 30, 50,  70,
-     70, 50, 30, 20, 20, 30, 50,  70,
-     80, 60, 40, 30, 30, 40, 60,  80,
-     90, 70, 60, 50, 50, 60, 70,  90,
-    100, 90, 80, 70, 70, 80, 90, 100
-  };
-
   // Table used to drive the king towards a corner square of the
   // right color in KBN vs K endgames.
   const int PushToCorners[SQUARE_NB] = {
-    200, 190, 180, 170, 160, 150, 140, 130,
-    190, 180, 170, 160, 150, 140, 130, 140,
-    180, 170, 155, 140, 140, 125, 140, 150,
-    170, 160, 140, 120, 110, 140, 150, 160,
-    160, 150, 140, 110, 120, 140, 160, 170,
-    150, 140, 125, 140, 140, 155, 170, 180,
-    140, 130, 140, 150, 160, 170, 180, 190,
-    130, 140, 150, 160, 170, 180, 190, 200
+      80, 75, 70, 65, 65, 70, 75, 80,
+      75, 70, 65, 60, 60, 65, 70, 75,
+      70, 65, 60, 55, 55, 60, 65, 70,
+      65, 60, 55, 50, 50, 55, 60, 65,
+      65, 60, 55, 50, 50, 55, 60, 65,
+      70, 65, 60, 55, 55, 60, 65, 70,
+      75, 70, 65, 60, 60, 65, 70, 75,
+      80, 75, 70, 65, 65, 70, 75, 80
   };
-
-
 
   // initialize() computes king and pawn attacks, and the king ring bitboard
   // for a given color. This is done at the beginning of the evaluation.
@@ -816,15 +801,6 @@ namespace {
 
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
 
-    if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + PawnValueMg
-       &&  pos.non_pawn_material(~strongSide)
-       && !pos.count<PAWN>(~strongSide)
-       &&  pos.non_pawn_material(strongSide) <= QueenValueMg){
-       Square winnerKSq = pos.square<KING>(strongSide);
-       Square loserKSq = pos.square<KING>(~strongSide);
-       return  ScaleFactor((PushToEdges[loserKSq] + PushToCorners[loserKSq] + PushClose[distance(winnerKSq, loserKSq)])/8);
-    }
-
     ScaleFactor sf = me->scale_factor(pos, strongSide);
 
     // If we don't already have an unusual scale factor, check for certain
@@ -849,6 +825,11 @@ namespace {
                  &&  pos.count<PAWN>(strongSide) <= 2
                  && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
             return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
+
+        else if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + PawnValueEg
+                && !pos.count<PAWN>(~strongSide)
+                &&  pos.non_pawn_material(strongSide) <= QueenValueMg)
+            return  ScaleFactor(PushToCorners[pos.square<KING>(~strongSide)]);
     }
     return sf;
   }
