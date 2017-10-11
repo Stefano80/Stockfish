@@ -826,8 +826,8 @@ namespace {
                  && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
             return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
 
-        else if(    abs(eg) <= BishopValueEg
-                && !pos.count<PAWN>(~strongSide)
+        else if(    pos.non_pawn_material(strongSide) > pos.non_pawn_material(~strongSide) + PawnValueEg
+                && !(pos.count<PAWN>(~strongSide) + pos.count<PAWN>(strongSide))
                 &&  pos.non_pawn_material(strongSide) <= QueenValueMg)
             return  ScaleFactor(PushToCorners[pos.square<KING>(~strongSide)]);
     }
