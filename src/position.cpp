@@ -1078,6 +1078,12 @@ bool Position::is_draw(int ply) const {
           return true;
   }
 
+  if (   !pieces(PAWN)
+      &&  non_pawn_material(WHITE) <= BishopValueMg
+      &&  non_pawn_material(BLACK) <= BishopValueMg
+      && !opposite_bishops())
+      return true;
+
   return false;
 }
 
