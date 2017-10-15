@@ -1078,7 +1078,8 @@ bool Position::is_draw(int ply, Move move) const {
           return true;
   }
 
-  if (    capture_or_promotion(move)
+  if (   !checkers()
+      &&  capture_or_promotion(move)
       && !pieces(PAWN)
       &&  non_pawn_material(WHITE) <= BishopValueMg
       &&  non_pawn_material(BLACK) <= BishopValueMg
