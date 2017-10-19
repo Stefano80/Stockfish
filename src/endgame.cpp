@@ -104,7 +104,6 @@ Endgames::Endgames() {
   add<KRPKR>("KRPKR");
   add<KRPKB>("KRPKB");
   add<KBPKB>("KBPKB");
-  add<KBPKN>("KBPKN");
   add<KBPPKB>("KBPPKB");
   add<KRPPKRP>("KRPPKRP");
 }
@@ -725,30 +724,6 @@ ScaleFactor Endgame<KBPPKB>::operator()(const Position& pos) const {
     return SCALE_FACTOR_NONE;
   }
 }
-
-
-/// KBP vs KN. There is a single rule: If the defending king is somewhere along
-/// the path of the pawn, and the square of the king is not of the same color as
-/// the stronger side's bishop, it's a draw.
-template<>
-ScaleFactor Endgame<KBPKN>::operator()(const Position& pos) const {
-
-  assert(verify_material(pos, strongSide, BishopValueMg, 1));
-  assert(verify_material(pos, weakSide, KnightValueMg, 0));
-
-  Square pawnSq = pos.square<PAWN>(strongSide);
-  Square strongBishopSq = pos.square<BISHOP>(strongSide);
-  Square weakKingSq = pos.square<KING>(weakSide);
-
-  if (   file_of(weakKingSq) == file_of(pawnSq)
-      && relative_rank(strongSide, pawnSq) < relative_rank(strongSide, weakKingSq)
-      && (   opposite_colors(weakKingSq, strongBishopSq)
-          || relative_rank(strongSide, weakKingSq) <= RANK_6))
-      return SCALE_FACTOR_DRAW;
-
-  return SCALE_FACTOR_NONE;
-}
-
 
 /// KNP vs K. There is a single rule: if the pawn is a rook pawn on the 7th rank
 /// and the defending king prevents the pawn from advancing, the position is drawn.
