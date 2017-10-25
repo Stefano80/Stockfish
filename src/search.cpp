@@ -541,7 +541,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval;
-    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
+    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving, softImproving, hardImproving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, quietCount;
@@ -799,9 +799,18 @@ moves_loop: // When in check search starts from here
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
-    improving =   ss->staticEval >= (ss-2)->staticEval
+    softImproving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
                ||(ss-2)->staticEval == VALUE_NONE;
+    hardImproving =   ss->staticEval > (ss-2)->staticEval
+            /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
+               ||(ss-2)->staticEval == VALUE_NONE;
+
+    if(  (pos.non_pawn_material() <  EndgameLimit && ss->staticEval >  VALUE_DRAW)
+      || (pos.non_pawn_material() >= EndgameLimit && ss->staticEval <= VALUE_DRAW))
+        improving = hardImproving;
+    else
+        improving = softImproving;
 
     singularExtensionNode =   !rootNode
                            &&  depth >= 8 * ONE_PLY
