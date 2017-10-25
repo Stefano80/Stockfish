@@ -806,8 +806,7 @@ moves_loop: // When in check search starts from here
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
                ||(ss-2)->staticEval == VALUE_NONE;
 
-    if(  (pos.non_pawn_material() <  EndgameLimit && ss->staticEval >  VALUE_DRAW)
-      || (pos.non_pawn_material() >= EndgameLimit && ss->staticEval <= VALUE_DRAW))
+    if(pos.non_pawn_material() <  EndgameLimit && ss->staticEval >  VALUE_DRAW)
         improving = hardImproving;
     else
         improving = softImproving;
