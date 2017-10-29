@@ -325,7 +325,7 @@ void MainThread::search() {
 void Thread::search() {
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
-  Value bestValue, alpha, beta, delta;
+  Value bestValue, alpha, beta, delta, maxValue, minValue, valueSpan = VALUE_ZERO;
   Move easyMove = MOVE_NONE;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
 
@@ -333,8 +333,8 @@ void Thread::search() {
   for (int i = 4; i > 0; i--)
      (ss-i)->contHistory = &this->contHistory[NO_PIECE][0]; // Use as sentinel
 
-  bestValue = delta = alpha = -VALUE_INFINITE;
-  beta = VALUE_INFINITE;
+  bestValue = delta = alpha = maxValue = -VALUE_INFINITE;
+  beta = minValue = VALUE_INFINITE;
 
   if (mainThread)
   {
@@ -385,7 +385,7 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
           {
-              delta = Value(18);
+              delta = Value(15) + valueSpan;
               alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
           }
@@ -396,6 +396,13 @@ void Thread::search() {
           while (true)
           {
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, false);
+
+              if (rootDepth >= 5 * ONE_PLY){
+                  maxValue = std::max(maxValue, bestValue);
+                  minValue = std::min(minValue, bestValue);
+                  valueSpan = (maxValue - minValue)/int(4*rootDepth/ONE_PLY);
+              }
+
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
