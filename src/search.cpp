@@ -403,7 +403,6 @@ void Thread::search() {
                   valueSpan = (maxValue - minValue)/int(2*rootDepth/ONE_PLY);
               }
 
-
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
               // first and eventually the new best one are set to -VALUE_INFINITE
@@ -428,23 +427,13 @@ void Thread::search() {
 
               // In case of failing low/high increase aspiration window and
               // re-search, otherwise exit the loop.
-              if (bestValue <= alpha)
+              if (bestValue <= alpha || bestValue >= beta)
               {
-                  beta = (alpha + beta) / 2;
-                  alpha = std::max(bestValue - delta, -VALUE_INFINITE);
-
-                  if (mainThread)
-                  {
-                      mainThread->failedLow = true;
-                      Threads.stopOnPonderhit = false;
-                  }
+                  beta  = rootDepth >= 5*ONE_PLY? bestValue + delta:  VALUE_INFINITE;
+                  alpha = rootDepth >= 5*ONE_PLY? bestValue - delta: -VALUE_INFINITE;
               }
-              else if (bestValue >= beta)
-                  beta = std::min(bestValue + delta, VALUE_INFINITE);
               else
                   break;
-
-              delta += delta / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
