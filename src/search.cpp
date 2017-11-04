@@ -362,7 +362,7 @@ void Thread::search() {
               if (rootDepth >= 5 * ONE_PLY){
                   maxValue = std::max(maxValue, bestValue);
                   minValue = std::min(minValue, bestValue);
-                  valueSpan = (maxValue - minValue)/int(2*rootDepth/ONE_PLY);
+                  valueSpan = std::min(Value(15), (maxValue - minValue)/int(2*rootDepth/ONE_PLY));
               }
 
 
