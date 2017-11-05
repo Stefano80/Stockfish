@@ -919,7 +919,7 @@ moves_loop: // When in check search starts from here
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           if (captureOrPromotion){
-              ss->statScore = 18000 + 5*thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))];
+              ss->statScore = 18000 + 5*thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())];
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
           }
           else
