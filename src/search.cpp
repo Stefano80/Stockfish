@@ -918,8 +918,10 @@ moves_loop: // When in check search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-          if (captureOrPromotion)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+          if (captureOrPromotion){
+              ss->statScore = 18000 + 5*thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))];
+              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+          }
           else
           {
               // Decrease reduction if opponent's move count is high
