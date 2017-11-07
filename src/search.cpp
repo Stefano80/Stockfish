@@ -919,7 +919,7 @@ moves_loop: // When in check search starts from here
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           if (captureOrPromotion)
-              r -= r && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] >= -Value(300) ? ONE_PLY : DEPTH_ZERO;
+              r -= r && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] >= -Value(150) ? ONE_PLY : DEPTH_ZERO;
           else
           {
               // Decrease reduction if opponent's move count is high
