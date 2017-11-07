@@ -214,6 +214,27 @@ void MainThread::search() {
   }
   else
   {
+      for (Thread* th : Threads){
+          if (th != this){
+              for( Piece p = NO_PIECE; p < PIECE_NB; p+=1 ){
+                  for( Square s = SQ_A1; s < SQUARE_NB; s+=1){
+                      for ( PieceType pt = NO_PIECE_TYPE; pt < PIECE_TYPE_NB; pt+=1 ){
+                          int16_t bonus = th->captureHistory[p][s][pt];
+                          this->captureHistory.update(p, s, pt, bonus);
+                      }
+                  }
+              }
+          }
+      }
+      for( Piece p = NO_PIECE; p < PIECE_NB; p+=1 ){
+          for( Square s = SQ_A1; s < SQUARE_NB; s+=1){
+              for ( PieceType pt = NO_PIECE_TYPE; pt < PIECE_TYPE_NB; pt+=1 ){
+                  this->captureHistory.update(p, s, pt, -(Options["Threads"]-1)*this->captureHistory[p][s][pt]/Options["Threads"]);
+              }
+          }
+      }
+
+
       for (Thread* th : Threads)
           if (th != this)
               th->start_searching();
