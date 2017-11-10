@@ -179,14 +179,18 @@ namespace {
         else if (!neighbours)
             score -= Isolated, e->weakUnopposed[Us] += !opposed;
 
-        else if (backward)
+        else if (backward){
             score -= Backward, e->weakUnopposed[Us] += !opposed;
+            e->pawnsOnSquares[Us][!!(s & DarkSquares)]++;
+        }
 
         if (doubled && !supported)
             score -= Doubled;
 
-        if (lever)
+        if (lever){
             score += Lever[relative_rank(Us, s)];
+            e->pawnsOnSquares[Us][!!(s & DarkSquares)]--;
+        }
     }
 
     return score;
