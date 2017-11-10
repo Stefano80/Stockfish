@@ -189,7 +189,7 @@ namespace {
 
         if (lever){
             score += Lever[relative_rank(Us, s)];
-            e->pawnsOnSquares[Us][!!(s & DarkSquares)]--;
+            e->pawnsOnSquares[Us][!!(DarkSquares & s)]--;
         }
     }
 
