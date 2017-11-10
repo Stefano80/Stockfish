@@ -181,7 +181,7 @@ namespace {
 
         else if (backward){
             score -= Backward, e->weakUnopposed[Us] += !opposed;
-            e->pawnsOnSquares[Us][!!(s & DarkSquares)]++;
+            e->pawnsOnSquares[Us][!!(DarkSquares & s)]++;
         }
 
         if (doubled && !supported)
