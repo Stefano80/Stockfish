@@ -114,7 +114,6 @@ int Thread::reductions()  {
     return 1000*idx;
 }
 
-
 /// ThreadPool::init() creates and launches the threads that will go
 /// immediately to sleep in idle_loop. We cannot use the constructor because
 /// Threads is a static object and we need a fully initialized engine at
