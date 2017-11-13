@@ -63,6 +63,7 @@ public:
   size_t PVIdx;
   int selDepth;
   int reductions();
+  Value penalty();
   std::atomic<uint64_t> nodes, tbHits;
 
   Position rootPos;

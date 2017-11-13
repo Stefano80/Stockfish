@@ -111,7 +111,11 @@ void Thread::idle_loop() {
 }
 
 int Thread::reductions()  {
-    return 500*idx;
+    return 1000*idx;
+}
+
+Value Thread::penalty() {
+    return idx > 0? Value(msb(idx)): VALUE_ZERO;
 }
 
 /// ThreadPool::init() creates and launches the threads that will go
