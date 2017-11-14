@@ -696,6 +696,9 @@ namespace {
             mbonus /= 2, ebonus /= 2;
 
         score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
+
+        if (pos.opposite_bishops())
+            score = make_score(mg_value(score), eg_value(score)/8);
     }
 
     if (T)
