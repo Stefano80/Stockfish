@@ -510,6 +510,9 @@ namespace {
     if (!(pos.pieces(PAWN) & KingFlank[kf]))
         score -= PawnlessFlank;
 
+    if (pos.opposite_bishops())
+        score = make_score(5*mg_value(score)/4, eg_value(score));
+
     if (T)
         Trace::add(KING, Us, score);
 
@@ -698,7 +701,7 @@ namespace {
         score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
 
         if (pos.opposite_bishops())
-            score = make_score(mg_value(score), eg_value(score)/8);
+            score = make_score(mg_value(score), 3*eg_value(score)/4);
     }
 
     if (T)
