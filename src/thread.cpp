@@ -111,7 +111,7 @@ void Thread::idle_loop() {
 }
 
 int Thread::reductions()  {
-    return 500*idx;
+    return 1000*idx;
 }
 
 /// ThreadPool::init() creates and launches the threads that will go
