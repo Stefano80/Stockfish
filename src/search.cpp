@@ -957,7 +957,9 @@ moves_loop: // When in check search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore - (ttHit? 0: thisThread->reductions())) / 20000) * ONE_PLY);
+              // and depending of whether this thread is exploring new ground.
+              int newGround = ttHit? int(std::max(DEPTH_ZERO, depth - tte->depth())) : 6;
+              r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore - (newGround * thisThread->reductions())) / 20000) * ONE_PLY);
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
