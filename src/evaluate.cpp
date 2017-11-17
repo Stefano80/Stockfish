@@ -444,7 +444,6 @@ namespace {
                     + 102 * kingAdjacentZoneAttacksCount[Them]
                     + 191 * popcount(kingRing[Us] & weak)
                     + 143 * !!pos.pinned_pieces(Us)
-                    - 848 * !pos.count<QUEEN>(Them)
                     -   9 * mg_value(score) / 8
                     +  40;
 
