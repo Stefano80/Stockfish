@@ -291,7 +291,7 @@ void Thread::search() {
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1.0;
-  bool thinkHard = false;
+  bool thinkHard = false, planChange = false;
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
   for (int i = 4; i > 0; i--)
@@ -338,7 +338,7 @@ void Thread::search() {
       for (RootMove& rm : rootMoves)
           rm.previousScore = rm.score;
 
-      size_t PVlines = thinkHard? std::min(size_t(3), rootMoves.size()): multiPV;
+      size_t PVlines = thinkHard && !planChange? std::min(size_t(4), rootMoves.size()): multiPV;
       // MultiPV loop. We perform a full root search for each PV line
       for (PVIdx = 0; PVIdx < PVlines && !Threads.stop; ++PVIdx)
       {
@@ -419,6 +419,9 @@ void Thread::search() {
       if (!Threads.stop)
           completedDepth = rootDepth;
 
+      if (!planChange)
+        planChange = thinkHard && (rootMoves[0].pv[0] != lastBestMove) && rootDepth > 8*ONE_PLY;
+
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
@@ -449,9 +452,12 @@ void Thread::search() {
               int improvingFactor = std::max(229, std::min(715, 357 + 119 * F[0] - 6 * F[1]));
 
               Color us = rootPos.side_to_move();
+
               thinkHard =  DrawValue[us] == bestValue
                         && Limits.time[us] - Time.elapsed() > Limits.time[~us]
                         && ::pv_is_draw(rootPos);
+
+
 
               double unstablePvFactor = 1 + mainThread->bestMoveChanges + thinkHard;
 
