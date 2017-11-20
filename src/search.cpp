@@ -338,11 +338,11 @@ void Thread::search() {
       for (RootMove& rm : rootMoves)
           rm.previousScore = rm.score;
 
-      size_t PVlines = thinkHard && !planChange? std::min(size_t(4), rootMoves.size()): multiPV;
+      size_t PVlines = thinkHard && !planChange? std::min(size_t(5), rootMoves.size()): multiPV;
       // MultiPV loop. We perform a full root search for each PV line
       for (PVIdx = 0; PVIdx < PVlines && !Threads.stop; ++PVIdx)
       {
-          if (rootMoves[PVIdx].previousScore < (rootMoves[0].previousScore - PawnValueMg/16))
+          if (rootMoves[PVIdx].previousScore < (rootMoves[0].previousScore - Value(20 - 5*PVIdx)))
               break;
 
           // Reset UCI info selDepth for each depth and each PV line
