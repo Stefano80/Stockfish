@@ -136,7 +136,7 @@ namespace {
         phalanx    = neighbours & rank_bb(s);
         supported  = neighbours & rank_bb(s - Up);
 
-        e->scaling += 3*popcount(phalanx);
+        e->scaling -= 2*popcount(doubled);
 
         // A pawn is backward when it is behind all pawns of the same color on the
         // adjacent files and cannot be safely advanced.
