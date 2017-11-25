@@ -36,6 +36,7 @@ Thread::Thread(size_t n) : idx(n), stdThread(&Thread::idle_loop, this) {
 
   wait_for_search_finished();
   clear(); // Zero-init histories (based on std::array)
+  reductions = 1000*idx;
 }
 
 
@@ -108,10 +109,6 @@ void Thread::idle_loop() {
 
       search();
   }
-}
-
-int Thread::reductions()  {
-    return 1000*idx;
 }
 
 /// ThreadPool::init() creates and launches the threads that will go
