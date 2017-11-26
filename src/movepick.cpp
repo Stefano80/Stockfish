@@ -135,9 +135,10 @@ void MovePicker::score() {
   for (auto& m : *this)
       if (Type == CAPTURES){
           Value h = Value((*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))]);
-          m.value =  PieceValue[MG][pos.piece_on(to_sq(m))] + h;
-          if(m.value > (maxValue + 2*PawnValueMg/3) && !pos.see_ge(m, h))
-              m.value -= PawnValueMg;
+          if((PieceValue[MG][pos.piece_on(to_sq(m))] > maxValue + PawnValueMg) && !pos.see_ge(m, maxValue))
+              m.value = PieceValue[MG][pos.piece_on(to_sq(m))] + h - PawnValueMg/3;
+          else
+              m.value = PieceValue[MG][pos.piece_on(to_sq(m))] + h;
           maxValue = std::max(maxValue, Value(m.value));
       }
 
