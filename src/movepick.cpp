@@ -130,7 +130,7 @@ void MovePicker::score() {
 
   static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
 
-  Value maxValue = -VALUE_INFINITE;
+  Value maxValue = KnightValueMg;
 
   for (auto& m : *this)
       if (Type == CAPTURES){
