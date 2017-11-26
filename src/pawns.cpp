@@ -104,6 +104,7 @@ namespace {
     Square s;
     bool opposed, backward;
     Score score = SCORE_ZERO;
+    e->scaling[Us] = 0;
     const Square* pl = pos.squares<PAWN>(Us);
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
@@ -136,7 +137,7 @@ namespace {
         phalanx    = neighbours & rank_bb(s);
         supported  = neighbours & rank_bb(s - Up);
 
-        e->scaling = +3*popcount(phalanx);
+        e->scaling[Us] += 2*(!!phalanx);
 
         // A pawn is backward when it is behind all pawns of the same color on the
         // adjacent files and cannot be safely advanced.
