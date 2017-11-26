@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "misc.h"
 
 namespace {
 
@@ -129,10 +130,16 @@ void MovePicker::score() {
 
   static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
 
+  Value maxValue = -VALUE_INFINITE;
+
   for (auto& m : *this)
-      if (Type == CAPTURES)
-          m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
-                   + Value((*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))]);
+      if (Type == CAPTURES){
+          Value h = Value((*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))]);
+          m.value =  PieceValue[MG][pos.piece_on(to_sq(m))] + h;
+          if(m.value > maxValue && !pos.see_ge(m, h))
+              m.value -= PawnValueMg;
+          maxValue = std::max(maxValue, Value(m.value));
+      }
 
       else if (Type == QUIETS)
           m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
