@@ -137,7 +137,7 @@ namespace {
         phalanx    = neighbours & rank_bb(s);
         supported  = neighbours & rank_bb(s - Up);
 
-        e->scaling[Us] += 5*!!phalanx - 3*!!doubled + 2*!!supported + 2*opposed;
+        e->scaling[Us] += 2*!!phalanx;
 
         // A pawn is backward when it is behind all pawns of the same color on the
         // adjacent files and cannot be safely advanced.
@@ -192,7 +192,6 @@ namespace {
             score += Lever[relative_rank(Us, s)];
     }
 
-    e->scaling[Us] /= 4;
     return score;
   }
 
