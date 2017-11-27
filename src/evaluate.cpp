@@ -788,7 +788,7 @@ namespace {
             // is almost a draw, in case of KBP vs KB, it is even more a draw.
             if (   pos.non_pawn_material(WHITE) == BishopValueMg
                 && pos.non_pawn_material(BLACK) == BishopValueMg)
-                return more_than_one(pos.pieces(PAWN)) ? ScaleFactor(31 + pe->scaling[WHITE] + pe->scaling[BLACK]) : ScaleFactor(9);
+                return more_than_one(pos.pieces(PAWN)) ? ScaleFactor(31) : ScaleFactor(9);
 
             // Endgame with opposite-colored bishops, but also other pieces. Still
             // a bit drawish, but not as drawish as with only the two bishops.
@@ -802,7 +802,7 @@ namespace {
             return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
     }
 
-    return sf;
+    return sf + pe->scaling[strongSide];
   }
 
 
