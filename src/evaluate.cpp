@@ -802,7 +802,7 @@ namespace {
             return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
     }
 
-    return sf + pe->scaling[strongSide];
+    return ScaleFactor(int(sf) + pe->scaling[strongSide]);
   }
 
 
