@@ -47,6 +47,7 @@ Thread::~Thread() {
   assert(!searching);
 
   exit = true;
+  thoroughness = 0;
   start_searching();
   stdThread.join();
 }
