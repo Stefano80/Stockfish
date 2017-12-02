@@ -356,7 +356,7 @@ void Thread::search() {
           while (true)
           {
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, false);
-              thoroughness = 4*bestValue;
+              thoroughness = std::max(5*int(bestValue), 0);
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
