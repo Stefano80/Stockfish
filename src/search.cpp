@@ -141,7 +141,7 @@ namespace {
   int A = 50;
   int B = 200;
   int C = 600;
-  TUNE(B,C, SetRange(-50, 50), A);
+  TUNE(B,C, SetRange(-50, 150), A);
 
 } // namespace
 
