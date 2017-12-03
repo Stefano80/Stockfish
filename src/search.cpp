@@ -494,6 +494,8 @@ namespace {
     const bool PvNode = NT == PV;
     const bool rootNode = PvNode && ss->ply == 0;
 
+    skipEarlyPruning &= !!pos.non_pawn_material();
+
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
     assert(DEPTH_ZERO < depth && depth < DEPTH_MAX);
