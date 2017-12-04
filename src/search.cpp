@@ -356,8 +356,8 @@ void Thread::search() {
           while (true)
           {
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, false);
-              int t = bestValue + abs(bestValue - rootMoves[0].score)/2;
-              thoroughness = t > VALUE_ZERO? 2*t: 6*t;
+              double t = int(bestValue) + 0.41*abs(bestValue - rootMoves[0].score);
+              thoroughness = t > 0? Value(std::round(1.89*t)): Value(std::round(5.98*t));
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
