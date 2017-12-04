@@ -906,6 +906,8 @@ moves_loop: // When in check search starts from here
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
 
+      ss->stablePosition = (ss-1)->stablePosition + !(captureOrPromotion || type_of(movedPiece) == PAWN);
+
       // Step 15. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
@@ -933,6 +935,9 @@ moves_loop: // When in check search starts from here
               // Increase reduction for cut nodes
               if (cutNode)
                   r += 2 * ONE_PLY;
+
+              if (pos.opposite_bishops() && pos.non_pawn_material() < EndgameLimit)
+                  r += ONE_PLY * ss->stablePosition/2;
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
