@@ -23,6 +23,7 @@
 #include <cstring>   // For std::memset
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 #include "bitboard.h"
 #include "evaluate.h"
@@ -334,8 +335,11 @@ namespace {
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
-        // Bonus for this piece as a king protector
-        score += KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
+        // Bonus for this piece as a king protector, decreased by interposing opponents
+        Bitboard interposePieces = between_bb(s, pos.square<KING>(Us)) & pos.pieces(~Us);
+        Bitboard interposePawns =  between_bb(s, pos.square<KING>(Us)) & pos.pieces(~Us, PAWN);
+
+        score += KingProtector[Pt - 2] * (distance(s, pos.square<KING>(Us)) + popcount(interposePieces) + popcount(interposePawns));
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
