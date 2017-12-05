@@ -936,8 +936,8 @@ moves_loop: // When in check search starts from here
               if (cutNode)
                   r += 2 * ONE_PLY;
 
-              if (pos.opposite_bishops() && pos.non_pawn_material() < EndgameLimit)
-                  r += ONE_PLY * 8/(1 + ss->stablePosition);
+              if (pos.opposite_bishops() && pos.non_pawn_material() < EndgameLimit && ss->stablePosition < 5)
+                  r += ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
