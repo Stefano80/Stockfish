@@ -510,7 +510,7 @@ namespace {
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount, tacticsCount;
+    int moveCount, captureCount, quietCount, tacticsCount = 0;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
