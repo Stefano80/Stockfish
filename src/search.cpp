@@ -510,7 +510,7 @@ namespace {
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, tacticsCount;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -953,12 +953,14 @@ moves_loop: // When in check search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+              r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore + 500*tacticsCount/(moveCount*moveCount)) / 20000) * ONE_PLY);
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
+
+          tacticsCount +=  std::max(alpha - value, value - beta) > PawnValueMg;
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
