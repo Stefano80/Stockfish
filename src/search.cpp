@@ -840,7 +840,7 @@ moves_loop: // When in check search starts from here
           extension = ONE_PLY;
       else if (   !pos.non_pawn_material()
                && type_of(movedPiece) == KING
-               && depth > 5 * ONE_PLY)
+               && depth > (4 + pos.count<PAWN>()/2) * ONE_PLY)
           extension = ONE_PLY;
 
       // Calculate new depth for this move
