@@ -692,11 +692,9 @@ namespace {
 
                 // If the path to the queen is fully defended, assign a big bonus.
                 // Otherwise assign a smaller bonus if the block square is defended.
-                if (defendedSquares == squaresToQueen)
-                    k += 6;
 
-                else if (defendedSquares & blockSq)
-                    k += 4;
+                int p = popcount(~defendedSquares & squaresToQueen);
+                k += 4 - p*p + 2*bool(defendedSquares & blockSq);
 
                 mbonus += k * rr, ebonus += k * rr;
             }
