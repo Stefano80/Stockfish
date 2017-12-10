@@ -943,12 +943,7 @@ moves_loop: // When in check search starts from here
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)];
 
-              // Decrease/increase reduction by comparing opponent's stat score
-              if (ss->statScore >= 0 && (ss-1)->statScore < 0)
-                  r -= ONE_PLY;
-
-              else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
-                  r += ONE_PLY;
+              contextScore += ss->statScore - (ss-1)->statScore;
 
               // Decrease/increase reduction for moves with a good/bad history
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore + contextScore)/ 20000) * ONE_PLY);
