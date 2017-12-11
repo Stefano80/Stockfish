@@ -694,7 +694,7 @@ namespace {
                 // Otherwise assign a smaller bonus if the block square is defended.
 
                 int p = popcount(~defendedSquares & squaresToQueen);
-                k += 4 - p*p + 2*bool(defendedSquares & blockSq);
+                k += 8 - 2*p*p + 4*bool(defendedSquares & blockSq);
 
                 mbonus += k * rr, ebonus += k * rr;
             }
