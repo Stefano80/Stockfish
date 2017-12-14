@@ -358,7 +358,7 @@ namespace {
             if (Pt == BISHOP)
             {
                 // Penalty for pawns on the same color square as the bishop, even more if we attack them
-                score -= BishopPawns * (pe->pawns_on_same_color_squares(Us, s) + popcount(b & pos.pieces(Us, PAWN)));
+                score -= BishopPawns * (pe->pawns_on_same_color_squares(Us, s) + popcount(b & forward_ranks_bb(Us, s) & pos.pieces(Us, PAWN)));
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s)))
