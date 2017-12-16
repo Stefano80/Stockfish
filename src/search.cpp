@@ -136,6 +136,11 @@ namespace {
     return nodes;
   }
 
+  int A = 300;
+  int B = 50;
+
+  TUNE(A,B);
+
 } // namespace
 
 
@@ -917,7 +922,7 @@ moves_loop: // When in check search starts from here
           else
           {
               // Decrease reduction if opponent's move count is high
-              int contextScore = (300 + 50*depth) * (ss-1)->moveCount;
+              int contextScore = (A + B*depth) * (ss-1)->moveCount;
 
               // Decrease reduction for exact PV nodes
               if (pvExact)
