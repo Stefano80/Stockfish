@@ -330,10 +330,14 @@ inline Square pop_lsb(Bitboard* b) {
 }
 
 
-inline int weighted_popcount(Bitboard b, int field[]) {
+/// weighted_popcount() computes the scalar product between a bitboard and a field
+/// defined on half a board
+
+inline int weighted_popcount(Bitboard b, int field[RANK_NB][FILE_NB/2]) {
     int v = 0;
     while (b){
-        v += field[pop_lsb(&b)];
+        Square s = pop_lsb(&b);
+        v += field[rank_of(s)][std::min(file_of(s), ~file_of(s))];
     }
     return v;
 }
