@@ -116,7 +116,7 @@ namespace {
     e->pawnsOnSquares[Us][BLACK] = popcount(ourPawns & DarkSquares);
     e->pawnsOnSquares[Us][WHITE] = pos.count<PAWN>(Us) - e->pawnsOnSquares[Us][BLACK];
 
-    e->pawnSpace[Us]    = shift<Up>(e->pawnAttacks[Us]) | ourPawns;
+    e->pawnSpace[Us]    = e->pawnAttacks[Us] | ourPawns;
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
