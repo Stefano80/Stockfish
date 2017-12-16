@@ -330,6 +330,15 @@ inline Square pop_lsb(Bitboard* b) {
 }
 
 
+inline int weighted_popcount(Bitboard b, int field[]) {
+    int v = 0;
+    while (b){
+        v += field[pop_lsb(&b)];
+    }
+    return v;
+}
+
+
 /// frontmost_sq() and backmost_sq() return the square corresponding to the
 /// most/least advanced bit relative to the given color.
 
