@@ -334,25 +334,6 @@ inline Square pop_lsb(Bitboard* b) {
 /// computes the scalar product between a bitboard and a field
 /// defined on half a board
 
-
-inline int popcount(Bitboard b, int(*field)(Rank r)) {
-    int v = 0;
-    while (b){
-        Square s = pop_lsb(&b);
-        v += field(rank_of(s));
-    }
-    return v;
-}
-
-inline int popcount(Bitboard b, int(*field)(File s)) {
-    int v = 0;
-    while (b){
-        Square s = pop_lsb(&b);
-        v += field(std::min(file_of(s), ~file_of(s)));
-    }
-    return v;
-}
-
 inline int popcount(Bitboard b, int(*field)(Rank r, File s)) {
     int v = 0;
     while (b){
