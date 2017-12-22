@@ -928,7 +928,7 @@ moves_loop: // When in check search starts from here
           {
               // Evaluate search context
               int contextScore = (298 + 57*depth) * (ss-1)->moveCount
-                               + 20000 * (pvExact - ttCapture - 2*cutNode);
+                               + 15000 * (pvExact - ttCapture - 2*cutNode);
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
