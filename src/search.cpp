@@ -927,7 +927,7 @@ moves_loop: // When in check search starts from here
           else
           {
               // Decrease reduction if opponent's move count is high
-              int contextScore = (298 + 57*depth) * (ss-1)->moveCount;
+              int contextScore = std::max(0, (330 + 65*depth) * ((ss-1)->moveCount - 5));
 
               // Decrease reduction for exact PV nodes
               if (pvExact)
