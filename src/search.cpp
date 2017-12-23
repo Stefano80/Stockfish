@@ -927,7 +927,7 @@ moves_loop: // When in check search starts from here
           else
           {
               // Evaluate search context
-              int contextScore = std::max(0, (298 + 57*depth) * ((ss-1)->moveCount-5))
+              int contextScore = std::max(0, (600 + 100*depth) * ((ss-1)->moveCount-10))
                                + 10000 * (pvExact - ttCapture - 2*cutNode);
 
               // Decrease reduction for moves that escape a capture. Filter out
