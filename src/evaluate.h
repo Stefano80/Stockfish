@@ -29,7 +29,7 @@ class Position;
 
 namespace Eval {
 
-const Value Tempo = Value(15); // Must be visible to search
+const Value Tempo = Value(25); // Must be visible to search
 
 extern Score Contempt;
 
