@@ -862,6 +862,11 @@ namespace {
     score += evaluate_pieces<WHITE, ROOK  >() - evaluate_pieces<BLACK, ROOK  >();
     score += evaluate_pieces<WHITE, QUEEN >() - evaluate_pieces<BLACK, QUEEN >();
 
+    // Early exit if score is high
+    v = (mg_value(score) + eg_value(score)) / 2;
+    if (PawnValueMg/2 + abs(v) > LazyThreshold)
+       return pos.side_to_move() == WHITE ? v : -v;
+
     score += mobility[WHITE] - mobility[BLACK];
 
     score +=  evaluate_king<WHITE>()
