@@ -363,8 +363,14 @@ void Thread::search() {
               // Adjust contempt based on root move's previousScore (dynamic contempt)
               ct += int(std::round(48 * atan(float(previousScore) / 128)));
 
-              contempt = (us == WHITE ?  make_score(ct, ct / 2)
-                                      : -make_score(ct, ct / 2));
+              if (Limits.use_time_management() && std::min(Limits.time[us], Limits.time[~us]) > 100){
+                  int ourTime   = Limits.time[us]  + 50*Limits.inc[us];
+                  int theirTime = Limits.time[~us] + 50*Limits.inc[~us];
+                  double timeFactor = double(ourTime) / double(theirTime);
+                  ct += std::min(2, int(std::round(10*log(timeFactor))));
+              }
+              contempt = (rootPos.side_to_move() == WHITE ?  make_score(ct, ct / 2)
+                                                          : -make_score(ct, ct / 2));
           }
 
           // Start with a small aspiration window and, in the case of a fail
