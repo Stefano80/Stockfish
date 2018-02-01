@@ -338,7 +338,7 @@ void Thread::search() {
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
 
               // Adjust contempt based on current situation
-              int contempt = Options["Contempt"] * PawnValueEg / 100 + bestValue/10; // From centipawns
+              int contempt = Options["Contempt"] * PawnValueEg / 100 + bestValue/12; // From centipawns
               Eval::Contempt = (rootPos.side_to_move() == WHITE ?  make_score(contempt, contempt / 2)
                                                                 : -make_score(contempt, contempt / 2));
 
