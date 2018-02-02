@@ -232,6 +232,7 @@ namespace {
   const Score ThreatByAttackOnQueen = S( 38, 22);
   const Score HinderPassedPawn      = S(  7,  0);
   const Score TrappedBishopA1H1     = S( 50, 50);
+  const Score UndefendedPawn        = S(  0, 20);
 
   #undef S
   #undef V
@@ -597,6 +598,10 @@ namespace {
     // Bonus for opponent unopposed weak pawns
     if (pos.pieces(Us, ROOK, QUEEN))
         score += WeakUnopposedPawn * pe->weak_unopposed(Them);
+
+    if (pos.pieces(Us, QUEEN))
+        score += UndefendedPawn * popcount(pos.pieces(Them, PAWN) & ~attackedBy[Them][ALL_PIECES]);
+
 
     // Find squares where our pawns can push on the next move
     b  = shift<Up>(pos.pieces(Us, PAWN)) & ~pos.pieces();
