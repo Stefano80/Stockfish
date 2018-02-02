@@ -232,7 +232,7 @@ namespace {
   const Score ThreatByAttackOnQueen = S( 38, 22);
   const Score HinderPassedPawn      = S(  7,  0);
   const Score TrappedBishopA1H1     = S( 50, 50);
-  const Score UndefendedPawn        = S(  0, 20);
+  const Score UndefendedPawn        = S(  0, 5);
 
   #undef S
   #undef V
@@ -599,8 +599,10 @@ namespace {
     if (pos.pieces(Us, ROOK, QUEEN))
         score += WeakUnopposedPawn * pe->weak_unopposed(Them);
 
-    if (pos.pieces(Us, QUEEN))
-        score += UndefendedPawn * popcount(pos.pieces(Them, PAWN) & ~attackedBy[Them][ALL_PIECES]);
+    if (pos.pieces(Us, QUEEN)){
+        int p = popcount(pos.pieces(Them, PAWN) & ~attackedBy[Them][ALL_PIECES]);
+        score += UndefendedPawn * p * p;
+    }
 
 
     // Find squares where our pawns can push on the next move
