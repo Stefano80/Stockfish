@@ -332,6 +332,16 @@ void Thread::search() {
           // Reset UCI info selDepth for each depth and each PV line
           selDepth = 0;
 
+          // Adjust contempt based on current situation
+
+          contempt  = Options["Contempt"] * PawnValueEg / 100;          // From centipawns
+          contempt += bestValue >  2 * PawnValueMg ?  PawnValueMg / 5:  // Dynamic contempt
+                      bestValue < -2 * PawnValueMg ? -PawnValueMg / 5:
+                      bestValue/10;
+
+          Eval::Contempt = (rootPos.side_to_move() == WHITE ?  make_score(contempt, contempt / 2)
+                                                            : -make_score(contempt, contempt / 2));
+
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
           {
@@ -347,6 +357,7 @@ void Thread::search() {
 
               Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                             : -make_score(ct, ct / 2));
+
           }
 
           // Start with a small aspiration window and, in the case of a fail
