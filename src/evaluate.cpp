@@ -906,6 +906,7 @@ namespace {
 } // namespace
 
 std::atomic<Score> Eval::Contempt;
+std::atomic<Value> Eval::SearchValue;
 
 /// evaluate() is the evaluator for the outer world. It returns a static evaluation
 /// of the position from the point of view of the side to move.
@@ -924,6 +925,7 @@ std::string Eval::trace(const Position& pos) {
   std::memset(scores, 0, sizeof(scores));
 
   Eval::Contempt = SCORE_ZERO;
+  Eval::SearchValue = VALUE_ZERO;
 
   Value v = Eval::Tempo + Evaluation<TRACE>(pos).value();
 
