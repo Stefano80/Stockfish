@@ -346,6 +346,8 @@ void Thread::search() {
 
               Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                             : -make_score(ct, ct / 2));
+              Eval::SearchValue = (us==WHITE ? bestValue : -bestValue);
+
           }
 
           // Start with a small aspiration window and, in the case of a fail
