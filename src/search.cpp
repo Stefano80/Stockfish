@@ -272,12 +272,11 @@ void MainThread::search() {
 void Thread::search() {
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
-  Value bestValue, alpha, beta, delta;
+  Value bestValue, alpha, beta, delta, contempt;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1.0;
-  Color us = rootPos.side_to_move();
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
   for (int i = 4; i > 0; i--)
@@ -299,11 +298,14 @@ void Thread::search() {
 
   multiPV = std::min(multiPV, rootMoves.size());
 
+<<<<<<< a8fffee1a8c5cd80b4fe878257e5423900afc886
   int ct = Options["Contempt"] * PawnValueEg / 100; // From centipawns
   Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                 : -make_score(ct, ct / 2));
 
 
+=======
+>>>>>>> Only in loop
   // Iterative deepening loop until requested to stop or the target depth is reached
   while (   (rootDepth += ONE_PLY) < DEPTH_MAX
          && !Threads.stop
@@ -334,9 +336,9 @@ void Thread::search() {
 
           // Adjust contempt based on current situation
 
-          contempt  = Options["Contempt"] * PawnValueEg / 100;          // From centipawns
-          contempt += bestValue >  2 * PawnValueMg ?  PawnValueMg / 5:  // Dynamic contempt
-                      bestValue < -2 * PawnValueMg ? -PawnValueMg / 5:
+          contempt  = Value(Options["Contempt"] * PawnValueEg / 100);          // From centipawns
+          contempt += bestValue >  500 ?  50:  // Dynamic contempt
+                      bestValue < -500 ? -50:
                       bestValue/10;
 
           Eval::Contempt = (rootPos.side_to_move() == WHITE ?  make_score(contempt, contempt / 2)
