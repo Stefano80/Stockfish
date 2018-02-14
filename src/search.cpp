@@ -330,7 +330,7 @@ void Thread::search() {
           // Adjust contempt based on current situation
 
           ct  = Value(Options["Contempt"] * PawnValueEg / 100);          // From centipawns
-          ct  += std::min(Value(75), std::max(Value(-75), (int(rootDepth / ONE_PLY) * bestValue / 64)));
+          ct  += std::min(Value(75), std::max(Value(-75), (int(rootDepth / ONE_PLY) * bestValue / 200)));
 
 
           Eval::Contempt = (rootPos.side_to_move() == WHITE ?  make_score(ct, ct / 2)
