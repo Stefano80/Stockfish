@@ -272,7 +272,7 @@ void MainThread::search() {
 void Thread::search() {
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
-  Value bestValue, alpha, beta, delta, contempt;
+  Value bestValue, alpha, beta, delta, ct;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
@@ -298,14 +298,7 @@ void Thread::search() {
 
   multiPV = std::min(multiPV, rootMoves.size());
 
-<<<<<<< a8fffee1a8c5cd80b4fe878257e5423900afc886
-  int ct = Options["Contempt"] * PawnValueEg / 100; // From centipawns
-  Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
-                                : -make_score(ct, ct / 2));
 
-
-=======
->>>>>>> Only in loop
   // Iterative deepening loop until requested to stop or the target depth is reached
   while (   (rootDepth += ONE_PLY) < DEPTH_MAX
          && !Threads.stop
@@ -336,12 +329,12 @@ void Thread::search() {
 
           // Adjust contempt based on current situation
 
-          contempt  = Value(Options["Contempt"] * PawnValueEg / 100);          // From centipawns
-          contempt  += std::min(Value(75), std::max(Value(-75), (int(rootDepth / ONE_PLY) * bestValue / 64)));
+          ct  = Value(Options["Contempt"] * PawnValueEg / 100);          // From centipawns
+          ct  += std::min(Value(75), std::max(Value(-75), (int(rootDepth / ONE_PLY) * bestValue / 64)));
 
 
-          Eval::Contempt = (rootPos.side_to_move() == WHITE ?  make_score(contempt, contempt / 2)
-                                                            : -make_score(contempt, contempt / 2));
+          Eval::Contempt = (rootPos.side_to_move() == WHITE ?  make_score(ct, ct / 2)
+                                                            : -make_score(ct, ct / 2));
 
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
@@ -349,16 +342,6 @@ void Thread::search() {
               delta = Value(18);
               alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
-
-              // Adjust contempt based on current bestValue
-              ct =  Options["Contempt"] * PawnValueEg / 100 // From centipawns
-                  + (bestValue >  500 ?  50:                // Dynamic contempt
-                     bestValue < -500 ? -50:
-                     bestValue / 10);
-
-              Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
-                                            : -make_score(ct, ct / 2));
-
           }
 
           // Start with a small aspiration window and, in the case of a fail
