@@ -876,8 +876,8 @@ namespace {
     Score ppb = evaluate_passed_pawns<BLACK>();
     int   r   = 1024;
 
-    score += make_score(mg_value(ppw) * (r + std::max(0, SearchValue))/r, eg_value(ppw) * (r + std::max(0, SearchValue))/r)
-           - make_score(mg_value(ppb) * (r - std::min(0, SearchValue))/r, eg_value(ppb) * (r - std::min(0, SearchValue))/r);
+    score += make_score(mg_value(ppw) * (r - std::min(0, SearchValue))/r, eg_value(ppw) * (r - std::min(0, SearchValue))/r)
+           - make_score(mg_value(ppb) * (r + std::max(0, SearchValue))/r, eg_value(ppb) * (r + std::max(0, SearchValue))/r);
 
     if (pos.non_pawn_material() >= SpaceThreshold)
         score +=  evaluate_space<WHITE>()
