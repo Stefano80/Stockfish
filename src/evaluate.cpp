@@ -854,6 +854,8 @@ namespace {
 
     // Main evaluation begins here
 
+    Value SearchValue = Value(Eval::SearchValue);
+
     initialize<WHITE>();
     initialize<BLACK>();
 
@@ -870,8 +872,8 @@ namespace {
     score +=  evaluate_threats<WHITE>()
             - evaluate_threats<BLACK>();
 
-    score +=  evaluate_passed_pawns<WHITE>()
-            - evaluate_passed_pawns<BLACK>();
+    score +=  evaluate_passed_pawns<WHITE>() * (2048 + std::max(VALUE_ZERO, SearchValue))/2048
+            - evaluate_passed_pawns<BLACK>() * (2048 - std::min(VALUE_ZERO, SearchValue))/2048;
 
     if (pos.non_pawn_material() >= SpaceThreshold)
         score +=  evaluate_space<WHITE>()
