@@ -872,8 +872,8 @@ namespace {
     score +=  evaluate_threats<WHITE>()
             - evaluate_threats<BLACK>();
 
-    score +=  evaluate_passed_pawns<WHITE>() * (16384 - std::min(VALUE_ZERO, SearchValue))/16384
-            - evaluate_passed_pawns<BLACK>() * (16384 + std::max(VALUE_ZERO, SearchValue))/16384;
+    score +=  evaluate_passed_pawns<WHITE>() * (16384 + std::max(VALUE_ZERO, SearchValue))/16384
+            - evaluate_passed_pawns<BLACK>() * (16384 - std::min(VALUE_ZERO, SearchValue))/16384;
 
     if (pos.non_pawn_material() >= SpaceThreshold)
         score +=  evaluate_space<WHITE>()
