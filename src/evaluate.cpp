@@ -103,6 +103,7 @@ namespace {
     template<Color Us, PieceType Pt> Score evaluate_pieces();
     ScaleFactor evaluate_scale_factor(Value eg);
     Score evaluate_initiative(Value eg);
+    Score evaluate_context(Score whiteScore, Score blackScore, int evalResource);
 
     // Data members
     const Position& pos;
@@ -248,6 +249,8 @@ namespace {
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
   const Value SpaceThreshold = Value(12222);
+
+  const int ContextResolution = 16384;
 
 
   // initialize() computes king and pawn attacks, and the king ring bitboard
@@ -820,6 +823,23 @@ namespace {
     return sf;
   }
 
+  template<Tracing T>
+  Score  Evaluation<T>::evaluate_context(Score whiteScore, Score blackScore, int evalResource) {
+      int SearchValue = int(Eval::SearchValue);
+      if(evalResource > 0)
+          return   make_score(mg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
+                              eg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution)
+                 - make_score(mg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
+                              eg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution);
+      else if(evalResource > 0)
+          return   make_score(mg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
+                              eg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution)
+                 - make_score(mg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
+                              eg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution);
+      else
+          return SCORE_ZERO;
+
+  }
 
   // value() is the main function of the class. It computes the various parts of
   // the evaluation and returns the value of the position from the point of view
@@ -854,8 +874,6 @@ namespace {
 
     // Main evaluation begins here
 
-    int SearchValue = int(Eval::SearchValue);
-
     initialize<WHITE>();
     initialize<BLACK>();
 
@@ -872,12 +890,7 @@ namespace {
     score +=  evaluate_threats<WHITE>()
             - evaluate_threats<BLACK>();
 
-    Score ppw = evaluate_passed_pawns<WHITE>();
-    Score ppb = evaluate_passed_pawns<BLACK>();
-    int   r   = 4096;
-
-    score += make_score(mg_value(ppw) * (r - std::min(0, SearchValue))/r, eg_value(ppw) * (r - std::min(0, SearchValue))/r)
-           - make_score(mg_value(ppb) * (r + std::max(0, SearchValue))/r, eg_value(ppb) * (r + std::max(0, SearchValue))/r);
+    score += evaluate_context(evaluate_passed_pawns<WHITE>(), evaluate_passed_pawns<BLACK>(), 4);
 
     if (pos.non_pawn_material() >= SpaceThreshold)
         score +=  evaluate_space<WHITE>()
