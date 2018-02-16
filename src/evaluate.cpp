@@ -837,7 +837,7 @@ namespace {
                  - make_score(mg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
                               eg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution);
       else
-          return SCORE_ZERO;
+          return whiteScore - blackScore;
 
   }
 
