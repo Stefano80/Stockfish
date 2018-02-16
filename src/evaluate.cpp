@@ -826,7 +826,7 @@ namespace {
   template<Tracing T>
   Score  Evaluation<T>::evaluate_context(Score whiteScore, Score blackScore, int evalResource) {
       int SearchValue = int(Eval::SearchValue);
-      if(evalResource > 0)
+      if(evalResource < 0)
           return   make_score(mg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
                               eg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution)
                  - make_score(mg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
