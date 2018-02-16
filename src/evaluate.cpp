@@ -887,10 +887,9 @@ namespace {
     score +=  evaluate_king<WHITE>()
             - evaluate_king<BLACK>();
 
-    score +=  evaluate_threats<WHITE>()
-            - evaluate_threats<BLACK>();
+    score += evaluate_context(evaluate_threats<WHITE>(), evaluate_threats<BLACK>() , 4);
 
-    score += evaluate_context(evaluate_passed_pawns<WHITE>(), evaluate_passed_pawns<BLACK>(), -4);
+    score += evaluate_context(evaluate_passed_pawns<WHITE>(), evaluate_passed_pawns<BLACK>(), 0);
 
     if (pos.non_pawn_material() >= SpaceThreshold)
         score +=  evaluate_space<WHITE>()
