@@ -874,7 +874,7 @@ namespace {
 
     Score ppw = evaluate_passed_pawns<WHITE>();
     Score ppb = evaluate_passed_pawns<BLACK>();
-    int   r   = 1024;
+    int   r   = 4096;
 
     score += make_score(mg_value(ppw) * (r - std::min(0, SearchValue))/r, eg_value(ppw) * (r - std::min(0, SearchValue))/r)
            - make_score(mg_value(ppb) * (r + std::max(0, SearchValue))/r, eg_value(ppb) * (r + std::max(0, SearchValue))/r);
