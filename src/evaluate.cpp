@@ -261,6 +261,8 @@ namespace {
   int E = 0;
   int F = 0;
 
+  TUNE(SetRange(-16,16), A1, A2, A3, A4, B, C, D, E, F);
+
 
   // initialize() computes king and pawn attacks, and the king ring bitboard
   // for a given color. This is done at the beginning of the evaluation.
