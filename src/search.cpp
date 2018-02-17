@@ -325,6 +325,11 @@ void Thread::search() {
       for (RootMove& rm : rootMoves)
           rm.previousScore = rm.score;
 
+      if (!skill.enabled() && mainThread){
+          multiPV = std::min(size_t(Options["MultiPV"] + std::round(mainThread->bestMoveChanges/2)), rootMoves.size());
+      }
+
+
       // MultiPV loop. We perform a full root search for each PV line
       for (PVIdx = 0; PVIdx < multiPV && !Threads.stop; ++PVIdx)
       {
