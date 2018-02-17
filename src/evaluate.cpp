@@ -251,6 +251,15 @@ namespace {
   const Value SpaceThreshold = Value(12222);
 
   const int ContextResolution = 16384;
+  int A1 = 0;
+  int A2 = 0;
+  int A3 = 0;
+  int A4 = 0;
+  int B = 0;
+  int C = 0;
+  int D = 0;
+  int E = 0;
+  int F = 0;
 
 
   // initialize() computes king and pawn attacks, and the king ring bitboard
@@ -877,23 +886,19 @@ namespace {
     initialize<WHITE>();
     initialize<BLACK>();
 
-    score += evaluate_pieces<WHITE, KNIGHT>() - evaluate_pieces<BLACK, KNIGHT>();
-    score += evaluate_pieces<WHITE, BISHOP>() - evaluate_pieces<BLACK, BISHOP>();
-    score += evaluate_pieces<WHITE, ROOK  >() - evaluate_pieces<BLACK, ROOK  >();
-    score += evaluate_pieces<WHITE, QUEEN >() - evaluate_pieces<BLACK, QUEEN >();
 
-    score += mobility[WHITE] - mobility[BLACK];
+    score += evaluate_context(evaluate_pieces<WHITE, KNIGHT>(), evaluate_pieces<BLACK, KNIGHT>(),   A1);
+    score += evaluate_context(evaluate_pieces<WHITE, BISHOP>(), evaluate_pieces<BLACK, BISHOP>(),   A2);
+    score += evaluate_context(evaluate_pieces<WHITE, ROOK  >(), evaluate_pieces<BLACK, ROOK  >(),   A3);
+    score += evaluate_context(evaluate_pieces<WHITE, QUEEN >(), evaluate_pieces<BLACK, QUEEN >(),   A4);
 
-    score +=  evaluate_king<WHITE>()
-            - evaluate_king<BLACK>();
-
-    score += evaluate_context(evaluate_threats<WHITE>(), evaluate_threats<BLACK>() , 16);
-
-    score += evaluate_context(evaluate_passed_pawns<WHITE>(), evaluate_passed_pawns<BLACK>(), 16);
+    score += evaluate_context(mobility[WHITE],                  mobility[BLACK],                B);
+    score += evaluate_context(evaluate_king<WHITE>(),           evaluate_king<BLACK>(),         C);
+    score += evaluate_context(evaluate_threats<WHITE>(),        evaluate_threats<BLACK>(),      D);
+    score += evaluate_context(evaluate_passed_pawns<WHITE>(),   evaluate_passed_pawns<BLACK>(), E);
 
     if (pos.non_pawn_material() >= SpaceThreshold)
-        score +=  evaluate_space<WHITE>()
-                - evaluate_space<BLACK>();
+        score +=  evaluate_context(evaluate_space<WHITE>(),     evaluate_space<BLACK>(), F);
 
     score += evaluate_initiative(eg_value(score));
 
