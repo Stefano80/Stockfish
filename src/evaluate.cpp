@@ -846,7 +846,7 @@ namespace {
     // Probe the pawn hash table
     pe = Pawns::probe(pos);
     int pm_correlation = int(mg_value(score)) * int(mg_value(pe->pawns_score()));
-    score += pe->pawns_score() - make_score(pm_correlation/4096, pm_correlation/4096);
+    score += pe->pawns_score() - make_score(pm_correlation/4096, -pm_correlation/4096);
 
     // Early exit if score is high
     Value v = (mg_value(score) + eg_value(score)) / 2;
