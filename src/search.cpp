@@ -932,6 +932,8 @@ moves_loop: // When in check, search starts from here
               r -= r ? ONE_PLY : DEPTH_ZERO;
           else
           {
+              Pawns::Entry* pe = Pawns::probe(pos);
+
               // Decrease reduction if opponent's move count is high
               if ((ss-1)->moveCount > 15)
                   r -= ONE_PLY;
@@ -947,7 +949,6 @@ moves_loop: // When in check, search starts from here
               // Increase reduction for cut nodes
               if (cutNode)
                   r += 2 * ONE_PLY;
-
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
               // hence break make_move().
@@ -955,10 +956,19 @@ moves_loop: // When in check, search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
+
+              Color Us = pos.side_to_move();
+              ss->pawnAttacks[Us] =
+                      popcount(pe->pawn_attacks(Us) &&
+                              (pos.pieces(~Us, QUEEN) | pos.pieces(~Us, ROOK) | pos.pieces(~Us, BISHOP) | pos.pieces(~Us, KNIGHT)));
+              // Decrease reductions for pawn attacks
+              int pawnTrend = (ss->pawnAttacks[Us] - (ss-2)->pawnAttacks[Us]) * 1000;
+
               ss->statScore =  thisThread->mainHistory[~pos.side_to_move()][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
+                             + pawnTrend
                              - 4000;
 
               // Decrease/increase reduction by comparing opponent's stat score
