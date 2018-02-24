@@ -968,6 +968,9 @@ moves_loop: // When in check, search starts from here
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
           }
 
+          if (newDepth > 10 * ONE_PLY)
+              r = std::min(r, 7 * ONE_PLY + 3 * (newDepth - 10 * ONE_PLY) / 4);
+
           Depth d = std::max(newDepth - r, ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
