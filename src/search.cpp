@@ -932,7 +932,7 @@ moves_loop: // When in check, search starts from here
               r -= r ? ONE_PLY : DEPTH_ZERO;
           else
           {
-              Pawns::Entry* pe = Pawns::probe(pos);
+
 
               // Decrease reduction if opponent's move count is high
               if ((ss-1)->moveCount > 15)
@@ -956,13 +956,13 @@ moves_loop: // When in check, search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
-
+              // Decrease reductions for pawn attacks
+              Pawns::Entry* pe = Pawns::probe(pos);
               Color Us = pos.side_to_move();
               ss->pawnAttacks[Us] =
                       popcount(pe->pawn_attacks(Us) &&
                               (pos.pieces(~Us, QUEEN) | pos.pieces(~Us, ROOK) | pos.pieces(~Us, BISHOP) | pos.pieces(~Us, KNIGHT)));
-              // Decrease reductions for pawn attacks
-              int pawnTrend = (ss->pawnAttacks[Us] - (ss-2)->pawnAttacks[Us]) * 1000;
+              int pawnTrend = (ss->pawnAttacks[Us] - (ss-2)->pawnAttacks[Us]) * 5000;
 
               ss->statScore =  thisThread->mainHistory[~pos.side_to_move()][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
