@@ -777,6 +777,7 @@ moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    int pawnTrend;
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
@@ -962,14 +963,13 @@ moves_loop: // When in check, search starts from here
               ss->pawnAttacks[Us] =
                       popcount(pe->pawn_attacks(Us) &&
                               (pos.pieces(~Us, QUEEN) | pos.pieces(~Us, ROOK) | pos.pieces(~Us, BISHOP) | pos.pieces(~Us, KNIGHT)));
-              int pawnTrend = (ss->pawnAttacks[Us] - (ss-2)->pawnAttacks[Us]) * 5000;
+              pawnTrend = (ss->pawnAttacks[Us] - (ss-2)->pawnAttacks[Us]);
 
               ss->statScore =  thisThread->mainHistory[~pos.side_to_move()][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
-                             + pawnTrend
-                             - 4000;
+                             - abs(pawnTrend) * 1000;
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
