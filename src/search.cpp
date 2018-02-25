@@ -965,13 +965,13 @@ moves_loop: // When in check, search starts from here
                               (pos.pieces(~Us) ^ pos.pieces(~Us, KING, PAWN)));
 
 
-              pawnTrend = (ss->pawnAttacks - (ss-2)->pawnAttacks);
+              pawnTrend = std::max(0 , (ss->pawnAttacks - (ss-2)->pawnAttacks));
 
               ss->statScore =  thisThread->mainHistory[~pos.side_to_move()][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
-                             + pawnTrend * 5000
+                             - pawnTrend * 5000
                              - 4000;
 
               // Decrease/increase reduction by comparing opponent's stat score
