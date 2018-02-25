@@ -49,7 +49,7 @@ struct Stack {
   Value staticEval;
   int statScore;
   int moveCount;
-  int pawnAttacks;
+  int pawnAttacks = 0;
 };
 
 
