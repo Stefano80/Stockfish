@@ -202,7 +202,9 @@ namespace {
     template<Color Us> Score space() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
-    Score context(Score whiteScore, Score blackScore, int evalResource) const;
+    Score context_behind(Score whiteScore, Score blackScore, int evalResource) const;
+    Score context_ahead(Score whiteScore, Score blackScore, int evalResource) const;
+
 
     const Position& pos;
     Material::Entry* me;
@@ -813,20 +815,21 @@ namespace {
   }
 
   template<Tracing T>
-  Score  Evaluation<T>::context(Score whiteScore, Score blackScore, int evalResource) const {
+  Score  Evaluation<T>::context_behind(Score whiteScore, Score blackScore, int evalResource) const {
     int SearchValue = int(Eval::SearchValue);
-    if(evalResource < 0)
-        return   make_score(mg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
-                            eg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution)
-               - make_score(mg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
-                            eg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution);
-    else if(evalResource > 0)
-        return   make_score(mg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
-                            eg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution)
-               - make_score(mg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
-                            eg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution);
-        else
-         return whiteScore - blackScore;
+    return   make_score(mg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
+                        eg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution)
+           - make_score(mg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
+                        eg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution);
+  }
+
+  template<Tracing T>
+  Score  Evaluation<T>::context_ahead(Score whiteScore, Score blackScore, int evalResource) const {
+    int SearchValue = int(Eval::SearchValue);
+    return   make_score(mg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
+                        eg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution)
+           - make_score(mg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
+                        eg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution);
   }
 
 
