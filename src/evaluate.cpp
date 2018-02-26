@@ -88,7 +88,7 @@ namespace {
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
   const Value SpaceThreshold = Value(12222);
-  const int ContextResolution = 16384;
+  const int ContextResolution = 32768;
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
   const int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 78, 56, 45, 11 };
@@ -817,10 +817,10 @@ namespace {
   template<Tracing T>
   Score  Evaluation<T>::context_behind(Score whiteScore, Score blackScore, int evalResource) const {
     int SearchValue = int(Eval::SearchValue);
-    return   make_score(mg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
-                        eg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution)
-           - make_score(mg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
-                        eg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution);
+    return   make_score(mg_value(whiteScore) * (ContextResolution + evalResource * std::min(0, SearchValue))/ContextResolution,
+                        eg_value(whiteScore) * (ContextResolution + evalResource * std::min(0, SearchValue))/ContextResolution)
+           - make_score(mg_value(blackScore) * (ContextResolution - evalResource * std::max(0, SearchValue))/ContextResolution,
+                        eg_value(blackScore) * (ContextResolution - evalResource * std::max(0, SearchValue))/ContextResolution);
   }
 
   template<Tracing T>
@@ -870,16 +870,16 @@ namespace {
     initialize<BLACK>();
 
     // Pieces should be evaluated first (populate attack tables)
-    score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
-            + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
-            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
-            + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+    score +=  context_ahead( pieces<WHITE, KNIGHT>(),  pieces<BLACK, KNIGHT>(), 3)
+            +                pieces<WHITE, BISHOP>(),  pieces<BLACK, BISHOP>()
+            + context_behind(pieces<WHITE, ROOK  >(),  pieces<BLACK, ROOK  >(), 1)
+            + context_ahead( pieces<WHITE, QUEEN >(),  pieces<BLACK, QUEEN >(), 2);
 
-    score += mobility[WHITE] - mobility[BLACK];
+    score += context_ahead(mobility[WHITE], mobility[BLACK], 3);
 
-    score +=  king<   WHITE>() - king<   BLACK>()
-            + threats<WHITE>() - threats<BLACK>()
-            + passed< WHITE>() - passed< BLACK>()
+    score +=  context_ahead(king<   WHITE>(),  king<   BLACK>(), 1)
+            + context_ahead(threats<WHITE>(),  threats<BLACK>(), 1)
+            + context_behind(passed< WHITE>(), passed< BLACK>(), 3)
             + space<  WHITE>() - space<  BLACK>();
 
     score += initiative(eg_value(score));
