@@ -88,7 +88,7 @@ namespace {
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
   const Value SpaceThreshold = Value(12222);
-  const int ContextResolution = 32768;
+  const int ContextResolution = 8192;
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
   const int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 78, 56, 45, 11 };
