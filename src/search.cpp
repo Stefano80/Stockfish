@@ -508,6 +508,7 @@ namespace {
     inCheck = pos.checkers();
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     ss->statScore = 0;
+    ss->pawnAttacks = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
 
