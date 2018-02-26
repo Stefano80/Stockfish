@@ -88,6 +88,7 @@ namespace {
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
   const Value SpaceThreshold = Value(12222);
+  const int ContextResolution = 16384;
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
   const int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 78, 56, 45, 11 };
@@ -201,6 +202,7 @@ namespace {
     template<Color Us> Score space() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
+    Score context(Score whiteScore, Score blackScore, int evalResource) const;
 
     const Position& pos;
     Material::Entry* me;
@@ -810,6 +812,23 @@ namespace {
     return ScaleFactor(sf);
   }
 
+  template<Tracing T>
+  Score  Evaluation<T>::context(Score whiteScore, Score blackScore, int evalResource) const {
+    int SearchValue = int(Eval::SearchValue);
+    if(evalResource < 0)
+        return   make_score(mg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
+                            eg_value(whiteScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution)
+               - make_score(mg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
+                            eg_value(blackScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution);
+    else if(evalResource > 0)
+        return   make_score(mg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution,
+                            eg_value(whiteScore) * (ContextResolution + evalResource * std::max(0, SearchValue))/ContextResolution)
+               - make_score(mg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution,
+                            eg_value(blackScore) * (ContextResolution - evalResource * std::min(0, SearchValue))/ContextResolution);
+        else
+         return whiteScore - blackScore;
+  }
+
 
   // Evaluation::value() is the main function of the class. It computes the various
   // parts of the evaluation and returns the value of the position from the point
@@ -892,6 +911,7 @@ Value Eval::evaluate(const Position& pos) {
   return Evaluation<NO_TRACE>(pos).value() + Eval::Tempo;
 }
 
+std::atomic<Value> Eval::SearchValue;
 
 /// trace() is like evaluate(), but instead of returning a value, it returns
 /// a string (suitable for outputting to stdout) that contains the detailed
@@ -902,6 +922,7 @@ std::string Eval::trace(const Position& pos) {
   std::memset(scores, 0, sizeof(scores));
 
   Eval::Contempt = SCORE_ZERO; // Reset any dynamic contempt
+  Eval::SearchValue = VALUE_ZERO;
 
   Value v = Evaluation<TRACE>(pos).value() + Eval::Tempo;
 
