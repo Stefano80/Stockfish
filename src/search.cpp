@@ -142,6 +142,11 @@ namespace {
     return nodes;
   }
 
+  int A = 10;
+  int B = 72;
+  int C = 128;
+  TUNE(A,B,C);
+
 } // namespace
 
 
@@ -347,8 +352,8 @@ void Thread::search() {
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
 
               // Adjust contempt based on current bestValue
-              ct =  Options["Contempt"] * PawnValueEg / 100 // From centipawns
-                  + int(std::round(72 * atan(float(bestValue) / 128)));
+              ct = A * PawnValueEg / 100 // From centipawns
+                  + int(std::round(B * atan(float(bestValue) / 72)));
 
               Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                             : -make_score(ct, ct / 2));
