@@ -285,6 +285,7 @@ void Thread::search() {
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1.0;
+  int optimism = 0;
   Color us = rootPos.side_to_move();
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
@@ -350,9 +351,10 @@ void Thread::search() {
 
               // Adjust contempt based on current bestValue (dynamic contempt)
               int sign = (bestValue > 0) - (bestValue < 0);
+              optimism /= 2;
               ct +=  bestValue >  500 ?  70 :
                      bestValue < -500 ? -70 :
-                     bestValue / 10 + sign * int(std::round(3.22 * log(1 + abs(bestValue))));
+                     bestValue / 10 + sign * int(std::round(3.22 * log(1 + abs(bestValue)))) + optimism;
 
               Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                             : -make_score(ct, ct / 2));
@@ -393,6 +395,7 @@ void Thread::search() {
               {
                   beta = (alpha + beta) / 2;
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
+                  optimism -= 1;
 
                   if (mainThread)
                   {
@@ -400,8 +403,10 @@ void Thread::search() {
                       Threads.stopOnPonderhit = false;
                   }
               }
-              else if (bestValue >= beta)
+              else if (bestValue >= beta){
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
+                  optimism += 1;
+              }
               else
                   break;
 
