@@ -348,7 +348,7 @@ void Thread::search() {
 
               // Adjust contempt based on current bestValue
               ct =  Options["Contempt"] * PawnValueEg / 100 // From centipawns
-                  + int(std::round(72 * atan(float(bestValue) / 128)));
+                  + int(std::round(72 * atan(float(bestValue) / 121)));
 
               Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                             : -make_score(ct, ct / 2));
