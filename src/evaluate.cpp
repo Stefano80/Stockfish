@@ -349,7 +349,7 @@ namespace {
             if (Pt == BISHOP)
             {
                 // Penalty according to number of pawns on the same color square as the bishop
-                score -= BishopPawns * std::min(4, pe->pawns_on_same_color_squares(Us, s));
+                score -= BishopPawns * std::min(5, pe->pawns_on_same_color_squares(Us, s));
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s)))
