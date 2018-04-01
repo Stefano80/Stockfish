@@ -61,10 +61,6 @@ namespace {
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV };
 
-  // Sizes and phases of the skip-blocks, used for distributing search depths across the threads
-  constexpr int SkipSize[]  = { 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4 };
-  constexpr int SkipPhase[] = { 0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 6, 7 };
-
   // Razor and futility margins
   constexpr int RazorMargin[] = {0, 590, 604};
   Value futility_margin(Depth d, bool improving) {
@@ -241,23 +237,6 @@ void MainThread::search() {
 
   // Check if there are threads with a better score than main thread
   Thread* bestThread = this;
-  if (    Options["MultiPV"] == 1
-      && !Limits.depth
-      && !Skill(Options["Skill Level"]).enabled()
-      &&  rootMoves[0].pv[0] != MOVE_NONE)
-  {
-      for (Thread* th : Threads)
-      {
-          Depth depthDiff = th->completedDepth - bestThread->completedDepth;
-          Value scoreDiff = th->rootMoves[0].score - bestThread->rootMoves[0].score;
-
-          // Select the thread with the best score, always if it is a mate
-          if (    scoreDiff > 0
-              && (depthDiff >= 0 || th->rootMoves[0].score >= VALUE_MATE_IN_MAX_PLY))
-              bestThread = th;
-      }
-  }
-
   previousScore = bestThread->rootMoves[0].score;
 
   // Send again PV info if we have a new best thread
@@ -328,12 +307,8 @@ void Thread::search() {
          && !(Limits.depth && mainThread && rootDepth / ONE_PLY > Limits.depth))
   {
       // Distribute search depths across the helper threads
-      if (idx > 0)
-      {
-          int i = (idx - 1) % 20;
-          if (((rootDepth / ONE_PLY + rootPos.game_ply() + SkipPhase[i]) / SkipSize[i]) % 2)
-              continue;  // Retry with an incremented rootDepth
-      }
+      if (!mainThread  && rootDepth <= Threads.main()->completedDepth - 9 * ONE_PLY)
+          continue;
 
       // Age out PV variability metric
       if (mainThread)
@@ -444,6 +419,9 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
+      // Walkthroug the game once  
+      playout(lastBestMove, ss);
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -489,6 +467,8 @@ void Thread::search() {
                       Threads.stop = true;
               }
           }
+
+
   }
 
   if (!mainThread)
@@ -500,6 +480,20 @@ void Thread::search() {
   if (skill.enabled())
       std::swap(rootMoves[0], *std::find(rootMoves.begin(), rootMoves.end(),
                 skill.best ? skill.best : skill.pick_best(multiPV)));
+}
+
+void Thread::playout(Move lastBestMove, Stack* ss) {
+    StateInfo st;
+    bool ttHit;
+    rootPos.do_move(lastBestMove, st);
+    (ss+1)->ply = ss->ply + 1;
+    TTEntry* tte = TT.probe(rootPos.key(), ttHit);
+    Value ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    Move ttMove = ttHit ? tte->move() : MOVE_NONE;    
+    // std::cout << MoveList<LEGAL>(rootPos).size() << " " << ttHit << " " << ss->ply <<  "\n";
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY)
+        playout(ttMove, ss+1);
+    rootPos.undo_move(lastBestMove);
 }
 
 
