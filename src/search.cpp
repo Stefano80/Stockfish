@@ -444,6 +444,8 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
+      playout(lastBestMove, ss);
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -500,6 +502,21 @@ void Thread::search() {
   if (skill.enabled())
       std::swap(rootMoves[0], *std::find(rootMoves.begin(), rootMoves.end(),
                 skill.best ? skill.best : skill.pick_best(multiPV)));
+}
+
+void Thread::playout(Move playMove, Stack* ss) {
+    StateInfo st;
+    bool ttHit;
+    rootPos.do_move(playMove, st);
+    TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
+    Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
+        (ss+1)->ply = ss->ply + 1;
+        qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
+        playout(ttMove, ss+1);
+    }
+    rootPos.undo_move(playMove);
 }
 
 
