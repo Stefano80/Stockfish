@@ -241,23 +241,6 @@ void MainThread::search() {
 
   // Check if there are threads with a better score than main thread
   Thread* bestThread = this;
-  if (    Options["MultiPV"] == 1
-      && !Limits.depth
-      && !Skill(Options["Skill Level"]).enabled()
-      &&  rootMoves[0].pv[0] != MOVE_NONE)
-  {
-      for (Thread* th : Threads)
-      {
-          Depth depthDiff = th->completedDepth - bestThread->completedDepth;
-          Value scoreDiff = th->rootMoves[0].score - bestThread->rootMoves[0].score;
-
-          // Select the thread with the best score, always if it is a mate
-          if (    scoreDiff > 0
-              && (depthDiff >= 0 || th->rootMoves[0].score >= VALUE_MATE_IN_MAX_PLY))
-              bestThread = th;
-      }
-  }
-
   previousScore = bestThread->rootMoves[0].score;
 
   // Send again PV info if we have a new best thread
@@ -489,6 +472,22 @@ void Thread::search() {
                       Threads.stop = true;
               }
           }
+      if(!mainThread && rootDepth >= Threads.main()->completedDepth/2){
+          StateInfo st;
+          if(!MoveList<LEGAL>(this->rootPos).size())
+              break;
+          int ply = ss->ply;
+          std::memset(ss-4, 0, 7 * sizeof(Stack));
+          for (int i = 4; i > 0; i--)
+             (ss-i)->contHistory = this->contHistory[NO_PIECE][0].get(); // Use as sentinel
+          ss-> ply = ply+1;
+
+          this->rootPos.do_move(lastBestMove, st);
+          this->rootMoves.clear();
+          for (const auto& m : MoveList<LEGAL>(this->rootPos))
+                        this->rootMoves.emplace_back(m);
+          Thread::search();
+      }
   }
 
   if (!mainThread)
