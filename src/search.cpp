@@ -444,6 +444,9 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
+      if (mainThread)
+        playout(lastBestMove, ss);
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -502,6 +505,24 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
+void Thread::playout(Move playMove, Stack* ss) {
+    playingOut = true;
+    StateInfo st;
+    bool ttHit;
+    rootPos.do_move(playMove, st);
+    TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
+    Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
+        (ss+1)->ply = ss->ply + 1;
+        Depth newDepth = std::max(rootDepth - 20 * ONE_PLY, DEPTH_ZERO);
+        ::search<PV>(rootPos, ss+1, ttValue-1, ttValue, newDepth, false);
+        playout(ttMove, ss+1);
+    }
+    rootPos.undo_move(playMove);
+    playingOut = false;
+}
+
 
 namespace {
 
@@ -511,7 +532,7 @@ namespace {
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
     constexpr bool PvNode = NT == PV;
-    const bool rootNode = PvNode && ss->ply == 0;
+    const bool rootNode = PvNode && ss->ply == 0 && !&thisThread->playingOut;
 
     // Check if we have an upcoming move which draws by repetition, or
     // if the opponent had an alternative move earlier to this position.
