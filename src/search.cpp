@@ -488,6 +488,7 @@ void Thread::search() {
           for (const auto& m : MoveList<LEGAL>(this->rootPos))
                         this->rootMoves.emplace_back(m);
           Thread::search();
+          rootPos.undo_move(lastBestMove);
       }
   }
 
