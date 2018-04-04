@@ -472,7 +472,7 @@ void Thread::search() {
                       Threads.stop = true;
               }
           }
-      if(!mainThread && rootDepth >= 8 * ONE_PLY){
+      if(!mainThread && rootDepth >= Threads.main()->completedDepth - 6 * ONE_PLY){
           StateInfo st;
           if(!MoveList<LEGAL>(this->rootPos).size())
               break;
