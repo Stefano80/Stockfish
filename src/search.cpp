@@ -470,11 +470,6 @@ void Thread::search() {
           StateInfo st;
           if(!MoveList<LEGAL>(this->rootPos).size())
               break;
-          int ply = ss->ply;
-          std::memset(ss-4, 0, 7 * sizeof(Stack));
-          for (int i = 4; i > 0; i--)
-             (ss-i)->contHistory = this->contHistory[NO_PIECE][0].get(); // Use as sentinel
-          ss-> ply = ply+1;
 
           this->rootDepth = this->completedDepth = DEPTH_ZERO;
           this->rootPos.do_move(lastBestMove, st);
