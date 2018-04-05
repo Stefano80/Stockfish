@@ -482,7 +482,7 @@ void Thread::search() {
              (ss-i)->contHistory = this->contHistory[NO_PIECE][0].get(); // Use as sentinel
           ss-> ply = ply+1;
 
-          this->rootDepth = DEPTH_ZERO;
+          this->rootDepth = this->completedDepth = DEPTH_ZERO;
           this->rootPos.do_move(lastBestMove, st);
           this->rootMoves.clear();
           for (const auto& m : MoveList<LEGAL>(this->rootPos))
