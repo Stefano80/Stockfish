@@ -86,6 +86,7 @@ namespace {
 
   // Threshold for lazy and space evaluation
   constexpr Value LazyThreshold  = Value(1500);
+  constexpr Value AccurateThreshold = Value(45);
   constexpr Value SpaceThreshold = Value(12222);
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
@@ -163,7 +164,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  8, 12);
-  constexpr Score BadBishop          = S( 20,  0);
+  constexpr Score BadBishop          = S( 30, 30);
   constexpr Score CloseEnemies       = S(  7,  0);
   constexpr Score Connectivity       = S(  3,  1);
   constexpr Score CorneredBishop     = S( 50, 50);
@@ -880,11 +881,12 @@ namespace {
     score += initiative(eg_value(score));
 
     // Penalty for bad bishop if score is even
-    if (abs(mg_value(score) + eg_value(score)) < PawnValueMg / 2){
+    v = Value(abs(mg_value(score) + eg_value(score)) / 2);
+    if (v < AccurateThreshold){
         if(pos.pieces(WHITE, BISHOP) & pe->bad_bishop_squares<WHITE>(pos))
-            score -= BadBishop;
+            score -= BadBishop * int(AccurateThreshold - v) / AccurateThreshold;
         if(pos.pieces(BLACK, BISHOP) & pe->bad_bishop_squares<BLACK>(pos))
-            score += BadBishop;
+            score += BadBishop * int(AccurateThreshold - v) / AccurateThreshold;
     }
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
