@@ -880,7 +880,7 @@ namespace {
     score += initiative(eg_value(score));
 
     // Penalty for bad bishop if score is even
-    if (abs(mg_value(score) + eg_value(score)) < PawnValueMg/2){
+    if (abs(mg_value(score) + eg_value(score)) < 3 * PawnValueMg / 4){
         if(pos.pieces(WHITE, BISHOP) & pe->bad_bishop_squares<WHITE>(pos))
             score -= BadBishop;
         if(pos.pieces(BLACK, BISHOP) & pe->bad_bishop_squares<BLACK>(pos))
