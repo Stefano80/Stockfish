@@ -163,7 +163,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  8, 12);
-  constexpr Score BadBishop          = S( 20, 20);
+  constexpr Score BadBishop          = S(  0, 20);
   constexpr Score CloseEnemies       = S(  7,  0);
   constexpr Score Connectivity       = S(  3,  1);
   constexpr Score CorneredBishop     = S( 50, 50);
@@ -880,7 +880,7 @@ namespace {
     score += initiative(eg_value(score));
 
     // Penalty for bad bishop if score is even
-    if (abs(mg_value(score) + eg_value(score)) < 3 * PawnValueMg / 4){
+    if (abs(mg_value(score) + eg_value(score)) < PawnValueMg / 2){
         if(pos.pieces(WHITE, BISHOP) & pe->bad_bishop_squares<WHITE>(pos))
             score -= BadBishop;
         if(pos.pieces(BLACK, BISHOP) & pe->bad_bishop_squares<BLACK>(pos))
