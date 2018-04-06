@@ -172,13 +172,13 @@ namespace {
   constexpr Score LongDiagonalBishop = S( 22,  0);
   constexpr Score MinorBehindPawn    = S( 16,  0);
   constexpr Score PawnlessFlank      = S( 20, 80);
-  constexpr Score RookOnPawn         = S(  8, 24);
+  constexpr Score RookOnPawn         = S( 16, 48);
   constexpr Score SliderOnQueen      = S( 42, 21);
   constexpr Score ThreatByPawnPush   = S( 47, 26);
   constexpr Score ThreatByRank       = S( 16,  3);
   constexpr Score ThreatBySafePawn   = S(175,168);
   constexpr Score TrappedRook        = S( 92,  0);
-  constexpr Score WeakQueen          = S(150, 30);
+  constexpr Score WeakQueen          = S(100, 20);
   constexpr Score WeakUnopposedPawn  = S(  5, 25);
 
 #undef S
