@@ -127,7 +127,7 @@ namespace {
 
   // RookOnFile[semiopen/open] contains bonuses for each rook when there is
   // no (friendly) pawn on the rook file.
-  constexpr Score RookOnFile[] = { S(20, 7), S(45, 20) };
+  constexpr Score RookOnFile[] = { S(25, 10), S(55, 25) };
 
   // ThreatByMinor/ByRook[attacked PieceType] contains bonuses according to
   // which piece type attacks which one. Attacks on lesser pieces which are
@@ -177,7 +177,7 @@ namespace {
   constexpr Score ThreatByPawnPush   = S( 47, 26);
   constexpr Score ThreatByRank       = S( 16,  3);
   constexpr Score ThreatBySafePawn   = S(175,168);
-  constexpr Score TrappedRook        = S( 92,  0);
+  constexpr Score TrappedRook        = S(110,  0);
   constexpr Score WeakQueen          = S(100, 20);
   constexpr Score WeakUnopposedPawn  = S(  5, 25);
 
