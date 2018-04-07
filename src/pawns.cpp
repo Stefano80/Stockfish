@@ -338,17 +338,10 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
              mob = sum / count;
          }
          mobility[1 - index][s] = (mobility[index][s] + mob) / 2;
+         if (index && mobility[1][s] <= 0)
+             bbs |= s;
       }
   }
-
-  b = allowed;
-  while(b)
-  {
-      Square s = pop_lsb(&b);
-      if (mobility[1][s] <= 0)
-         bbs |= s;
-  }
-
   return bbs;
 }
 // Explicit template instantiation
