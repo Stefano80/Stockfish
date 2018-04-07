@@ -86,7 +86,7 @@ namespace {
 
   // Threshold for lazy and space evaluation
   constexpr Value LazyThreshold     = Value(1500);
-  constexpr Value AccurateThreshold = Value(30);
+  constexpr Value AccurateThreshold = Value(85);
   constexpr Value SpaceThreshold    = Value(12222);
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
@@ -884,9 +884,9 @@ namespace {
     v = Value(abs(mg_value(score) + eg_value(score)) / 2);
     if (v < AccurateThreshold){
         if(pos.pieces(WHITE, BISHOP) & pe->bad_bishop_squares<WHITE>(pos))
-            score -= BadBishop * int(AccurateThreshold - v) / AccurateThreshold;
+            score -= BadBishop;
         if(pos.pieces(BLACK, BISHOP) & pe->bad_bishop_squares<BLACK>(pos))
-            score += BadBishop * int(AccurateThreshold - v) / AccurateThreshold;
+            score += BadBishop;
     }
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
