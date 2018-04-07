@@ -332,9 +332,6 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
       {
          Square s = pop_lsb(&b);
          bb = allowed & attacks_bb<BISHOP>(s, blocker);
-         int totalSquareMobility = 0;
-         while(bb)
-             totalSquareMobility += mobility[index][pop_lsb(&bb)];
          if (index && !mobility[1][s])
              bbs |= s;
       }
