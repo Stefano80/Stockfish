@@ -335,9 +335,9 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
          while(bb)
              totalSquareMobility += mobility[index][pop_lsb(&bb)];
          if(index)
-            mobility[1 - index][s] = (mobility[index][s] + totalSquareMobility) / 2;
+            mobility[0][s] = (mobility[1][s] + totalSquareMobility) / 2;
          else
-            mobility[1 - index][s] = (mobility[index][s] + totalMobility[index][s]) / 2;
+            mobility[1][s] = (mobility[0][s] + totalMobility[0][s]) / 2;
          if (index && !mobility[1][s])
              bbs |= s;
       }
