@@ -312,6 +312,7 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
 
   Bitboard b, bb, blocker, allowed, bbs = 0;
   int mobility[2][SQUARE_NB];
+  int totalMobility[2];
 
   blocker = pos.pieces(PAWN);
   b = allowed = ~(pos.pieces(Us, PAWN) | pawnAttacks[Them]);
@@ -320,6 +321,7 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
      Square s = pop_lsb(&b);
      bb = allowed & attacks_bb<BISHOP>(s, blocker);
      mobility[0][s] = popcount(bb);
+     totalMobility[0] += mobility[0][s];
   }
 
   for(int index = 0; index < 2; ++index)
@@ -332,13 +334,7 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
          int totalSquareMobility = 0;
          while(bb)
              totalSquareMobility += mobility[index][pop_lsb(&bb)];
-
-
-
          mobility[1 - index][s] = (mobility[index][s] + totalSquareMobility) / 2;
-
-
-
          if (index && !mobility[1][s])
              bbs |= s;
       }
