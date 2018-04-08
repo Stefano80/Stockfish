@@ -85,8 +85,8 @@ namespace {
   };
 
   // Threshold for lazy and space evaluation
-  constexpr Value LazyThreshold     = Value(1500);
-  constexpr Value SpaceThreshold    = Value(12222);
+  constexpr Value LazyThreshold  = Value(1500);
+  constexpr Value SpaceThreshold = Value(12222);
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
   constexpr int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 78, 56, 45, 11 };
@@ -163,7 +163,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  8, 12);
-  constexpr Score BadBishop          = S(  0, 15);
+  constexpr Score BadBishop          = S(-15, 15);
   constexpr Score CloseEnemies       = S(  7,  0);
   constexpr Score Connectivity       = S(  3,  1);
   constexpr Score CorneredBishop     = S( 50, 50);
