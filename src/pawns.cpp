@@ -206,6 +206,9 @@ void init() {
 }
 
 
+
+
+
 /// Pawns::probe() looks up the current position's pawns configuration in
 /// the pawns hash table. It returns a pointer to the Entry if the position
 /// is found. Otherwise a new Entry is computed and stored there, so we don't
@@ -298,5 +301,29 @@ Score Entry::do_king_safety(const Position& pos, Square ksq) {
 // Explicit template instantiation
 template Score Entry::do_king_safety<WHITE>(const Position& pos, Square ksq);
 template Score Entry::do_king_safety<BLACK>(const Position& pos, Square ksq);
+
+/// generate_bad_bishop_squares() calculates a bitboard of squares on which a bishop
+/// is considered bad.
+
+template<Color Us>
+Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
+
+  constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
+
+  Bitboard b, blocker, allowed, bbs = 0;
+
+  blocker = pos.pieces(PAWN);
+  b = allowed = ~(pos.pieces(Us, PAWN) | pawnAttacks[Them]);
+  while(b)
+  {
+     Square s = pop_lsb(&b);
+     if (!bool(allowed & attacks_bb<BISHOP>(s, blocker)))
+        bbs |= s;
+  }
+  return bbs;
+}
+// Explicit template instantiation
+template Bitboard Entry::do_bad_bishop_squares<WHITE>(const Position& pos);
+template Bitboard Entry::do_bad_bishop_squares<BLACK>(const Position& pos);
 
 } // namespace Pawns

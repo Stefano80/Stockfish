@@ -24,6 +24,8 @@
 #include "misc.h"
 #include "position.h"
 #include "types.h"
+#include "bitboard.h"
+
 
 namespace Pawns {
 
@@ -56,7 +58,17 @@ struct Entry {
   }
 
   template<Color Us>
+  Bitboard bad_bishop_squares(const Position& pos) {
+      if (badBishopSquares[Us] == AllSquares)
+          badBishopSquares[Us]  = do_bad_bishop_squares<Us>(pos);
+      return badBishopSquares[Us];
+  }
+
+  template<Color Us>
   Score do_king_safety(const Position& pos, Square ksq);
+
+  template<Color Us>
+  Bitboard do_bad_bishop_squares(const Position& pos);
 
   template<Color Us>
   Value shelter_storm(const Position& pos, Square ksq);
@@ -66,6 +78,7 @@ struct Entry {
   Bitboard passedPawns[COLOR_NB];
   Bitboard pawnAttacks[COLOR_NB];
   Bitboard pawnAttacksSpan[COLOR_NB];
+  Bitboard badBishopSquares[COLOR_NB] = {AllSquares, AllSquares};
   Square kingSquares[COLOR_NB];
   Score kingSafety[COLOR_NB];
   int weakUnopposed[COLOR_NB];
