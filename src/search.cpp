@@ -364,8 +364,8 @@ void Thread::search() {
               ct += int(std::round(48 * atan(float(previousScore) / 128)));
 
               if (Limits.use_time_management() && std::min(Limits.time[us], Limits.time[~us]) > 100){
-                  int ourTime   = Limits.time[us]  + 50*Limits.inc[us];
-                  int theirTime = Limits.time[~us] + 50*Limits.inc[~us];
+                  int ourTime   = Limits.time[us]  + int(rootPos.non_pawn_material()) * Limits.inc[us]  / 300;
+                  int theirTime = Limits.time[~us] + int(rootPos.non_pawn_material()) * Limits.inc[~us] / 300;
                   double timeFactor = double(ourTime) / double(theirTime);
                   ct += std::min(4, int(std::round(5*log(timeFactor))));
               }
