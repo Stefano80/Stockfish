@@ -367,7 +367,7 @@ void Thread::search() {
                   int ourTime   = Limits.time[us]  + 50*Limits.inc[us];
                   int theirTime = Limits.time[~us] + 50*Limits.inc[~us];
                   double timeFactor = double(ourTime) / double(theirTime);
-                  ct += std::min(2, int(std::round(10*log(timeFactor))));
+                  ct += std::min(5, int(std::round(10*log(timeFactor))));
               }
               contempt = (rootPos.side_to_move() == WHITE ?  make_score(ct, ct / 2)
                                                           : -make_score(ct, ct / 2));
