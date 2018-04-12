@@ -92,9 +92,7 @@ namespace {
   constexpr int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 78, 56, 45, 11 };
 
   // Penalties for enemy's safe checks
-  constexpr int QueenSafeCheck  = 780;
-  constexpr int RookSafeCheck   = 433;
-  constexpr int BishopSafeCheck = 342;
+  constexpr int SliderSafeCheck = 400;
   constexpr int KnightSafeCheck = 790;
 
 #define S(mg, eg) make_score(mg, eg)
@@ -442,20 +440,20 @@ namespace {
 
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
-            kingDanger += QueenSafeCheck;
+            kingDanger += SliderSafeCheck * popcount(b1 | b2);
 
         b1 &= attackedBy[Them][ROOK];
         b2 &= attackedBy[Them][BISHOP];
 
         // Enemy rooks checks
         if (b1 & safe)
-            kingDanger += RookSafeCheck * popcount(b1);
+            kingDanger += SliderSafeCheck * popcount(b1);
         else
             unsafeChecks |= b1;
 
         // Enemy bishops checks
         if (b2 & safe)
-            kingDanger += BishopSafeCheck * popcount(b2);
+            kingDanger += SliderSafeCheck * popcount(b2);
         else
             unsafeChecks |= b2;
 
