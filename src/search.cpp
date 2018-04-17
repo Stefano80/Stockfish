@@ -367,7 +367,7 @@ void Thread::search() {
                   int ourTime   = Limits.time[us]  + int(rootPos.non_pawn_material()) * Limits.inc[us]  / 300;
                   int theirTime = Limits.time[~us] + int(rootPos.non_pawn_material()) * Limits.inc[~us] / 300;
                   double timeFactor = double(ourTime) / double(theirTime);
-                  ct += std::max(-4, std::min(4, int(std::round(5*log(timeFactor)))));
+                  ct += int(std::round(5*log(timeFactor)));
               }
               contempt = (rootPos.side_to_move() == WHITE ?  make_score(ct, ct / 2)
                                                           : -make_score(ct, ct / 2));
