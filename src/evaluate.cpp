@@ -184,6 +184,16 @@ namespace {
 
 #undef S
 
+  Score saturate(Score x, int A, int B){
+      Value m = mg_value(x);
+      Value e = eg_value(x);
+
+      m = B * m / (A + std::abs(m));
+      e = B * e / (A + std::abs(e));
+
+      return make_score(m, e);
+  }
+
   // Evaluation class computes and stores attacks tables and other working data
   template<Tracing T>
   class Evaluation {
@@ -863,10 +873,12 @@ namespace {
     initialize<BLACK>();
 
     // Pieces should be evaluated first (populate attack tables)
-    score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
-            + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
-            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
-            + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+    score +=  saturate(
+                  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
+                + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
+                + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
+                + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >(),
+                RookValueMg, RookValueMg);
 
     score += mobility[WHITE] - mobility[BLACK];
 
