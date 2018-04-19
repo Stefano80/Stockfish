@@ -869,6 +869,8 @@ namespace {
 
     // Main evaluation begins here
 
+    score = saturate(score, QueenValueMg, QueenValueMg);
+
     initialize<WHITE>();
     initialize<BLACK>();
 
@@ -878,7 +880,7 @@ namespace {
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
-    score += saturate(mobility[WHITE] - mobility[BLACK], QueenValueMg, QueenValueMg);
+    score += mobility[WHITE] - mobility[BLACK];
 
     score +=  king<   WHITE>() - king<   BLACK>()
             + threats<WHITE>() - threats<BLACK>()
