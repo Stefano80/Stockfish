@@ -880,7 +880,7 @@ namespace {
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
-    score += saturate(mobility[WHITE] - mobility[BLACK], 2750, 2250);
+    score += saturate(mobility[WHITE] - mobility[BLACK], 2250, 2750);
 
     score +=  king<   WHITE>() - king<   BLACK>()
             + threats<WHITE>() - threats<BLACK>()
