@@ -880,7 +880,7 @@ namespace {
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >(),
-              2750, 2250);
+              2250, 2750);
 
     score += mobility[WHITE] - mobility[BLACK];
 
