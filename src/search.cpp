@@ -1043,7 +1043,9 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, false);
+          Depth PVdepth = newDepth + ONE_PLY * (moveCount == 1 && value > alpha);
+
+          value = -search<PV>(pos, ss+1, -beta, -alpha, PVdepth, false, false);
       }
 
       // Step 18. Undo move
