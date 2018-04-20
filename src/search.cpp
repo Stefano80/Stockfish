@@ -1043,7 +1043,7 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          Depth PVdepth = newDepth + ONE_PLY * (moveCount == 1 && value > alpha);
+          Depth PVdepth = newDepth + ONE_PLY * (moveCount == 1 && value > alpha && thisThread == Threads.main());
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, PVdepth, false, false);
       }
