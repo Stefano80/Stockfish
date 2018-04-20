@@ -883,8 +883,8 @@ namespace {
     score += mobility[WHITE] - mobility[BLACK];
 
     score +=  king<   WHITE>() - king<   BLACK>()
-            + saturate(threats<WHITE>() - threats<BLACK>(), 2500, 2500)
-            + passed< WHITE>() - passed< BLACK>()
+            + threats<WHITE>() - threats<BLACK>()
+            + saturate(passed< WHITE>() - passed< BLACK>(), 2500, 2500)
             + space<  WHITE>() - space<  BLACK>();
 
     score += initiative(eg_value(score));
