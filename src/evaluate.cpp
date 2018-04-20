@@ -882,8 +882,8 @@ namespace {
 
     score += mobility[WHITE] - mobility[BLACK];
 
-    score +=  saturate(king<   WHITE>() - king<   BLACK>(), 2500, 2500)
-            + threats<WHITE>() - threats<BLACK>()
+    score +=  king<   WHITE>() - king<   BLACK>()
+            + saturate(threats<WHITE>() - threats<BLACK>(), 2500, 2500)
             + passed< WHITE>() - passed< BLACK>()
             + space<  WHITE>() - space<  BLACK>();
 
