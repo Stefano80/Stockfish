@@ -103,7 +103,6 @@ namespace {
   int piecesB = 2500;
   int mobA = 2500;
   int mobB = 2500;
-  TUNE(spaceA, spaceB, piecesA, piecesB, mobA, mobB);
 
 #define S(mg, eg) make_score(mg, eg)
 
