@@ -97,12 +97,12 @@ namespace {
   constexpr int BishopSafeCheck = 435;
   constexpr int KnightSafeCheck = 790;
 
-  int spaceA = 2500;
-  int spaceB = 2500;
-  int piecesA = 2500;
-  int piecesB = 2500;
-  int mobA = 2500;
-  int mobB = 2500;
+  int spaceA = 2512;
+  int spaceB = 2630;
+  int piecesA = 2533;
+  int piecesB = 2790;
+  int mobA = 2371;
+  int mobB = 2388;
 
 #define S(mg, eg) make_score(mg, eg)
 
