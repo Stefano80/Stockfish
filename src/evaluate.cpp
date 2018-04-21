@@ -803,7 +803,7 @@ namespace {
     if (sf == SCALE_FACTOR_NORMAL || sf == SCALE_FACTOR_ONEPAWN)
     {
         if (pos.opposite_bishops())
-            sf = std::min(31 + (pos.non_pawn_material() - 2 * BishopValueMg)/700, int(SCALE_FACTOR_NORMAL));
+            sf = std::min(29 + (pos.non_pawn_material() - 2 * BishopValueMg)/700, int(SCALE_FACTOR_NORMAL));
 
         // Endings where weaker side can place his king in front of the enemy's
         // pawns are drawish.
