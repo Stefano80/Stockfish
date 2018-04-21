@@ -97,6 +97,14 @@ namespace {
   constexpr int BishopSafeCheck = 435;
   constexpr int KnightSafeCheck = 790;
 
+  int spaceA = 2500;
+  int spaceB = 2500;
+  int piecesA = 2500;
+  int piecesB = 2500;
+  int mobA = 2500;
+  int mobB = 2500;
+  TUNE(spaceA, spaceB, piecesA, piecesB, mobA, mobB);
+
 #define S(mg, eg) make_score(mg, eg)
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
@@ -875,17 +883,19 @@ namespace {
     initialize<BLACK>();
 
     // Pieces should be evaluated first (populate attack tables)
-    score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
+    score +=  saturate(
+              pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
-            + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+            + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >(),
+              piecesA, piecesB);
 
-    score += mobility[WHITE] - mobility[BLACK];
+    score += saturate(mobility[WHITE] - mobility[BLACK], mobA, mobB);
 
     score +=  king<   WHITE>() - king<   BLACK>()
             + threats<WHITE>() - threats<BLACK>()
             + passed< WHITE>() - passed< BLACK>()
-            + saturate(space<  WHITE>() - space<  BLACK>(), 2500, 2500);
+            + saturate(space<  WHITE>() - space<  BLACK>(), spaceA, spaceB);
 
     score += initiative(eg_value(score));
 
