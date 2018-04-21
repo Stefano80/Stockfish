@@ -803,17 +803,8 @@ namespace {
     if (sf == SCALE_FACTOR_NORMAL || sf == SCALE_FACTOR_ONEPAWN)
     {
         if (pos.opposite_bishops())
-        {
-            // Endgame with opposite-colored bishops and no other pieces is almost a draw
-            if (   pos.non_pawn_material(WHITE) == BishopValueMg
-                && pos.non_pawn_material(BLACK) == BishopValueMg)
-                sf = 31;
+            sf = std::min(31 + (pos.non_pawn_material() - 2 * BishopValueMg)/600, int(SCALE_FACTOR_NORMAL));
 
-            // Endgame with opposite-colored bishops, but also other pieces. Still
-            // a bit drawish, but not as drawish as with only the two bishops.
-            else
-                sf = 46;
-        }
         // Endings where weaker side can place his king in front of the enemy's
         // pawns are drawish.
         else if (    abs(eg) <= BishopValueEg
