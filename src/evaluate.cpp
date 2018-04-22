@@ -826,7 +826,7 @@ namespace {
         // Consider score asymmetry when evaluating scale factor
         int asymmetry = int(eg_value(score)) * int(mg_value(score));
         if(asymmetry)
-            sf += 2 * asymmetry/std::abs(asymmetry);
+            sf -= 2 * asymmetry/std::abs(asymmetry);
     }
     return ScaleFactor(sf);
   }
