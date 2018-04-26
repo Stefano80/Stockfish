@@ -804,7 +804,7 @@ namespace {
             - 14000 * pos.opposite_bishops()
             + pos.non_pawn_material()
             + 5000 * pos.count<PAWN>(strongSide))/700;
-        sf  = std::min(sf, int(SCALE_FACTOR_NORMAL));
+        sf  = std::min(sf, 64);
     }
 
     return ScaleFactor(sf);
