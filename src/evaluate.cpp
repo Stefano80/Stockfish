@@ -798,7 +798,7 @@ namespace {
 
     // If we don't already have an unusual scale factor, check for certain
     // types of endgames, and use a lower scale for those.
-    if (sf == SCALE_FACTOR_NORMAL || sf == SCALE_FACTOR_ONEPAWN)
+    if (sf == SCALE_FACTOR_NORMAL)
     {
         sf = (35000
             - 14000 * pos.opposite_bishops()
