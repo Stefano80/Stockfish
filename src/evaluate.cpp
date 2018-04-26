@@ -184,6 +184,13 @@ namespace {
 
 #undef S
 
+  int A = 35000;
+  int B = 14000;
+  int C = 5000;
+  int D = 64;
+
+  TUNE(A,B,C,D);
+
   // Evaluation class computes and stores attacks tables and other working data
   template<Tracing T>
   class Evaluation {
@@ -800,11 +807,11 @@ namespace {
     // types of endgames, and use a lower scale for those.
     if (sf == SCALE_FACTOR_NORMAL)
     {
-        sf = (35000
-            - 14000 * pos.opposite_bishops()
+        sf = (A
+            - B * pos.opposite_bishops()
             + pos.non_pawn_material()
-            + 5000 * pos.count<PAWN>(strongSide))/700;
-        sf  = std::min(sf, 64);
+            + C * pos.count<PAWN>(strongSide))/700;
+        sf  = std::min(sf, D);
     }
 
     return ScaleFactor(sf);
