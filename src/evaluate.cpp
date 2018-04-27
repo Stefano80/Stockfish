@@ -184,12 +184,17 @@ namespace {
 
 #undef S
 
-  int A = 35000;
-  int B = 14000;
-  int C = 5000;
-  int D = 64;
+  int A = 26656;
+  int B = 14847;
+  int C = 4593;
+  int D = 65;
+  int E = 128;
 
-  TUNE(A,B,C,D);
+  TUNE(SetRange(23000, 28000), A,
+       SetRange(13000, 17000), B,
+       SetRange( 3500,  5500), C,
+       SetRange(   60,    70), D,
+       SetRange(  110,   146), E);
 
   // Evaluation class computes and stores attacks tables and other working data
   template<Tracing T>
@@ -809,7 +814,7 @@ namespace {
     {
         sf = (A
             - B * pos.opposite_bishops()
-            + pos.non_pawn_material()
+            + E * pos.non_pawn_material() / 128
             + C * pos.count<PAWN>(strongSide))/700;
         sf  = std::min(sf, D);
     }
