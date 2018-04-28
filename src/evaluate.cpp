@@ -800,10 +800,10 @@ namespace {
     // types of endgames, and use a lower scale for those.
     if (sf == SCALE_FACTOR_NORMAL)
     {
-        sf = (26656
-            - 14847 * pos.opposite_bishops()
+        sf = (26489
+            - 14591 * pos.opposite_bishops()
             + pos.non_pawn_material()
-            + 4593 * pos.count<PAWN>(strongSide))/700;
+            + 4620 * pos.count<PAWN>(strongSide))/700;
         sf  = std::min(sf, 65);
     }
 
