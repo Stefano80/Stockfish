@@ -798,12 +798,12 @@ namespace {
 
     // If we don't already have an unusual scale factor, check for certain
     // types of endgames, and use a lower scale for those.
-    if (sf == SCALE_FACTOR_NORMAL)
+    if (sf == SCALE_FACTOR_NORMAL && (pos.count<PAWN>(strongSide) <= 4 || pos.non_pawn_material() <= 9000))
     {
-        sf = (26489
-            - 14591 * pos.opposite_bishops()
-            + pos.non_pawn_material()
-            + 4620 * pos.count<PAWN>(strongSide))/700;
+        sf = (620017
+            - 342355 * pos.opposite_bishops()
+            +     23 * pos.non_pawn_material()
+            + 108321 * pos.count<PAWN>(strongSide))/16384;
         sf  = std::min(sf, 65);
     }
 
