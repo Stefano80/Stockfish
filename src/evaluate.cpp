@@ -184,17 +184,17 @@ namespace {
 
 #undef S
 
-  int A = 26656;
-  int B = 14847;
-  int C = 4593;
+  int A = 26448;
+  int B = 14591;
+  int C = 4511;
   int D = 65;
-  int E = 128;
+  int E = 127;
 
-  TUNE(SetRange(23000, 28000), A,
-       SetRange(13000, 17000), B,
+  TUNE(SetRange(25500, 27500), A,
+       SetRange(13000, 16000), B,
        SetRange( 3500,  5500), C,
-       SetRange(   60,    70), D,
-       SetRange(  110,   146), E);
+       SetRange(   55,    75), D,
+       SetRange(   10,   250), E);
 
   // Evaluation class computes and stores attacks tables and other working data
   template<Tracing T>
