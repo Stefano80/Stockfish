@@ -800,7 +800,7 @@ namespace {
     return
             me->scale_factor(pos, strongSide) != SCALE_FACTOR_NORMAL    ?
             me->scale_factor(pos, strongSide) :  pos.opposite_bishops() ?
-            ScaleFactor(std::min(39 + pos.non_pawn_material()/640, 51)) :
+            ScaleFactor(std::min(30 + pos.non_pawn_material()/640, 50)) :
             ScaleFactor(std::min(40 + 7 * pos.count<PAWN>(strongSide), 64));
   }
 
