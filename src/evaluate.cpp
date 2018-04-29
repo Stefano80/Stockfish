@@ -186,7 +186,9 @@ namespace {
 
   int A = 40;
   int B = 680;
-  int c = 50;
+  int C = 50;
+
+  TUNE(A,C, SetRange(100, 900), B);
 
   // Evaluation class computes and stores attacks tables and other working data
   template<Tracing T>
