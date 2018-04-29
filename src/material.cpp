@@ -206,6 +206,16 @@ Entry* probe(const Position& pos) {
       e->factor[BLACK] = uint8_t(npm_b <  RookValueMg   ? SCALE_FACTOR_DRAW :
                                  npm_w <= BishopValueMg ? 4 : 14);
 
+  if (pos.opposite_bishops()){
+      for (Color c = WHITE; c <= BLACK; ++c){
+          if (   pos.non_pawn_material(WHITE) == BishopValueMg
+              && pos.non_pawn_material(BLACK) == BishopValueMg)
+              e->factor[c] = e->factor[c] == SCALE_FACTOR_NORMAL? 31: e->factor[c];
+          else
+              e->factor[c] = e->factor[c] == SCALE_FACTOR_NORMAL? 46: e->factor[c];
+      }
+  }
+
   // Evaluate the material imbalance. We use PIECE_TYPE_NONE as a place holder
   // for the bishop pair "extended piece", which allows us to be more flexible
   // in defining bishop pair bonuses.
