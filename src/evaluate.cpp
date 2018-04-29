@@ -201,7 +201,6 @@ namespace {
     template<Color Us> Score threats() const;
     template<Color Us> Score passed() const;
     template<Color Us> Score space() const;
-    ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
 
     const Position& pos;
@@ -785,23 +784,6 @@ namespace {
     return make_score(0, v);
   }
 
-
-  // Evaluation::scale_factor() computes the scale factor for the winning side
-
-  template<Tracing T>
-  ScaleFactor Evaluation<T>::scale_factor(Value eg) const {
-
-    Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
-    int sf = me->scale_factor(pos, strongSide);
-
-    // If scale is not already specific, scale down the endgame via general heuristics
-    if (sf == SCALE_FACTOR_NORMAL)
-        sf = std::min(40 + 7 * pos.count<PAWN>(strongSide), sf);
-
-    return ScaleFactor(sf);
-  }
-
-
   // Evaluation::value() is the main function of the class. It computes the various
   // parts of the evaluation and returns the value of the position from the point
   // of view of the side to move.
@@ -853,10 +835,12 @@ namespace {
 
     score += initiative(eg_value(score));
 
-    // Interpolate between a middlegame and a (scaled by 'sf') endgame score
-    ScaleFactor sf = scale_factor(eg_value(score));
+    // Interpolate between a middlegame and a scaked endgame score
+
+    Color strongSide = eg_value(score) > VALUE_DRAW ? WHITE : BLACK;
+
     v =  mg_value(score) * int(me->game_phase())
-       + eg_value(score) * int(PHASE_MIDGAME - me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
+       + eg_value(score) * int(PHASE_MIDGAME - me->game_phase()) * me->scale_factor(pos, strongSide) / SCALE_FACTOR_NORMAL;
 
     v /= int(PHASE_MIDGAME);
 
