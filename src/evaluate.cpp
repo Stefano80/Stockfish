@@ -184,6 +184,10 @@ namespace {
 
 #undef S
 
+  int A = 40;
+  int B = 680;
+  int c = 50;
+
   // Evaluation class computes and stores attacks tables and other working data
   template<Tracing T>
   class Evaluation {
@@ -798,7 +802,7 @@ namespace {
     if (sf == SCALE_FACTOR_NORMAL)
     {
         if (pos.opposite_bishops())
-            sf = std::min(30 + pos.non_pawn_material()/680, 50);
+            sf = std::min(A + pos.non_pawn_material()/B, C);
         else
             sf = std::min(40 + 7 * pos.count<PAWN>(strongSide), sf);
     }
