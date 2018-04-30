@@ -150,6 +150,19 @@ Entry* probe(const Position& pos) {
           return e;
       }
 
+
+  // Evaluate the material imbalance. We use PIECE_TYPE_NONE as a place holder
+  // for the bishop pair "extended piece", which allows us to be more flexible
+  // in defining bishop pair bonuses.
+  const int pieceCount[COLOR_NB][PIECE_TYPE_NB] = {
+  { pos.count<BISHOP>(WHITE) > 1, pos.count<PAWN>(WHITE), pos.count<KNIGHT>(WHITE),
+    pos.count<BISHOP>(WHITE)    , pos.count<ROOK>(WHITE), pos.count<QUEEN >(WHITE) },
+  { pos.count<BISHOP>(BLACK) > 1, pos.count<PAWN>(BLACK), pos.count<KNIGHT>(BLACK),
+    pos.count<BISHOP>(BLACK)    , pos.count<ROOK>(BLACK), pos.count<QUEEN >(BLACK) } };
+
+  e->value = int16_t((imbalance<WHITE>(pieceCount) - imbalance<BLACK>(pieceCount)) / 16);
+
+
   // OK, we didn't find any special evaluation function for the current material
   // configuration. Is there a suitable specialized scaling function?
   EndgameBase<ScaleFactor>* sf;
@@ -206,32 +219,20 @@ Entry* probe(const Position& pos) {
       e->factor[BLACK] = uint8_t(npm_b <  RookValueMg   ? SCALE_FACTOR_DRAW :
                                  npm_w <= BishopValueMg ? 4 : 14);
 
-  for (Color c = WHITE; c <= BLACK; ++c){
-    if (pos.opposite_bishops()){
-          if (   pos.non_pawn_material(WHITE) == BishopValueMg
-              && pos.non_pawn_material(BLACK) == BishopValueMg)
-              e->factor[c] = e->factor[c] == SCALE_FACTOR_NORMAL? 31: e->factor[c];
-          else
-              e->factor[c] = e->factor[c] == SCALE_FACTOR_NORMAL? 46: e->factor[c];
-      }
-    else
-        e->factor[c] = e->factor[c] == SCALE_FACTOR_NORMAL?
-            std::min(40 + 7 * pos.count<PAWN>(c), int(SCALE_FACTOR_NORMAL)):
-            e->factor[c];
+  if (e->factor[WHITE] != SCALE_FACTOR_NORMAL || e->factor[BLACK] != SCALE_FACTOR_NORMAL)
+      return e;
+
+if (pos.opposite_bishops()){
+      if (   pos.non_pawn_material(WHITE) == BishopValueMg
+          && pos.non_pawn_material(BLACK) == BishopValueMg)
+          e->factor[WHITE] = e->factor[BLACK] = 31;
+      else
+          e->factor[WHITE] = e->factor[BLACK] = 46;
   }
+else
+    e->factor[WHITE] = std::min(40 + 7 * pos.count<PAWN>(WHITE), int(SCALE_FACTOR_NORMAL));
+    e->factor[BLACK] = std::min(40 + 7 * pos.count<PAWN>(BLACK), int(SCALE_FACTOR_NORMAL));
 
-
-
-  // Evaluate the material imbalance. We use PIECE_TYPE_NONE as a place holder
-  // for the bishop pair "extended piece", which allows us to be more flexible
-  // in defining bishop pair bonuses.
-  const int pieceCount[COLOR_NB][PIECE_TYPE_NB] = {
-  { pos.count<BISHOP>(WHITE) > 1, pos.count<PAWN>(WHITE), pos.count<KNIGHT>(WHITE),
-    pos.count<BISHOP>(WHITE)    , pos.count<ROOK>(WHITE), pos.count<QUEEN >(WHITE) },
-  { pos.count<BISHOP>(BLACK) > 1, pos.count<PAWN>(BLACK), pos.count<KNIGHT>(BLACK),
-    pos.count<BISHOP>(BLACK)    , pos.count<ROOK>(BLACK), pos.count<QUEEN >(BLACK) } };
-
-  e->value = int16_t((imbalance<WHITE>(pieceCount) - imbalance<BLACK>(pieceCount)) / 16);
   return e;
 }
 
