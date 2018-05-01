@@ -125,11 +125,11 @@ Entry* probe(const Position& pos) {
   Key key = pos.material_key();
   Entry* e = pos.this_thread()->materialTable[key];
 
-  // Opposite bishops
-  if (pos.opposite_bishops()){
-        e->scalingFunction[WHITE] = &ScaleOCB[WHITE];
-        e->scalingFunction[BLACK] = &ScaleOCB[BLACK];
-  }
+  // Opposite bishops as a last resort
+  if (pos.opposite_bishops())
+      for (Color c = WHITE; c <= BLACK; ++c)
+          if (e->scalingFunction[c] == nullptr && e->factor[c] == SCALE_FACTOR_NORMAL)
+              e->scalingFunction[c] = &ScaleOCB[c];
 
   if (e->key == key)
       return e;
