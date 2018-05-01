@@ -796,6 +796,5 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
 
 template<>
 ScaleFactor Endgame<OCB>::operator()(const Position& pos) const {
-    return (pos.non_pawn_material(WHITE) == BishopValueMg && pos.non_pawn_material(BLACK) == BishopValueMg) ?
-            ScaleFactor(31) : ScaleFactor(46);
+    return ScaleFactor(10*(pos.count<PAWN>(strongSide) - pos.count<PAWN>(~strongSide)) + pos.non_pawn_material(strongSide)/640);
 }
