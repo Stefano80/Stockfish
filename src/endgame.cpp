@@ -796,7 +796,7 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
 
 template<>
 ScaleFactor Endgame<OCB>::operator()(const Position& pos) const {
-    return ScaleFactor(std::min(5 + 15 * pos.count<PAWN>(strongSide)
-                                  -  5 * pos.count<PAWN>(~strongSide)
-                                  +      pos.non_pawn_material(strongSide)/640, 55));
+    return ScaleFactor(std::min(19 +  9 * pos.count<PAWN>(strongSide)
+                                   -  2 * pos.count<PAWN>(~strongSide)
+                                  +       pos.non_pawn_material(strongSide)/712, 50));
 }
