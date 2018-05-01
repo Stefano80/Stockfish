@@ -61,6 +61,8 @@ namespace {
   Endgame<KQKRPs> ScaleKQKRPs[] = { Endgame<KQKRPs>(WHITE), Endgame<KQKRPs>(BLACK) };
   Endgame<KPsK>   ScaleKPsK[]   = { Endgame<KPsK>(WHITE),   Endgame<KPsK>(BLACK) };
   Endgame<KPKP>   ScaleKPKP[]   = { Endgame<KPKP>(WHITE),   Endgame<KPKP>(BLACK) };
+  Endgame<OCB>    ScaleOCB[]    = { Endgame<OCB>(WHITE),    Endgame<OCB>(BLACK) };
+
 
   // Helper used to detect a given material distribution
   bool is_KXK(const Position& pos, Color us) {
@@ -170,9 +172,11 @@ Entry* probe(const Position& pos) {
 
     else if (is_KQKRPs(pos, c))
         e->scalingFunction[c] = &ScaleKQKRPs[c];
+
   }
 
-  if (npm_w + npm_b == VALUE_ZERO && pos.pieces(PAWN)) // Only pawns on the board
+  // Only pawns on the board
+  if (npm_w + npm_b == VALUE_ZERO && pos.pieces(PAWN))
   {
       if (!pos.count<PAWN>(BLACK))
       {
@@ -195,16 +199,20 @@ Entry* probe(const Position& pos) {
       }
   }
 
-  // Zero or just one pawn makes it difficult to win, even with a small material
-  // advantage. This catches some trivial draws like KK, KBK and KNK and gives a
-  // drawish scale factor for cases such as KRKBP and KmmKm (except for KBBKN).
-  if (!pos.count<PAWN>(WHITE) && npm_w - npm_b <= BishopValueMg)
-      e->factor[WHITE] = uint8_t(npm_w <  RookValueMg   ? SCALE_FACTOR_DRAW :
-                                 npm_b <= BishopValueMg ? 4 : 14);
+  // Opposite bishops
+  if (pos.opposite_bishops()){
+        e->scalingFunction[WHITE] = &ScaleOCB[WHITE];
+        e->scalingFunction[BLACK] = &ScaleOCB[BLACK];
+  }
 
-  if (!pos.count<PAWN>(BLACK) && npm_b - npm_w <= BishopValueMg)
-      e->factor[BLACK] = uint8_t(npm_b <  RookValueMg   ? SCALE_FACTOR_DRAW :
-                                 npm_w <= BishopValueMg ? 4 : 14);
+  // No pawns for strong side.
+  // This catches some trivial draws like KK, KBK and KNK and gives a
+  // drawish scale factor for cases such as KRKBP and KmmKm (except for KBBKN).
+  for (Color c = WHITE; c <= BLACK; ++c){
+      if (!pos.count<PAWN>(c) && pos.non_pawn_material(c) - pos.non_pawn_material(~c) <= BishopValueMg)
+          e->factor[c] = uint8_t(pos.non_pawn_material(c) <  RookValueMg    ? SCALE_FACTOR_DRAW :
+                                 pos.non_pawn_material(~c) <= BishopValueMg ? 4 : 14);
+  }
 
   // Evaluate the material imbalance. We use PIECE_TYPE_NONE as a place holder
   // for the bishop pair "extended piece", which allows us to be more flexible

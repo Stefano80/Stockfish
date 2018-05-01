@@ -793,3 +793,9 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
   // it's probably at least a draw even with the pawn.
   return Bitbases::probe(wksq, psq, bksq, us) ? SCALE_FACTOR_NONE : SCALE_FACTOR_DRAW;
 }
+
+template<>
+ScaleFactor Endgame<OCB>::operator()(const Position& pos) const {
+    return (pos.non_pawn_material(WHITE) == BishopValueMg && pos.non_pawn_material(BLACK) == BishopValueMg) ?
+            ScaleFactor(31) : ScaleFactor(46);
+}
