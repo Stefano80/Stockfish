@@ -45,7 +45,7 @@ namespace Zobrist {
   Key psq[PIECE_NB][SQUARE_NB];
   Key enpassant[FILE_NB];
   Key castling[CASTLING_RIGHT_NB];
-  Key side, noPawns;
+  Key side, noPawns, oppositeBishops;
 }
 
 namespace {
@@ -157,6 +157,8 @@ void Position::init() {
 
   Zobrist::side = rng.rand<Key>();
   Zobrist::noPawns = rng.rand<Key>();
+  Zobrist::oppositeBishops = rng.rand<Key>();
+
 }
 
 
@@ -381,7 +383,10 @@ void Position::set_state(StateInfo* si) const {
       for (int cnt = 0; cnt < pieceCount[pc]; ++cnt)
           si->materialKey ^= Zobrist::psq[pc][cnt];
   }
+  if (opposite_bishops())
+    si->materialKey ^= Zobrist::oppositeBishops;
 }
+
 
 
 /// Position::set() is an overload to initialize the position object with
@@ -704,6 +709,8 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
   Square to = to_sq(m);
   Piece pc = piece_on(from);
   Piece captured = type_of(m) == ENPASSANT ? make_piece(them, PAWN) : piece_on(to);
+  bool ocbFrom, ocbTo;
+  ocbFrom = ocbTo = false;
 
   assert(color_of(pc) == us);
   assert(captured == NO_PIECE || color_of(captured) == (type_of(m) != CASTLING ? them : us));
@@ -745,6 +752,9 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
 
           st->pawnKey ^= Zobrist::psq[captured][capsq];
       }
+      else if (type_of(captured) == BISHOP && type_of(pc) != BISHOP)
+          ocbFrom = opposite_bishops();
+
       else
           st->nonPawnMaterial[them] -= PieceValue[MG][captured];
 
@@ -826,6 +836,12 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
       // Reset rule 50 draw counter
       st->rule50 = 0;
   }
+
+  if (captured && type_of(captured) == BISHOP && type_of(pc) != BISHOP)
+      ocbTo = opposite_bishops();
+
+  if (ocbTo ^ ocbFrom)
+      k ^= Zobrist::oppositeBishops;
 
   // Update incremental scores
   st->psq += PSQT::psq[pc][to] - PSQT::psq[pc][from];
