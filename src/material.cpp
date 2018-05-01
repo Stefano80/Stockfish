@@ -212,7 +212,10 @@ Entry* probe(const Position& pos) {
       if (!pos.count<PAWN>(c) && pos.non_pawn_material(c) - pos.non_pawn_material(~c) <= BishopValueMg)
           e->factor[c] = uint8_t(pos.non_pawn_material(c) <  RookValueMg    ? SCALE_FACTOR_DRAW :
                                  pos.non_pawn_material(~c) <= BishopValueMg ? 4 : 14);
+      else if (pos.count<PAWN>(c))
+          e->factor[c] = std::min(40 + 7 * pos.count<PAWN>(c), int(SCALE_FACTOR_NORMAL));
   }
+
 
   // Evaluate the material imbalance. We use PIECE_TYPE_NONE as a place holder
   // for the bishop pair "extended piece", which allows us to be more flexible
