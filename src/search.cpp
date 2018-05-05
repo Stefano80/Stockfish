@@ -36,6 +36,7 @@
 #include "tt.h"
 #include "uci.h"
 #include "syzygy/tbprobe.h"
+#include "bitboard.h"
 
 namespace Search {
 
@@ -854,6 +855,8 @@ moves_loop: // When in check, search starts from here
     skipQuiets = false;
     ttCapture = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
+    Bitboard capturingOn = Bitboard(0);
+
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
@@ -991,8 +994,13 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-          if (captureOrPromotion) // (~5 Elo)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+          if (captureOrPromotion){ // (~5 Elo)
+              r -= ONE_PLY;
+              if (to_sq(move) && capturingOn)
+                  r -= ONE_PLY;
+              capturingOn |= to_sq(move);
+              r = std::max(r, DEPTH_ZERO);
+          }
           else
           {
               // Decrease reduction if opponent's move count is high (~5 Elo)
