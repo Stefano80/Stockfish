@@ -986,7 +986,7 @@ moves_loop: // When in check, search starts from here
 
           if (captureOrPromotion){ // (~5 Elo)
               r -= ONE_PLY;
-              if (bool(to_sq(move) & capturingOn))
+              if (bool(capturingOn & to_sq(move)))
                   r -= ONE_PLY;
               capturingOn |= to_sq(move);
               r = std::max(r, DEPTH_ZERO);
