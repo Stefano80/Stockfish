@@ -952,7 +952,7 @@ moves_loop: // When in check, search starts from here
           }
           else if (    depth < 7 * ONE_PLY // (~20 Elo)
                    && !extension
-                   && !pos.see_ge(move, - (Value(CapturePruneMargin[depth / ONE_PLY] - PawnValueEg * bool(to_sq(move) & capturingOn) / 2  ))))
+                   && !pos.see_ge(move, -Value(CapturePruneMargin[depth / ONE_PLY])))
                   continue;
       }
 
@@ -985,8 +985,11 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           if (captureOrPromotion){ // (~5 Elo)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+              r -= ONE_PLY;
+              if (bool(to_sq(move) & capturingOn))
+                  r -= ONE_PLY;
               capturingOn |= to_sq(move);
+              r = std::max(r, DEPTH_ZERO);
           }
           else
           {
