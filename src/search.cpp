@@ -911,6 +911,13 @@ moves_loop: // When in check, search starts from here
       // Calculate new depth for this move
       newDepth = depth - ONE_PLY + extension;
 
+      // Check for legality before see-based pruning
+      if (!rootNode && !pos.legal(move))
+      {
+          ss->moveCount = --moveCount;
+          continue;
+      }
+
       // Step 14. Pruning at shallow depth (~170 Elo)
       if (  !rootNode
           && pos.non_pawn_material(pos.side_to_move())
@@ -955,13 +962,6 @@ moves_loop: // When in check, search starts from here
 
       // Speculative prefetch as early as possible
       prefetch(TT.first_entry(pos.key_after(move)));
-
-      // Check for legality just before making the move
-      if (!rootNode && !pos.legal(move))
-      {
-          ss->moveCount = --moveCount;
-          continue;
-      }
 
       if (move == ttMove && captureOrPromotion)
           ttCapture = true;
