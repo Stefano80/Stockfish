@@ -962,7 +962,7 @@ moves_loop: // When in check, search starts from here
           }
           else if (    depth < 7 * ONE_PLY // (~20 Elo)
                    && !extension
-                   && !pos.see_ge(move, - (Value(CapturePruneMargin[depth / ONE_PLY] + bool(capturingOn & to_sq(move)) * 10 * depth / ONE_PLY ))))
+                   && !pos.see_ge(move, - (Value(CapturePruneMargin[depth / ONE_PLY] + bool(capturingOn & to_sq(move)) * 5 * depth / ONE_PLY ))))
                   continue;
       }
 
