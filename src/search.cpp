@@ -73,13 +73,13 @@ namespace {
   }
 
   // Margin for pruning capturing moves: almost linear in depth
-  constexpr int CapturePruneMargin[] = { 0,
-                                         1 * PawnValueEg * 1055 / 1000,
-                                         2 * PawnValueEg * 1042 / 1000,
-                                         3 * PawnValueEg * 963  / 1000,
-                                         4 * PawnValueEg * 1038 / 1000,
-                                         5 * PawnValueEg * 950  / 1000,
-                                         6 * PawnValueEg * 930  / 1000
+  constexpr int CapturePruneMargin[][2]   = {{0, 0},
+                                            {1 * PawnValueEg * 1055 / 1000, 1 * PawnValueEg * 1055 / 1000 + 120},
+                                            {2 * PawnValueEg * 1042 / 1000, 2 * PawnValueEg * 1042 / 1000 + 100},
+                                            {3 * PawnValueEg * 963  / 1000, 3 * PawnValueEg *  963 / 1000 +  80},
+                                            {4 * PawnValueEg * 1038 / 1000, 4 * PawnValueEg * 1100 / 1000 +  60},
+                                            {5 * PawnValueEg * 950  / 1000, 5 * PawnValueEg *  950 / 1000 +  50},
+                                            {6 * PawnValueEg * 930  / 1000, 6 * PawnValueEg *  930 / 1000 +  40}
                                        };
 
   // Futility and reductions lookup tables, initialized at startup
@@ -951,7 +951,7 @@ moves_loop: // When in check, search starts from here
           }
           else if (    depth < 7 * ONE_PLY // (~20 Elo)
                    && !extension
-                   && !pos.see_ge(move, - (Value(CapturePruneMargin[depth / ONE_PLY] + bool(capturingOn & to_sq(move)) * 5 * depth / ONE_PLY ))))
+                   && !pos.see_ge(move, -Value(CapturePruneMargin[depth / ONE_PLY][bool(capturingOn & to_sq(move))])))
                   continue;
       }
 
@@ -972,6 +972,10 @@ moves_loop: // When in check, search starts from here
       ss->currentMove = move;
       ss->contHistory = thisThread->contHistory[movedPiece][to_sq(move)].get();
 
+      if (captureOrPromotion)
+          capturingOn |= to_sq(move);
+
+
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
@@ -983,10 +987,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-          if (captureOrPromotion){ // (~5 Elo)
+          if (captureOrPromotion) // (~5 Elo)
               r -= r ? ONE_PLY : DEPTH_ZERO;
-              capturingOn |= to_sq(move);
-          }
+
           else
           {
               // Decrease reduction if opponent's move count is high (~5 Elo)
