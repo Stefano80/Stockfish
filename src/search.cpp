@@ -973,6 +973,9 @@ moves_loop: // When in check, search starts from here
       ss->currentMove = move;
       ss->contHistory = thisThread->contHistory[movedPiece][to_sq(move)].get();
 
+      if (captureOrPromotion)
+        capturingOn |= to_sq(move);
+
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
@@ -984,10 +987,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-          if (captureOrPromotion){ // (~5 Elo)
+          if (captureOrPromotion) // (~5 Elo)
               r -= r ? ONE_PLY : DEPTH_ZERO;
-              capturingOn |= to_sq(move);
-          }
           else
           {
               // Decrease reduction if opponent's move count is high (~5 Elo)
