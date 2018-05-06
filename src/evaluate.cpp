@@ -803,7 +803,7 @@ namespace {
     {
         if (pos.opposite_bishops())
             // Scale using a sigmoid function
-            sf = 50 * pos.non_pawn_material() / (1100 + std::abs( pos.non_pawn_material()));
+            sf = 46 * pos.non_pawn_material() / (400 + std::abs( pos.non_pawn_material(strongSide)));
         else
             sf = std::min(40 + 7 * pos.count<PAWN>(strongSide), sf);
     }
