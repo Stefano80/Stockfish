@@ -78,7 +78,7 @@ namespace {
                                             {2 * PawnValueEg * 1042 / 1000, 2 * PawnValueEg * 1042 / 1000 + 100},
                                             {3 * PawnValueEg * 963  / 1000, 3 * PawnValueEg *  963 / 1000 +  80},
                                             {4 * PawnValueEg * 1038 / 1000, 4 * PawnValueEg * 1100 / 1000 +  60},
-                                            {5 * PawnValueEg * 950  / 1000, 5 * PawnValueEg *  100 / 1000 +  50},
+                                            {5 * PawnValueEg * 950  / 1000, 5 * PawnValueEg * 1000 / 1000 +  50},
                                             {6 * PawnValueEg * 930  / 1000, 6 * PawnValueEg *  950 / 1000 +  40}
                                        };
 
