@@ -801,9 +801,11 @@ namespace {
     // If scale is not already specific, scale down the endgame via general heuristics
     if (sf == SCALE_FACTOR_NORMAL)
     {
-        if (pos.opposite_bishops())
+        if (pos.opposite_bishops()){
             // Scale using a sigmoid function
-            sf = 46 * pos.non_pawn_material(strongSide) / (400 + pos.non_pawn_material(strongSide));
+            int s = pos.non_pawn_material() + 1000 * pos.count<PAWN>(strongSide);
+            sf = 46 * s / (1200 + s);
+        }
         else
             sf = std::min(40 + 7 * pos.count<PAWN>(strongSide), sf);
     }
