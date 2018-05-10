@@ -73,7 +73,7 @@ namespace {
   }
 
   // Margin for pruning capturing moves: almost linear in depth
-  constexpr int CapturePruneMargin[][2]   = {{0, 0},
+           int CapturePruneMargin[][2]   = {{0, 0},
                                             { 253,  373},
                                             { 500,  600},
                                             { 693,  773},
@@ -81,6 +81,8 @@ namespace {
                                             {1140, 1190},
                                             {1339, 1379}
                                        };
+
+  TUNE(CapturePruneMargin);
 
   // Futility and reductions lookup tables, initialized at startup
   int FutilityMoveCounts[2][16]; // [improving][depth]
