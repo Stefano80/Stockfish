@@ -74,12 +74,12 @@ namespace {
 
   // Margin for pruning capturing moves: almost linear in depth
   constexpr int CapturePruneMargin[][2]   = {{0, 0},
-                                            { 254,  346},
-                                            { 531,  610},
-                                            { 702,  683},
-                                            { 993, 1005},
-                                            {1151, 1276},
-                                            {1291, 1413}
+                                            { 248,  359},
+                                            { 529,  543},
+                                            { 683,  704},
+                                            {1023, 1011},
+                                            {1175, 1222},
+                                            {1319, 1417}
                                        };
 
   // Futility and reductions lookup tables, initialized at startup
