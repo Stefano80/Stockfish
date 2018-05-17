@@ -797,10 +797,8 @@ namespace {
 
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
 
-
-    bool condition = pos.non_pawn_material() > MidgameLimit || !pos.opposite_bishops() && pos.count<PAWN>(strongSide) > 4;
-
-    if(condition)
+    // Return early if no effect to be expected
+    if((pos.non_pawn_material() > MidgameLimit) || (!pos.opposite_bishops() && pos.count<PAWN>(strongSide) > 3))
         return SCALE_FACTOR_NORMAL;
 
     int sf = me->scale_factor(pos, strongSide);
