@@ -796,6 +796,13 @@ namespace {
   ScaleFactor Evaluation<T>::scale_factor(Value eg) const {
 
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
+
+
+    bool condition = pos.non_pawn_material() > MidgameLimit || !pos.opposite_bishops() && pos.count<PAWN>(strongSide) > 4;
+
+    if(condition)
+        return SCALE_FACTOR_NORMAL;
+
     int sf = me->scale_factor(pos, strongSide);
 
     // If scale is not already specific, scale down the endgame via general heuristics
