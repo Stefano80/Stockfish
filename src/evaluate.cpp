@@ -199,7 +199,7 @@ namespace {
     template<Color Us, PieceType Pt> Score pieces();
     template<Color Us> Score king() const;
     template<Color Us> Score threats() const;
-    template<Color Us> Score passed() const;
+    template<Color Us> Score passed();
     template<Color Us> Score space() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
@@ -208,7 +208,8 @@ namespace {
     Material::Entry* me;
     Pawns::Entry* pe;
     Bitboard mobilityArea[COLOR_NB];
-    Score mobility[COLOR_NB] = { SCORE_ZERO, SCORE_ZERO };
+    Score mobility[COLOR_NB]    = { SCORE_ZERO, SCORE_ZERO };
+    Score Passed[COLOR_NB]      = { SCORE_ZERO, SCORE_ZERO };
 
     // attackedBy[color][piece type] is a bitboard representing all squares
     // attacked by a given color and piece type. Special "piece types" which
@@ -627,7 +628,7 @@ namespace {
   // pawns of the given color.
 
   template<Tracing T> template<Color Us>
-  Score Evaluation<T>::passed() const {
+  Score Evaluation<T>::passed() {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
@@ -710,8 +711,11 @@ namespace {
         score += bonus + PassedFile[file_of(s)];
     }
 
+    Passed[Us] = score;
+
     if (T)
         Trace::add(PASSED, Us, score);
+
 
     return score;
   }
@@ -806,12 +810,12 @@ namespace {
             // Endgame with opposite-colored bishops and no other pieces is almost a draw
             if (   pos.non_pawn_material(WHITE) == BishopValueMg
                 && pos.non_pawn_material(BLACK) == BishopValueMg)
-                sf = 28 + pos.count<PAWN>(strongSide);
+                sf = 31  + eg_value(Passed[strongSide] - Passed[~strongSide])/32;
 
             // Endgame with opposite-colored bishops, but also other pieces. Still
             // a bit drawish, but not as drawish as with only the two bishops.
             else
-                sf = 42 + 2 * pos.count<PAWN>(strongSide);
+                sf = 46;
         }
         else
             sf = std::min(40 + 7 * pos.count<PAWN>(strongSide), sf);
