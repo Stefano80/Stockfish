@@ -810,7 +810,7 @@ namespace {
             // Endgame with opposite-colored bishops and no other pieces is almost a draw
             if (   pos.non_pawn_material(WHITE) == BishopValueMg
                 && pos.non_pawn_material(BLACK) == BishopValueMg)
-                sf = 31  + eg_value(Passed[strongSide] - Passed[~strongSide])/32;
+                sf = 31;
 
             // Endgame with opposite-colored bishops, but also other pieces. Still
             // a bit drawish, but not as drawish as with only the two bishops.
@@ -818,7 +818,7 @@ namespace {
                 sf = 46;
         }
         else
-            sf = std::min(40 + 7 * pos.count<PAWN>(strongSide), sf);
+            sf = std::min(40 + 7 * pos.count<PAWN>(strongSide) + eg_value(Passed[strongSide] - Passed[~strongSide])/32, sf);
     }
 
     return ScaleFactor(sf);
