@@ -818,7 +818,7 @@ namespace {
                 sf = 46;
         }
         else{
-            int p = - eg_value(Passed[strongSide] - Passed[~strongSide]);
+            int p = eg_value(Passed[~strongSide]);
             int pp = 2 * p / (std::abs(p) + 100);
             sf = std::min(40 + 7 * pos.count<PAWN>(strongSide) + pp, sf);
         }
