@@ -818,7 +818,7 @@ namespace {
                 sf = 46;
         }
         else
-            sf = std::min(40 + 7 * pos.count<PAWN>(strongSide) + eg_value(Passed[strongSide] - Passed[~strongSide])/32, sf);
+            sf = std::min(40 + 7 * pos.count<PAWN>(strongSide) + eg_value(Passed[~strongSide] - Passed[strongSide])/32, sf);
     }
 
     return ScaleFactor(sf);
