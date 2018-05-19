@@ -180,7 +180,7 @@ namespace {
   constexpr Score ThreatBySafePawn   = S(175,168);
   constexpr Score TrappedRook        = S( 92,  0);
   constexpr Score WeakQueen          = S( 50, 10);
-  constexpr Score WeakUnopposedPawn  = S(  5, 25);
+  constexpr Score WeakUnopposedPawn  = S(  3, 15);
 
 #undef S
 
@@ -572,8 +572,7 @@ namespace {
     }
 
     // Bonus for enemy unopposed weak pawns
-    if (pos.pieces(Us, ROOK, QUEEN))
-        score += WeakUnopposedPawn * pe->weak_unopposed(Them);
+    score += WeakUnopposedPawn * pe->weak_unopposed(Them) * popcount(pos.pieces(Us, ROOK, QUEEN));
 
     // Our safe or protected pawns
     b =   pos.pieces(Us, PAWN)
