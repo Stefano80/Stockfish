@@ -792,19 +792,14 @@ namespace {
   ScaleFactor Evaluation<T>::scale_factor(Value eg) const {
 
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
-    int sf = me->scale_factor(pos, strongSide);
+
+    if (me->scale_factor(pos, strongSide) != SCALE_FACTOR_NORMAL)
+       return me->scale_factor(pos, strongSide);
 
     // If scale is not already specific, scale down the endgame via general heuristics
-    if (sf == SCALE_FACTOR_NORMAL)
-    {
-        if (   pos.opposite_bishops()
-            && pos.non_pawn_material(WHITE) == BishopValueMg
-            && pos.non_pawn_material(BLACK) == BishopValueMg)
-            sf = 31;
-        else
-            sf = std::min(40 + (pos.opposite_bishops() ? 2 : 7) * pos.count<PAWN>(strongSide), sf);
-    }
-
+    int sf = pos.opposite_bishops()? me->piece_types() == 1? 31
+                                   : std::min(40 + 2 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL))
+                                   : std::min(40 + 7 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL));
     return ScaleFactor(sf);
   }
 
