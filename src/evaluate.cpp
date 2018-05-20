@@ -801,7 +801,8 @@ namespace {
        return me->scale_factor(pos, strongSide);
 
     // If scale is not already specific, scale down the endgame via general heuristics
-    int sf = pos.opposite_bishops()? me->piece_types() == 1? 31: 46
+    int sf = pos.opposite_bishops()? me->piece_types() == 1? 31
+                                   : 42 + pos.count<KNIGHT>()
                                    : std::min(40 + 7 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL));
     return ScaleFactor(sf);
   }
