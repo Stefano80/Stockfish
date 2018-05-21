@@ -849,7 +849,7 @@ namespace {
 
     // Early exit if score is high
     Value v = (mg_value(score) + eg_value(score)) / 2;
-    if (abs(v) > (LazyThreshold + pe->asymmetry * 80))
+    if (abs(v) > (LazyThreshold + pe->asymmetry * 160))
        return pos.side_to_move() == WHITE ? v : -v;
 
     // Main evaluation begins here
