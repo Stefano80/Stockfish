@@ -433,7 +433,7 @@ namespace {
         int kingDanger = 0;
         unsafeChecks = 0;
 
-        int mateDanger = 13 - popcount(kingRing[Us] & ~attackedBy[Them][ALL_PIECES] & ~pos.pieces(Us));
+        int mateDanger = 19 - popcount(kingRing[Us] & ~attackedBy[Them][ALL_PIECES] & ~pos.pieces(Us));
 
         // Attacked squares defended at most once by our queen or king
         weak =  attackedBy[Them][ALL_PIECES]
