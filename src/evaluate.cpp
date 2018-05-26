@@ -433,7 +433,7 @@ namespace {
         int kingDanger = 0;
         unsafeChecks = 0;
 
-        int mateDanger = 17 - popcount(kingRing[Us] & ~attackedBy[Them][ALL_PIECES] & ~pos.pieces(Us));
+        int mateDanger = 18 - popcount(kingRing[Us] & ~attackedBy[Them][ALL_PIECES] & ~pos.pieces(Us));
 
         // Attacked squares defended at most once by our queen or king
         weak =  attackedBy[Them][ALL_PIECES]
@@ -449,27 +449,27 @@ namespace {
 
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
-            kingDanger += QueenSafeCheck * mateDanger / 25;
+            kingDanger += QueenSafeCheck * mateDanger / 16;
 
         b1 &= attackedBy[Them][ROOK];
         b2 &= attackedBy[Them][BISHOP];
 
         // Enemy rooks checks
         if (b1 & safe)
-            kingDanger += RookSafeCheck * mateDanger / 25;
+            kingDanger += RookSafeCheck * mateDanger / 16;
         else
             unsafeChecks |= b1;
 
         // Enemy bishops checks
         if (b2 & safe)
-            kingDanger += BishopSafeCheck * mateDanger / 25;
+            kingDanger += BishopSafeCheck * mateDanger / 16;
         else
             unsafeChecks |= b2;
 
         // Enemy knights checks
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
         if (b & safe)
-            kingDanger += KnightSafeCheck * mateDanger / 25;
+            kingDanger += KnightSafeCheck * mateDanger / 16;
         else
             unsafeChecks |= b;
 
