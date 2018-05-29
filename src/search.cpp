@@ -866,6 +866,9 @@ moves_loop: // When in check, search starts from here
       if (move == excludedMove)
           continue;
 
+      if (thisThread != Threads.main() && !PvNode && bestValue >= alpha && bestMove == ttMove)
+          continue;
+
       // At root obey the "searchmoves" option and skip moves not listed in Root
       // Move List. As a consequence any illegal move is also skipped. In MultiPV
       // mode we also skip PV moves which have been already searched and those
