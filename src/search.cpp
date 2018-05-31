@@ -866,7 +866,7 @@ moves_loop: // When in check, search starts from here
       if (move == excludedMove)
           continue;
 
-      if (thisThread != Threads.main() && !PvNode && bestValue >= alpha && bestMove == ttMove)
+      if (thisThread != Threads.main() && !PvNode && bestValue >= beta && bestMove == ttMove)
           continue;
 
       // At root obey the "searchmoves" option and skip moves not listed in Root
