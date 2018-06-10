@@ -866,7 +866,7 @@ namespace {
     score += mobility[WHITE] - mobility[BLACK];
 
     Score kingScore = king<   WHITE>() - king<   BLACK>();
-    score += make_score(-mg_value(pos.this_thread()->contempt) * int(mg_value(kingScore)) / 512, 0);
+    score += make_score(-mg_value(pos.this_thread()->contempt) * int(mg_value(kingScore)) / 1024, 0);
 
     score +=  kingScore
             + threats<WHITE>() - threats<BLACK>()
