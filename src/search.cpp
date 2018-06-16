@@ -1030,7 +1030,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 18000) * ONE_PLY);
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
@@ -1153,11 +1153,8 @@ moves_loop: // When in check, search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_quiet_stats(pos, ss, bestMove, quietsSearched, quietCount,
-                               stat_bonus(depth + (bestValue > beta + PawnValueMg ? ONE_PLY : DEPTH_ZERO)));
             update_quiet_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth, (bestValue - beta)/64));
         else
-
             update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth, (bestValue - beta)/36));
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
