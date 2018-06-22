@@ -808,7 +808,7 @@ namespace {
         else{
             sf = std::min(40 + (pos.opposite_bishops() ? 2 : 7) * pos.count<PAWN>(strongSide), sf);
             if (pos.opposite_bishops())
-                sf += pos.count<KNIGHT>() - 2;
+                sf += pos.count<KNIGHT>(strongSide) - 1;
         }
     }
 
