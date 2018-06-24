@@ -806,8 +806,8 @@ namespace {
     bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
                             && (pos.pieces(PAWN) & KingSide);
 
-    if (me->piece_types() == 1 && pos.count<ROOK>() && !pawnsOnBothFlanks)
-        sf -= 2;
+    if (me->piece_types() == 1 && pos.count<KNIGHT>() && pawnsOnBothFlanks)
+        sf += 2;
 
     return ScaleFactor(sf);
   }
