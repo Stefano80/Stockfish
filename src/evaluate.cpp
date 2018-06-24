@@ -800,6 +800,10 @@ namespace {
     int sf = pos.opposite_bishops()? me->piece_types() == 1? 31
                                    : std::min(40 + 2 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL))
                                    : std::min(40 + 7 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL));
+
+    if (me->piece_types() == 1 && pos.count<ROOK>())
+        sf -= 2;
+
     return ScaleFactor(sf);
   }
 
