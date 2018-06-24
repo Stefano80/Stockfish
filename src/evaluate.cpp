@@ -802,7 +802,7 @@ namespace {
                                    : std::min(40 + 7 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL));
 
     if (me->piece_types() == 1 && pos.count<BISHOP>())
-        sf -= 1;
+        sf -= 3;
 
     return ScaleFactor(sf);
   }
