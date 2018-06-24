@@ -801,8 +801,8 @@ namespace {
                                    : std::min(40 + 2 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL))
                                    : std::min(40 + 7 * pos.count<PAWN>(strongSide), int(SCALE_FACTOR_NORMAL));
 
-    if (me->piece_types() == 1 && pos.count<ROOK>())
-        sf -= 3;
+    if (me->piece_types() == 1 && pos.count<BISHOP>())
+        sf -= 1;
 
     return ScaleFactor(sf);
   }
