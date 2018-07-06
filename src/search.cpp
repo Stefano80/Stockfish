@@ -251,6 +251,7 @@ void MainThread::search() {
           Depth depthDiff = th->completedDepth - bestThread->completedDepth;
           Value scoreDiff = th->rootMoves[0].score - bestThread->rootMoves[0].score;
 
+          // Only use first 16 threads to select best move
           if (int(th->idx >= 16))
               break;
 
