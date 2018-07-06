@@ -807,7 +807,7 @@ namespace {
                             && (pos.pieces(PAWN) & KingSide);
 
     if (me->piece_types() == 1 && pos.count<KNIGHT>() && pawnsOnBothFlanks)
-        sf += 4;
+        sf += 6;
 
     return ScaleFactor(sf);
   }
