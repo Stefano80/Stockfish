@@ -466,19 +466,8 @@ void Thread::search() {
           }
 
       // Montecarlo search
-      if(!mainThread && rootDepth >= Threads.main()->completedDepth - 6 * ONE_PLY){
-          StateInfo st;
-          if(!MoveList<LEGAL>(this->rootPos).size())
-              break;
-
-          this->rootDepth = this->completedDepth = DEPTH_ZERO;
-          this->rootPos.do_move(lastBestMove, st);
-          this->rootMoves.clear();
-          for (const auto& m : MoveList<LEGAL>(this->rootPos))
-                        this->rootMoves.emplace_back(m);
-          Thread::search();
-          rootPos.undo_move(lastBestMove);
-      }
+      if(!mainThread && rootDepth >= Threads.main()->completedDepth - 6 * ONE_PLY)
+        playout(lastBestMove);
   }
 
   if (!mainThread)
@@ -490,6 +479,20 @@ void Thread::search() {
   if (skill.enabled())
       std::swap(rootMoves[0], *std::find(rootMoves.begin(), rootMoves.end(),
                 skill.best ? skill.best : skill.pick_best(multiPV)));
+}
+
+void Thread::playout(Move lastBestMove) {
+    StateInfo st;
+    if(!MoveList<LEGAL>(this->rootPos).size())
+        return;
+
+    this->rootDepth = this->completedDepth = DEPTH_ZERO;
+    this->rootPos.do_move(lastBestMove, st);
+    this->rootMoves.clear();
+    for (const auto& m : MoveList<LEGAL>(this->rootPos))
+                this->rootMoves.emplace_back(m);
+    Thread::search();
+    rootPos.undo_move(lastBestMove);
 }
 
 
