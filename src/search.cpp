@@ -419,6 +419,9 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
+      // Montecarlo search  
+      playout(lastBestMove, ss);
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -465,9 +468,7 @@ void Thread::search() {
               }
           }
 
-      // Montecarlo search
-      if(!mainThread && rootDepth >= Threads.main()->completedDepth - 6 * ONE_PLY)
-        playout(lastBestMove);
+
   }
 
   if (!mainThread)
@@ -481,17 +482,17 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
-void Thread::playout(Move lastBestMove) {
+void Thread::playout(Move lastBestMove, Stack* ss) {
     StateInfo st;
-    if(!MoveList<LEGAL>(this->rootPos).size())
-        return;
-
-    this->rootDepth = this->completedDepth = DEPTH_ZERO;
-    this->rootPos.do_move(lastBestMove, st);
-    this->rootMoves.clear();
-    for (const auto& m : MoveList<LEGAL>(this->rootPos))
-                this->rootMoves.emplace_back(m);
-    Thread::search();
+    bool ttHit;
+    rootPos.do_move(lastBestMove, st);
+    (ss+1)->ply = ss->ply + 1;
+    TTEntry* tte = TT.probe(rootPos.key(), ttHit);
+    Value ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    Move ttMove = ttHit ? tte->move() : MOVE_NONE;    
+    // std::cout << MoveList<LEGAL>(rootPos).size() << " " << ttHit << " " << ss->ply <<  "\n";
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY)
+        playout(ttMove, ss+1);
     rootPos.undo_move(lastBestMove);
 }
 
