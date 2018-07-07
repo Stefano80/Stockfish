@@ -419,7 +419,7 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
-      // Montecarlo search  
+      // Walkthroug the game once  
       playout(lastBestMove, ss);
 
       // Have we found a "mate in x"?
