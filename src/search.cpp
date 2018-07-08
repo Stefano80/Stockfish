@@ -382,7 +382,7 @@ void Thread::search() {
           while (true)
           {
 
-              // Look ahead before searching!
+              // Look ahead before searching in order to fill TT
               for (int games = 0; games <= rootDepth && !Threads.stop; games++)
                 playout(lastBestMove, ss);
               
