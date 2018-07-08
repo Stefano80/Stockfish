@@ -507,6 +507,8 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
+// playout plays a game until the end
+
 void Thread::playout(Move playMove, Stack* ss, Value v) {
 
     if (playMove == MOVE_NONE)
