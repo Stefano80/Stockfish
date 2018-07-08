@@ -443,7 +443,7 @@ void Thread::search() {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
       }
-      for (int games = 0; games < 10 && !Threads.stop; games++)
+      for (int games = 0; games <= rooDepth && !Threads.stop; games++)
         playout(lastBestMove, ss);
 
       // Have we found a "mate in x"?
