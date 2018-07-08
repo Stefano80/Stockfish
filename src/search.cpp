@@ -419,6 +419,8 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
+      playout(lastBestMove, ss);
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -488,7 +490,7 @@ void Thread::playout(Move lastBestMove, Stack* ss) {
     Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
         (ss+1)->ply = ss->ply + 1;
-        Value v = qsearch<PV>(rootPos, ss+1, -VALUE_INFINITE, VALUE_INFINITE, DEPTH_ZERO);
+        Value v = qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
         playout(ttMove, ss+1);
     }
     rootPos.undo_move(lastBestMove);
