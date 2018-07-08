@@ -493,7 +493,7 @@ void Thread::playout(Move playMove, Stack* ss) {
         Value v = qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
         playout(ttMove, ss+1);
     }
-    rootPos.undo_move(lastBestMove);
+    rootPos.undo_move(playMove);
 }
 
 
