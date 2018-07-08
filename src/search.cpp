@@ -381,6 +381,11 @@ void Thread::search() {
           // high/low anymore.
           while (true)
           {
+
+              // Look ahead before searching!
+              for (int games = 0; games <= rootDepth && !Threads.stop; games++)
+                playout(lastBestMove, ss);
+              
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false);
 
               // Bring the best move to the front. It is critical that sorting
@@ -443,8 +448,6 @@ void Thread::search() {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
       }
-      for (int games = 0; games <= rooDepth && !Threads.stop; games++)
-        playout(lastBestMove, ss);
 
       // Have we found a "mate in x"?
       if (   Limits.mate
@@ -505,6 +508,10 @@ void Thread::search() {
 }
 
 void Thread::playout(Move playMove, Stack* ss) {
+
+    if (playMove == MOVE_NONE)
+      return;
+
     StateInfo st;
     bool ttHit;
     rootPos.do_move(playMove, st);
