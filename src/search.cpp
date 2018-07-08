@@ -384,7 +384,7 @@ void Thread::search() {
 
               // Look ahead before searching in order to fill TT
               for (int games = 0; games <= rootDepth && !Threads.stop; games++)
-                playout(lastBestMove, ss);
+                playout(lastBestMove, ss, bestValue);
               
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false);
 
@@ -507,7 +507,7 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
-void Thread::playout(Move playMove, Stack* ss) {
+void Thread::playout(Move playMove, Stack* ss, Value v) {
 
     if (playMove == MOVE_NONE)
       return;
@@ -516,12 +516,16 @@ void Thread::playout(Move playMove, Stack* ss) {
     bool ttHit;
     rootPos.do_move(playMove, st);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
-    Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    if (!ttHit){
+      qsearch<NonPV>(rootPos, ss+1, v-1, v, DEPTH_ZERO);
+      tte    = TT.probe(rootPos.key(), ttHit);
+    }
     Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
+        Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
         (ss+1)->ply = ss->ply + 1;
-        qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
-        playout(ttMove, ss+1);
+        qsearch<NonPV>(rootPos, ss+1, v-1, v, DEPTH_ZERO);
+        playout(ttMove, ss+1, ttValue);
     }
     rootPos.undo_move(playMove);
 }
