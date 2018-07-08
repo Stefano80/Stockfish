@@ -481,10 +481,10 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
-void Thread::playout(Move lastBestMove, Stack* ss) {
+void Thread::playout(Move playMove, Stack* ss) {
     StateInfo st;
     bool ttHit;
-    rootPos.do_move(lastBestMove, st);
+    rootPos.do_move(playMove, st);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
     Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
     Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
