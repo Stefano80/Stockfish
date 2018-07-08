@@ -513,7 +513,7 @@ void Thread::playout(Move playMove, Stack* ss) {
     Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
         (ss+1)->ply = ss->ply + 1;
-        Value v = qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
+        qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
         playout(ttMove, ss+1);
     }
     rootPos.undo_move(playMove);
