@@ -483,12 +483,14 @@ void Thread::playout(Move lastBestMove, Stack* ss) {
     StateInfo st;
     bool ttHit;
     rootPos.do_move(lastBestMove, st);
-    (ss+1)->ply = ss->ply + 1;
-    TTEntry* tte = TT.probe(rootPos.key(), ttHit);
-    Value ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
-    Move ttMove = ttHit ? tte->move() : MOVE_NONE;    
-    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY)
+    TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
+    Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
+        (ss+1)->ply = ss->ply + 1;
+        Value v = qsearch<PV>(rootPos, ss+1, -VALUE_INFINITE, VALUE_INFINITE, DEPTH_ZERO);
         playout(ttMove, ss+1);
+    }
     rootPos.undo_move(lastBestMove);
 }
 
