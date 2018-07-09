@@ -426,6 +426,8 @@ void Thread::search() {
               delta += delta / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
+              
+              Value playoutValue = playout(lastBestMove, ss);
           }
 
           // Sort the PV lines searched so far and update the GUI
@@ -443,8 +445,6 @@ void Thread::search() {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
       }
-
-      playout(lastBestMove, ss);
 
       // Have we found a "mate in x"?
       if (   Limits.mate
@@ -504,9 +504,10 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
-void Thread::playout(Move playMove, Stack* ss) {
+Value Thread::playout(Move playMove, Stack* ss) {
     StateInfo st;
     bool ttHit;
+    Value v = VALUE_ZERO;
     rootPos.do_move(playMove, st);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
     Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
@@ -514,9 +515,12 @@ void Thread::playout(Move playMove, Stack* ss) {
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
         (ss+1)->ply = ss->ply + 1;
         qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
-        playout(ttMove, ss+1);
+        v = playout(ttMove, ss+1);
     }
+    else
+        v = ttValue;
     rootPos.undo_move(playMove);
+    return v;
 }
 
 
