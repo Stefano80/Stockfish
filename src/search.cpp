@@ -426,8 +426,8 @@ void Thread::search() {
               delta += delta / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
-              
-              Value playoutValue = playout(lastBestMove, ss);
+              if (failedLow)
+                playout(lastBestMove, ss);
           }
 
           // Sort the PV lines searched so far and update the GUI
