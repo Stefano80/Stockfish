@@ -517,7 +517,7 @@ Value Thread::playout(Move playMove, Stack* ss) {
         qsearch<NonPV>(rootPos, ss+1, ttValue-1, ttValue, DEPTH_ZERO);
         v = playout(ttMove, ss+1);
     }
-    else
+    else if(ttHit)
         v = ttValue;
     rootPos.undo_move(playMove);
     return v;
