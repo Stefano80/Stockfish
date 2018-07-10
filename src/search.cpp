@@ -444,7 +444,7 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
-      if (!mainThread)
+      if (mainThread)
         playout(lastBestMove, ss);
 
       // Have we found a "mate in x"?
