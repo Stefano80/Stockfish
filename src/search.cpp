@@ -444,6 +444,11 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
+      if (mainThread && !Threads.stop && rootDepth > 5 * ONE_PLY)
+        {
+		   playout(lastBestMove, ss);
+		}
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -502,6 +507,28 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
+// Playout a game, in the hope of meaningfully filling the TT beyond the horizon
+void Thread::playout(Move playMove, Stack* ss) {
+    StateInfo st;
+    bool ttHit;
+    rootPos.do_move(playMove, st);
+	Depth DD = rootDepth - 8 * ONE_PLY;
+    TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
+    Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_ZERO;
+	if (!ttHit || tte->depth() < DD)
+	   {
+	    ::search<NonPV>(rootPos, ss, ttValue - 1, ttValue, DD, true);
+	    tte    = TT.probe(rootPos.key(), ttHit);
+	   }
+    Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
+
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY ){
+        (ss+1)->ply = ss->ply + 1;
+        playout(ttMove, ss+1);
+    }
+    rootPos.undo_move(playMove);
+	return;
+}
 
 namespace {
 
@@ -597,7 +624,7 @@ namespace {
     // statScore of the previous grandchild. This influences the reduction rules in
     // LMR which are based on the statScore of parent position.
     (ss+2)->statScore = 0;
-
+ 	
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
     // position key in case of an excluded move.
@@ -608,7 +635,7 @@ namespace {
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
 
-    // At non-PV nodes we check for an early TT cutoff
+   // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
         && ttHit
         && tte->depth() >= depth
