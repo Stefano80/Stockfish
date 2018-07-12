@@ -1231,9 +1231,7 @@ moves_loop: // When in check, search starts from here
     bool ttHit, inCheck, givesCheck, evasionPrunable;
     int moveCount;
 
-    Thread* thisThread = pos.this_thread();
-
-    if (PvNode && !thisThread->playingOut)
+    if (PvNode)
     {
         oldAlpha = alpha; // To flag BOUND_EXACT when eval above alpha and no available moves
         (ss+1)->pv = pv;
