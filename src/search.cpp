@@ -515,7 +515,7 @@ void Thread::playout(Move playMove, Stack* ss) {
     Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
         (ss+1)->ply = ss->ply + 1;
-        Depth newDepth = std::max(rootDepth - 20 * ONE_PLY, DEPTH_ZERO);
+        Depth newDepth = std::max(rootDepth - 8 * ONE_PLY, DEPTH_ZERO);
         ::search<PV>(rootPos, ss+1, ttValue-1, ttValue, newDepth, false);
         playout(ttMove, ss+1);
     }
