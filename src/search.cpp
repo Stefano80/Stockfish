@@ -520,8 +520,6 @@ void Thread::playout(Move playMove, Stack* ss) {
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
         (ss+1)->ply = ss->ply + 1;
         Depth newDepth = std::max(rootDepth - 4 * ONE_PLY, DEPTH_ZERO);
-        // std::cout << "PlAYING_OUT " << ttMove << "\n";
-        // std::cout << "TARGET DEPTH " << newDepth << "\n";
         ::search<NonPV>(rootPos, ss+1, ttValue-1, ttValue, newDepth, true);
         playout(ttMove, ss+1);
     }
@@ -553,8 +551,6 @@ namespace {
             return alpha;
     }
 
-
-    // std::cout << "GOING TO CALL QSEARCH\n";
     // Dive into quiescence search when the depth reaches zero
     if (depth < ONE_PLY)
         return qsearch<NT>(pos, ss, alpha, beta);
@@ -1235,7 +1231,6 @@ moves_loop: // When in check, search starts from here
     bool ttHit, inCheck, givesCheck, evasionPrunable;
     int moveCount;
 
-    // std::cout << "ENTERING QSEARCH\n";
     Thread* thisThread = pos.this_thread();
 
     if (PvNode && !thisThread->playingOut)
@@ -1262,18 +1257,11 @@ moves_loop: // When in check, search starts from here
     // only two types of depth in TT: DEPTH_QS_CHECKS or DEPTH_QS_NO_CHECKS.
     ttDepth = inCheck || depth >= DEPTH_QS_CHECKS ? DEPTH_QS_CHECKS
                                                   : DEPTH_QS_NO_CHECKS;
-
-
-    // std::cout << "GOING TO LOOKUP TT\n";
-
     // Transposition table lookup
     posKey = pos.key();
     tte = TT.probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
     ttMove = ttHit ? tte->move() : MOVE_NONE;
-
-    // std::cout << "TT-LOOKUP DONE\n";
-
 
     if (  !PvNode
         && ttHit
