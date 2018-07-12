@@ -506,13 +506,8 @@ void Thread::search() {
 }
 
 void Thread::playout(Move playMove, Stack* ss) {
-    playingOut = true;
     StateInfo st;
     bool ttHit;
-    if (playMove == MOVE_NULL){
-        playingOut = false; 
-        return;
-    }
     rootPos.do_move(playMove, st);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
     Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
@@ -524,7 +519,6 @@ void Thread::playout(Move playMove, Stack* ss) {
         playout(ttMove, ss+1);
     }
     rootPos.undo_move(playMove);
-    playingOut = false;
     return;
 }
 
