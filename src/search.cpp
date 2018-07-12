@@ -515,7 +515,7 @@ void Thread::playout(Move playMove, Stack* ss) {
     Move ttMove     = ttHit ? tte->move() : MOVE_NONE;  
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
         (ss+1)->ply = ss->ply + 1;
-        ::search<NonPV>(rootPos, ss+1, ttValue-1, ttValue, rootDepth - 8 * ONE_PLY, true);
+        ::search<NonPV>(rootPos, ss+1, ttValue-1, ttValue, rootDepth - 12 * ONE_PLY, true);
         playout(ttMove, ss+1);
     }
     rootPos.undo_move(playMove);
