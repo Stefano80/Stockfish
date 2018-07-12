@@ -522,7 +522,7 @@ void Thread::playout(Move playMove, Stack* ss) {
         Depth newDepth = std::max(rootDepth - 4 * ONE_PLY, DEPTH_ZERO);
         // std::cout << "PlAYING_OUT " << ttMove << "\n";
         // std::cout << "TARGET DEPTH " << newDepth << "\n";
-        ::search<NonPV>(rootPos, ss+1, ttValue-1, ttValue, newDepth, false);
+        ::search<NonPV>(rootPos, ss+1, ttValue-1, ttValue, newDepth, true);
         playout(ttMove, ss+1);
     }
     rootPos.undo_move(playMove);
