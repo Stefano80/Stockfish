@@ -509,6 +509,10 @@ void Thread::playout(Move playMove, Stack* ss) {
     playingOut = true;
     StateInfo st;
     bool ttHit;
+    if (playMove == MOVE_NULL){
+        playingOut = false; 
+        return;
+    }
     rootPos.do_move(playMove, st);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
     Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
@@ -516,11 +520,14 @@ void Thread::playout(Move playMove, Stack* ss) {
     if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY){
         (ss+1)->ply = ss->ply + 1;
         Depth newDepth = std::max(rootDepth - 8 * ONE_PLY, DEPTH_ZERO);
-        ::search<PV>(rootPos, ss+1, ttValue-1, ttValue, newDepth, false);
+        // std::cout << "PlAYING_OUT " << ttMove << "\n";
+        // std::cout << "TARGET DEPTH " << newDepth << "\n";
+        ::search<NonPV>(rootPos, ss+1, ttValue-1, ttValue, newDepth, false);
         playout(ttMove, ss+1);
     }
     rootPos.undo_move(playMove);
     playingOut = false;
+    return;
 }
 
 
@@ -532,7 +539,7 @@ namespace {
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
     constexpr bool PvNode = NT == PV;
-    const bool rootNode = PvNode && ss->ply == 0 && !&thisThread->playingOut;
+    const bool rootNode = PvNode && ss->ply == 0;
 
     // Check if we have an upcoming move which draws by repetition, or
     // if the opponent had an alternative move earlier to this position.
@@ -546,6 +553,8 @@ namespace {
             return alpha;
     }
 
+
+    // std::cout << "GOING TO CALL QSEARCH\n";
     // Dive into quiescence search when the depth reaches zero
     if (depth < ONE_PLY)
         return qsearch<NT>(pos, ss, alpha, beta);
@@ -1226,7 +1235,10 @@ moves_loop: // When in check, search starts from here
     bool ttHit, inCheck, givesCheck, evasionPrunable;
     int moveCount;
 
-    if (PvNode)
+    // std::cout << "ENTERING QSEARCH\n";
+    Thread* thisThread = pos.this_thread();
+
+    if (PvNode && !thisThread->playingOut)
     {
         oldAlpha = alpha; // To flag BOUND_EXACT when eval above alpha and no available moves
         (ss+1)->pv = pv;
@@ -1250,11 +1262,18 @@ moves_loop: // When in check, search starts from here
     // only two types of depth in TT: DEPTH_QS_CHECKS or DEPTH_QS_NO_CHECKS.
     ttDepth = inCheck || depth >= DEPTH_QS_CHECKS ? DEPTH_QS_CHECKS
                                                   : DEPTH_QS_NO_CHECKS;
+
+
+    // std::cout << "GOING TO LOOKUP TT\n";
+
     // Transposition table lookup
     posKey = pos.key();
     tte = TT.probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
     ttMove = ttHit ? tte->move() : MOVE_NONE;
+
+    // std::cout << "TT-LOOKUP DONE\n";
+
 
     if (  !PvNode
         && ttHit
