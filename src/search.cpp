@@ -505,6 +505,7 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
+// Playout is used for playing out a game
 void Thread::playout(Move playMove, Stack* ss) {
     StateInfo st;
     bool ttHit;
