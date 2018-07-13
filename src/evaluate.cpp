@@ -803,8 +803,8 @@ namespace {
 
 
 
-    bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
-                            && (pos.pieces(PAWN) & KingSide);
+    bool pawnsOnBothFlanks =    (pos.pieces(PAWN) & QueenSide & ~CenterFiles)
+                            &&  (pos.pieces(PAWN) & KingSide  & ~CenterFiles);
 
     if (me->piece_types() == 1 && pos.count<KNIGHT>() && pawnsOnBothFlanks)
         sf += 6;
