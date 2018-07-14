@@ -513,7 +513,7 @@ void Thread::playout(Move playMove, Stack* ss) {
     bool ttHit;
     bool searchNode = false;
     rootPos.do_move(playMove, st);
-	Depth DD = rootDepth - 8 * ONE_PLY;
+	Depth DD = std::min(rootDepth - 8 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
     Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_ZERO;
 	if (!ttHit || tte->depth() < DD)
@@ -524,7 +524,7 @@ void Thread::playout(Move playMove, Stack* ss) {
 	   }
     Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
 
-    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY/2 ){
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY ){
         if (!searchNode)
           (ss+1)->ply = ss->ply + 1;
         playout(ttMove, ss+1);
