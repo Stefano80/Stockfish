@@ -524,7 +524,7 @@ void Thread::playout(Move playMove, Stack* ss) {
 	   }
     Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
 
-    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY ){
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY/2 ){
         if (!searchNode)
           (ss+1)->ply = ss->ply + 1;
         playout(ttMove, ss+1);
