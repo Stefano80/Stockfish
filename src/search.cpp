@@ -444,6 +444,9 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
+      if (mainThread)
+		   playout(lastBestMove, ss);
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -502,6 +505,35 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
+// Playout a game, in the hope of meaningfully filling the TT beyond the horizon
+void Thread::playout(Move playMove, Stack* ss) {
+    StateInfo st;
+    bool ttHit;
+
+    if (     Threads.stop 
+        ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4))
+        return;
+
+    ss->currentMove = playMove;
+    ss->contHistory = contHistory[rootPos.moved_piece(playMove)][to_sq(playMove)].get();
+    (ss+1)->ply = ss->ply + 1;
+    rootPos.do_move(playMove, st);
+	Depth newDepth  = std::min(rootDepth - 8 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
+    TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
+    Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_ZERO;
+	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size())
+	   {
+	    ::search<NonPV>(rootPos, ss+1, ttValue - 1, ttValue, newDepth, true);
+	    tte    = TT.probe(rootPos.key(), ttHit);
+	   }
+    
+    Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
+    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY - 2)
+        playout(ttMove, ss+1);
+
+    rootPos.undo_move(playMove);
+	return;
+}
 
 namespace {
 
@@ -597,7 +629,7 @@ namespace {
     // statScore of the previous grandchild. This influences the reduction rules in
     // LMR which are based on the statScore of parent position.
     (ss+2)->statScore = 0;
-
+ 	
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
     // position key in case of an excluded move.
@@ -608,7 +640,7 @@ namespace {
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
 
-    // At non-PV nodes we check for an early TT cutoff
+   // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
         && ttHit
         && tte->depth() >= depth
