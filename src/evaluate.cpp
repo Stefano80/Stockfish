@@ -803,11 +803,11 @@ namespace {
 
 
 
-    bool pawnsOnBothFlanks =    (pos.pieces(PAWN) & QueenSide & ~CenterFiles)
-                            &&  (pos.pieces(PAWN) & KingSide  & ~CenterFiles);
+    Bitboard pawnsOnBothFlanks =    (pos.pieces(strongSide, PAWN) & QueenSide & ~CenterFiles)
+                                |   (pos.pieces(strongSide, PAWN) & KingSide  & ~CenterFiles);
 
     if (me->piece_types() == 1 && pos.count<KNIGHT>() && pawnsOnBothFlanks)
-        sf += 6;
+        sf += popcount(pawnsOnBothFlanks);
 
     return ScaleFactor(sf);
   }
