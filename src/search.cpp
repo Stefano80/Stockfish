@@ -444,9 +444,6 @@ void Thread::search() {
          lastBestMoveDepth = rootDepth;
       }
 
-      if (mainThread)
-		   playout(lastBestMove, ss);
-
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -492,6 +489,9 @@ void Thread::search() {
                       Threads.stop = true;
               }
           }
+        if (mainThread && !Threads.stop)
+		   playout(lastBestMove, ss);
+          
   }
 
   if (!mainThread)
@@ -518,7 +518,7 @@ void Thread::playout(Move playMove, Stack* ss) {
     ss->contHistory = contHistory[rootPos.moved_piece(playMove)][to_sq(playMove)].get();
     (ss+1)->ply = ss->ply + 1;
     rootPos.do_move(playMove, st);
-	Depth newDepth  = std::min(rootDepth - 10 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
+	Depth newDepth  = std::min(rootDepth - 8 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
     Value ttValue   = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_ZERO;
 	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size())
