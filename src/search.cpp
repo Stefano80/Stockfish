@@ -511,7 +511,8 @@ void Thread::playout(Move playMove, Stack* ss) {
     bool ttHit;
 
     if (     Threads.stop 
-        ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4))
+        ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4)
+        ||  !rootPos.legal(playMove))
         return;
 
     ss->currentMove = playMove;
@@ -530,8 +531,6 @@ void Thread::playout(Move playMove, Stack* ss) {
     Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
     if(  ttHit 
       && ttMove != MOVE_NONE 
-      && rootPos.legal(ttMove)
-      && MoveList<LEGAL>(rootPos).size() 
       && ss->ply < MAX_PLY - 2)
         playout(ttMove, ss+1);
 
