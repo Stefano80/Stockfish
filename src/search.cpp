@@ -528,7 +528,11 @@ void Thread::playout(Move playMove, Stack* ss) {
 	   }
     
     Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
-    if(ttHit && ttMove != MOVE_NONE && MoveList<LEGAL>(rootPos).size() && ss->ply < MAX_PLY - 2)
+    if(  ttHit 
+      && ttMove != MOVE_NONE 
+      && rootPos.legal(ttMove)
+      && MoveList<LEGAL>(rootPos).size() 
+      && ss->ply < MAX_PLY - 2)
         playout(ttMove, ss+1);
 
     rootPos.undo_move(playMove);
