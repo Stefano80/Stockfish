@@ -581,7 +581,7 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, playoutValue, eval, maxValue;
+    Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
@@ -637,29 +637,29 @@ namespace {
     // statScore of the previous grandchild. This influences the reduction rules in
     // LMR which are based on the statScore of parent position.
     (ss+2)->statScore = 0;
- 	
+
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
     // position key in case of an excluded move.
     excludedMove = ss->excludedMove;
     posKey = pos.key() ^ Key(excludedMove << 16); // Isn't a very good hash
     tte = TT.probe(posKey, ttHit);
-    playoutValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
 
-   // At non-PV nodes we check for an early TT cutoff
+    // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
         && ttHit
         && tte->depth() >= depth
-        && playoutValue != VALUE_NONE // Possible in case of TT access race
-        && (playoutValue >= beta ? (tte->bound() & BOUND_LOWER)
+        && ttValue != VALUE_NONE // Possible in case of TT access race
+        && (ttValue >= beta ? (tte->bound() & BOUND_LOWER)
                             : (tte->bound() & BOUND_UPPER)))
     {
         // If ttMove is quiet, update move sorting heuristics on TT hit
         if (ttMove)
         {
-            if (playoutValue >= beta)
+            if (ttValue >= beta)
             {
                 if (!pos.capture_or_promotion(ttMove))
                     update_quiet_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
@@ -676,7 +676,7 @@ namespace {
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
-        return playoutValue;
+        return ttValue;
     }
 
     // Step 5. Tablebases probe
@@ -739,10 +739,10 @@ namespace {
         if ((ss->staticEval = eval = tte->eval()) == VALUE_NONE)
             eval = ss->staticEval = evaluate(pos);
 
-        // Can playoutValue be used as a better position evaluation?
-        if (    playoutValue != VALUE_NONE
-            && (tte->bound() & (playoutValue > eval ? BOUND_LOWER : BOUND_UPPER)))
-            eval = playoutValue;
+        // Can ttValue be used as a better position evaluation?
+        if (    ttValue != VALUE_NONE
+            && (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER)))
+            eval = ttValue;
     }
     else
     {
@@ -869,7 +869,7 @@ namespace {
         search<NT>(pos, ss, alpha, beta, depth - 7 * ONE_PLY, cutNode);
 
         tte = TT.probe(posKey, ttHit);
-        playoutValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+        ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
         ttMove = ttHit ? tte->move() : MOVE_NONE;
     }
 
@@ -929,17 +929,17 @@ moves_loop: // When in check, search starts from here
       // search of (alpha-s, beta-s), and just one fails high on (alpha, beta),
       // then that move is singular and should be extended. To verify this we do
       // a reduced search on on all the other moves but the ttMove and if the
-      // result is lower than playoutValue minus a margin then we will extend the ttMove.
+      // result is lower than ttValue minus a margin then we will extend the ttMove.
       if (    depth >= 8 * ONE_PLY
           &&  move == ttMove
           && !rootNode
           && !excludedMove // Recursive singular search is not allowed
-          &&  playoutValue != VALUE_NONE
+          &&  ttValue != VALUE_NONE
           && (tte->bound() & BOUND_LOWER)
           &&  tte->depth() >= depth - 3 * ONE_PLY
           &&  pos.legal(move))
       {
-          Value rBeta = std::max(playoutValue - 2 * depth / ONE_PLY, -VALUE_MATE);
+          Value rBeta = std::max(ttValue - 2 * depth / ONE_PLY, -VALUE_MATE);
           ss->excludedMove = move;
           value = search<NonPV>(pos, ss, rBeta - 1, rBeta, depth / 2, cutNode);
           ss->excludedMove = MOVE_NONE;
@@ -1241,7 +1241,7 @@ moves_loop: // When in check, search starts from here
     Key posKey;
     Move ttMove, move, bestMove;
     Depth ttDepth;
-    Value bestValue, value, playoutValue, futilityValue, futilityBase, oldAlpha;
+    Value bestValue, value, ttValue, futilityValue, futilityBase, oldAlpha;
     bool ttHit, inCheck, givesCheck, evasionPrunable;
     int moveCount;
 
@@ -1274,16 +1274,16 @@ moves_loop: // When in check, search starts from here
     // Transposition table lookup
     posKey = pos.key();
     tte = TT.probe(posKey, ttHit);
-    playoutValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
     ttMove = ttHit ? tte->move() : MOVE_NONE;
 
     if (  !PvNode
         && ttHit
         && tte->depth() >= ttDepth
-        && playoutValue != VALUE_NONE // Only in case of TT access race
-        && (playoutValue >= beta ? (tte->bound() & BOUND_LOWER)
+        && ttValue != VALUE_NONE // Only in case of TT access race
+        && (ttValue >= beta ? (tte->bound() & BOUND_LOWER)
                             : (tte->bound() & BOUND_UPPER)))
-        return playoutValue;
+        return ttValue;
 
     // Evaluate the position statically
     if (inCheck)
@@ -1299,10 +1299,10 @@ moves_loop: // When in check, search starts from here
             if ((ss->staticEval = bestValue = tte->eval()) == VALUE_NONE)
                 ss->staticEval = bestValue = evaluate(pos);
 
-            // Can playoutValue be used as a better position evaluation?
-            if (    playoutValue != VALUE_NONE
-                && (tte->bound() & (playoutValue > bestValue ? BOUND_LOWER : BOUND_UPPER)))
-                bestValue = playoutValue;
+            // Can ttValue be used as a better position evaluation?
+            if (    ttValue != VALUE_NONE
+                && (tte->bound() & (ttValue > bestValue ? BOUND_LOWER : BOUND_UPPER)))
+                bestValue = ttValue;
         }
         else
             ss->staticEval = bestValue =
