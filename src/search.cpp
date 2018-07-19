@@ -528,7 +528,7 @@ Value Thread::playout(Move playMove, Stack* ss) {
     playoutValue    = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_ZERO;
 	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size())
 	   {
-	    playoutValue = ::search<NonPV>(rootPos, ss+1, -VALUE_INFINITE, VALUE_INFINITE, newDepth, true);
+	    playoutValue = ::search<NonPV>(rootPos, ss+1, playoutValue - 1, playoutValue, newDepth, true);
 	    tte    = TT.probe(rootPos.key(), ttHit);
 	   }
     
