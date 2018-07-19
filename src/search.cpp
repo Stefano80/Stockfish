@@ -512,7 +512,8 @@ void Thread::playout(Move playMove, Stack* ss) {
 
     if (     Threads.stop 
         ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4)
-        ||  !rootPos.legal(playMove))
+        ||  !rootPos.legal(playMove)
+        ||  !MoveList<LEGAL>(rootPos).size())
         return;
 
     ss->currentMove = playMove;
