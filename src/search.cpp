@@ -512,6 +512,7 @@ Value Thread::playout(Move playMove, Stack* ss) {
 
     if (     Threads.stop 
         ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4)
+        ||  !rootPos.pseudo_legal(playMove)
         ||  !rootPos.legal(playMove))
         return VALUE_NONE;
 
@@ -519,10 +520,11 @@ Value Thread::playout(Move playMove, Stack* ss) {
         return VALUE_DRAW;
 
     Value playoutValue = ::search<NonPV>(rootPos, ss, -VALUE_INFINITE, VALUE_INFINITE, ONE_PLY, false);
-
-    rootPos.do_move(playMove, st);
     ss->currentMove = playMove;
     ss->continuationHistory = continuationHistory[rootPos.moved_piece(playMove)][to_sq(playMove)].get();
+
+    rootPos.do_move(playMove, st);
+
     (ss+1)->ply = ss->ply + 1;
 	Depth newDepth  = std::min(rootDepth - 8 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
@@ -570,7 +572,6 @@ namespace {
         return qsearch<NT>(pos, ss, alpha, beta);
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
-    assert(PvNode || (alpha == beta - 1));
     assert(DEPTH_ZERO < depth && depth < DEPTH_MAX);
     assert(!(PvNode && cutNode));
     assert(depth / ONE_PLY * ONE_PLY == depth);
@@ -1154,7 +1155,6 @@ moves_loop: // When in check, search starts from here
                   alpha = value;
               else
               {
-                  assert(value >= beta); // Fail high
                   ss->statScore = 0;
                   break;
               }
