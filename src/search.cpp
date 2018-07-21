@@ -280,7 +280,7 @@ void MainThread::search() {
 void Thread::search() {
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
-  Value bestValue, alpha, beta, delta;
+  Value alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
@@ -509,7 +509,7 @@ void Thread::search() {
 Value Thread::playout(Move playMove, Stack* ss) {
     StateInfo st;
     bool ttHit;
-    Value playoutValue = VALUE_ZERO;
+    Value playoutValue = bestValue;
 
     if (     Threads.stop 
         ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4)
@@ -525,7 +525,6 @@ Value Thread::playout(Move playMove, Stack* ss) {
     rootPos.do_move(playMove, st);
 	Depth newDepth  = std::min(rootDepth - 8 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
-    playoutValue    = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_ZERO;
 	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size())
 	   {
 	    playoutValue = ::search<NonPV>(rootPos, ss+1, playoutValue - 1, playoutValue, newDepth, true);
