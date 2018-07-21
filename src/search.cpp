@@ -381,6 +381,8 @@ void Thread::search() {
           // high/low anymore.
           while (true)
           {
+              if (mainThread && !Threads.stop && rootDepth > 3 * ONE_PLY)
+		          playout(lastBestMove, ss);
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false);
 
               // Bring the best move to the front. It is critical that sorting
@@ -488,10 +490,7 @@ void Thread::search() {
                   else
                       Threads.stop = true;
               }
-          }
-        if (mainThread && !Threads.stop)
-		   playout(lastBestMove, ss);
-          
+          }      
   }
 
   if (!mainThread)
