@@ -509,23 +509,24 @@ void Thread::search() {
 Value Thread::playout(Move playMove, Stack* ss) {
     StateInfo st;
     bool ttHit;
-    Value playoutValue = bestValue;
 
     if (     Threads.stop 
         ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4)
         ||  !rootPos.legal(playMove))
-        return playoutValue;
+        return VALUE_NONE;
 
     if (rootPos.is_draw(ss->ply))
         return VALUE_DRAW;
 
+    Value playoutValue = ::search<NonPV>(rootPos, ss, -VALUE_INFINITE, VALUE_INFINITE, ONE_PLY, false);
+
+    rootPos.do_move(playMove, st);
     ss->currentMove = playMove;
     ss->continuationHistory = continuationHistory[rootPos.moved_piece(playMove)][to_sq(playMove)].get();
     (ss+1)->ply = ss->ply + 1;
-    rootPos.do_move(playMove, st);
 	Depth newDepth  = std::min(rootDepth - 8 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
-	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size())
+	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size() && newDepth > ONE_PLY)
 	   {
 	    playoutValue = ::search<NonPV>(rootPos, ss+1, playoutValue - 1, playoutValue, newDepth, true);
 	    tte    = TT.probe(rootPos.key(), ttHit);
