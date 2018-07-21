@@ -511,7 +511,6 @@ Value Thread::playout(Move playMove, Stack* ss) {
     bool ttHit;
 
     if (     Threads.stop 
-        ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4)
         ||  !rootPos.pseudo_legal(playMove)
         ||  !rootPos.legal(playMove))
         return VALUE_NONE;
