@@ -524,7 +524,8 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
     rootPos.do_move(playMove, st);
 
     (ss+1)->ply = ss->ply + 1;
-    int d = int(rootDepth) * int(rootDepth) / (rootDepth + 4 * ONE_PLY) - 2;
+    int d = rootDepth / ONE_PLY;
+    d = ( 3 * d * d / 4 - 3 * d - 8) / (d + 4);
 	Depth newDepth  = d * ONE_PLY;
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
 	if (!ttHit && MoveList<LEGAL>(rootPos).size()){
