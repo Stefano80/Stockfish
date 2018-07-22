@@ -280,7 +280,7 @@ void MainThread::search() {
 void Thread::search() {
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
-  Value bestValue, alpha, beta, delta;
+  Value bestValue, playoutValue, alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
@@ -474,7 +474,7 @@ void Thread::search() {
                      timeReduction *= 1.25;
 
               // Use part of the gained time from a previous stable move for the current move
-              double bestMoveInstability = 1.0 + mainThread->bestMoveChanges;
+              double bestMoveInstability = 1.0 + mainThread->bestMoveChanges + playoutValue != VALUE_NONE? abs(playoutValue - bestValue)/PawnValueMg : 0;
               bestMoveInstability *= std::pow(mainThread->previousTimeReduction, 0.528) / timeReduction;
 
               // Stop the search if we have only one legal move, or if available time elapsed
@@ -490,7 +490,7 @@ void Thread::search() {
               }
           }
         if (mainThread && !Threads.stop)
-		   playout(lastBestMove, ss, bestValue);
+		   playoutValue = playout(lastBestMove, ss, bestValue);
           
   }
 
