@@ -521,10 +521,10 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
 
     ss->currentMove         = playMove;
     ss->continuationHistory = continuationHistory[rootPos.moved_piece(playMove)][to_sq(playMove)].get();
+    (ss+1)->ply = ss->ply + 1;
 
     rootPos.do_move(playMove, st);
 
-    (ss+1)->ply = ss->ply + 1;
     int d = int(rootDepth) * int(rootDepth) / (rootDepth + 4 * ONE_PLY) - 2 * ONE_PLY;
 	Depth newDepth  = d * ONE_PLY;
 	playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
