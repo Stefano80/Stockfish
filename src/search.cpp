@@ -509,6 +509,7 @@ void Thread::search() {
 Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
     StateInfo st;
     bool ttHit;
+    TTEntry* tte ;
 
     if (     Threads.stop 
         ||  !rootPos.pseudo_legal(playMove)
@@ -526,12 +527,9 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
     (ss+1)->ply = ss->ply + 1;
     int d = int(rootDepth) * int(rootDepth) / (rootDepth + 4 * ONE_PLY) - 2 * ONE_PLY;
 	Depth newDepth  = d * ONE_PLY;
-    TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
-	if (MoveList<LEGAL>(rootPos).size()){
-	    playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
-	    tte    = TT.probe(rootPos.key(), ttHit);
-	   }
-    
+	playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
+	
+    tte    = TT.probe(rootPos.key(), ttHit);   
     Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
     if(  ttHit 
       && ttMove != MOVE_NONE 
