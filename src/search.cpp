@@ -511,10 +511,13 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
     bool ttHit;
     TTEntry* tte ;
 
+    if (!MoveList<LEGAL>(rootPos).size())
+         return rootPos.checkers()? mated_in(ss->ply): VALUE_DRAW;
+
     if (     Threads.stop 
         ||  !rootPos.pseudo_legal(playMove)
         ||  !rootPos.legal(playMove))
-        return rootPos.checkers()? mated_in(ss->ply): VALUE_DRAW;
+        return playoutValue;
 
     if (rootPos.is_draw(ss->ply))
         return VALUE_DRAW;
