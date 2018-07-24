@@ -525,10 +525,10 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
     rootPos.do_move(playMove, st);
 
     (ss+1)->ply = ss->ply + 1;
-    int d = int(rootDepth) * int(rootDepth) / (rootDepth + 6 * ONE_PLY) - 2 * ONE_PLY;
+    int d = int(rootDepth) * int(rootDepth) / (rootDepth + 4 * ONE_PLY) - 2 * ONE_PLY;
 	Depth newDepth  = d * ONE_PLY;
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
-	if (!ttHit && MoveList<LEGAL>(rootPos).size()){
+	if (MoveList<LEGAL>(rootPos).size()){
 	    playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
 	    tte    = TT.probe(rootPos.key(), ttHit);
 	   }
