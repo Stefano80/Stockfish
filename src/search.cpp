@@ -514,7 +514,7 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
     if (     Threads.stop 
         ||  !rootPos.pseudo_legal(playMove)
         ||  !rootPos.legal(playMove))
-        return VALUE_NONE;
+        return rootPos.checkers()? mated_in(ss->ply): VALUE_DRAW;
 
     if (rootPos.is_draw(ss->ply))
         return VALUE_DRAW;
@@ -525,9 +525,9 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
 
     rootPos.do_move(playMove, st);
 
-    int d = int(rootDepth) * int(rootDepth) / (rootDepth + 4 * ONE_PLY) - 2 * ONE_PLY;
+    int d = int(rootDepth) * int(rootDepth) / (rootDepth + 4 * ONE_PLY) - ss->ply/2;
 	Depth newDepth  = d * ONE_PLY;
-	playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
+	playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, false);
 	
     tte    = TT.probe(rootPos.key(), ttHit);   
     Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
