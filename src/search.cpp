@@ -530,7 +530,7 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
 
     int d = int(rootDepth) * int(rootDepth) / (rootDepth + 4 * ONE_PLY) - ss->ply/2;
 	Depth newDepth  = d * ONE_PLY;
-	playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, false);
+	playoutValue = - ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, false);
 	
     tte    = TT.probe(rootPos.key(), ttHit);   
     Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
