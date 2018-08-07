@@ -994,15 +994,7 @@ moves_loop: // When in check, search starts from here
               // Decrease reduction if opponent's move count is high (~5 Elo)
               if ((ss-1)->moveCount > 15)
                   r -= ONE_PLY;
-
-              // Decrease reduction for exact PV nodes (~0 Elo)
-              if (pvExact)
-                  r -= ONE_PLY;
-
-              // Increase reduction if ttMove is a capture (~0 Elo)
-              if (ttCapture)
-                  r += ONE_PLY;
-
+                  
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
                   r += 2 * ONE_PLY;
