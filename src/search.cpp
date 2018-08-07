@@ -975,12 +975,6 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
-      ss->statScore =  thisThread->mainHistory[us][from_to(move)]
-                             + (*contHist[0])[movedPiece][to_sq(move)]
-                             + (*contHist[1])[movedPiece][to_sq(move)]
-                             + (*contHist[3])[movedPiece][to_sq(move)]
-                             - 4000;
-
       // Step 16. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
@@ -1020,6 +1014,12 @@ moves_loop: // When in check, search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
+              ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+                             + (*contHist[0])[movedPiece][to_sq(move)]
+                             + (*contHist[1])[movedPiece][to_sq(move)]
+                             + (*contHist[3])[movedPiece][to_sq(move)]
+                             - 4000;
+
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
                   r -= ONE_PLY;
@@ -1051,9 +1051,19 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
-          
-          // PV extension
-          Depth d = newDepth + ONE_PLY * ss->statScore / (40000 * moveCount * int(1 + newDepth));
+
+           Depth d = newDepth;
+           if (PvNode){
+
+           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+                          + (*contHist[0])[movedPiece][to_sq(move)]
+                          + (*contHist[1])[movedPiece][to_sq(move)]
+                          + (*contHist[3])[movedPiece][to_sq(move)]
+                          - 4000;
+
+            // LMRX
+            d = newDepth + ONE_PLY * ss->statScore / (20000 * moveCount * int(1 + newDepth));
+          }
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, d, false);
       }
