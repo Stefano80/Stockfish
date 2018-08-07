@@ -489,8 +489,11 @@ void Thread::search() {
                       Threads.stop = true;
               }
           }
-        if (mainThread && !Threads.stop)
-		   playout(lastBestMove, ss, bestValue);
+        if (mainThread && !Threads.stop){
+           for (int n = 0; n < std::min(int(rootDepth), 10); n++){
+		     bestValue = playout(lastBestMove, ss, bestValue);
+           }
+        }
           
   }
 
@@ -523,7 +526,7 @@ Value Thread::playout(Move playMove, Stack* ss, Value playoutValue) {
         return VALUE_DRAW;
 
     ss->currentMove         = playMove;
-    ss->continuationHistory = continuationHistory[rootPos.moved_piece(playMove)][to_sq(playMove)].get();
+    ss->continuationHistory = &continuationHistory[rootPos.moved_piece(playMove)][to_sq(playMove)];
     (ss+1)->ply = ss->ply + 1;
 
     rootPos.do_move(playMove, st);
