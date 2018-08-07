@@ -1052,8 +1052,7 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          if (  moveCount == 1 
-             && ss->ply * ONE_PLY < thisThread->rootDepth)
+          if (moveCount == 1 && ss->statScore > 20000)
             newDepth = std::max(newDepth, ONE_PLY);
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
