@@ -1051,9 +1051,9 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
-
-          if (moveCount == 1 && ss->statScore > 20000)
-            newDepth = std::max(newDepth, ONE_PLY);
+          
+          // PV extension
+          newDepth = newDepth + ONE_PLY * ss->statScore / (20000 * moveCount * int(1 + newDepth)) ;
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
       }
