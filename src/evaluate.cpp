@@ -324,7 +324,7 @@ namespace {
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
-        if (Pt == BISHOP || Pt == KNIGHT)
+        if (Pt == BISHOP)
         {
             // Bonus if piece is on an outpost square or can reach one
             bb = OutpostRanks & ~pe->pawn_attacks_span(Them);
@@ -341,25 +341,22 @@ namespace {
             // Penalty if the piece is far from the king
             score -= KingProtector * distance(s, pos.square<KING>(Us));
 
-            if (Pt == BISHOP)
-            {
-                // Penalty according to number of pawns on the same color square as the
-                // bishop, bigger when the center files are blocked with pawns.
-                Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces());
+            // Penalty according to number of pawns on the same color square as the
+            // bishop, bigger when the center files are blocked with pawns.
+            Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces());
 
-                score -= BishopPawns * pe->pawns_on_same_color_squares(Us, s)
-                                     * (1 + popcount(blocked & CenterFiles));
+            score -= BishopPawns * pe->pawns_on_same_color_squares(Us, s)
+                                    * (1 + popcount(blocked & CenterFiles));
 
-                // Bonus for bishop on a long diagonal which can "see" both center squares
-                if (more_than_one(Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s)))
-                    score += LongDiagonalBishop;
-            }
+            // Bonus for bishop on a long diagonal which can "see" both center squares
+            if (more_than_one(Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s)))
+                score += LongDiagonalBishop;
+            
 
             // An important Chess960 pattern: A cornered bishop blocked by a friendly
             // pawn diagonally in front of it is a very serious problem, especially
             // when that pawn is also blocked.
-            if (   Pt == BISHOP
-                && pos.is_chess960()
+            if (    pos.is_chess960()
                 && (s == relative_square(Us, SQ_A1) || s == relative_square(Us, SQ_H1)))
             {
                 Direction d = pawn_push(Us) + (file_of(s) == FILE_A ? EAST : WEST);
