@@ -364,7 +364,7 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
           {
-              Value previousScore = rootMoves[pvIdx].previousScore;
+              Value previousScore = bestValue;
               delta = Value(18);
               alpha = std::max(previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(previousScore + delta, VALUE_INFINITE);
@@ -490,11 +490,11 @@ void Thread::search() {
               }
           }
         if (mainThread && !Threads.stop){
-           for (int n = 0; n < std::min(int(rootDepth), 10); n++){
+           int playoutNum = int(rootDepth) * int(rootDepth);
+           for (int n = 0; n < playoutNum; n++){
 		     bestValue = playout(lastBestMove, ss, bestValue);
            }
-        }
-          
+        }     
   }
 
   if (!mainThread)
