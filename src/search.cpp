@@ -254,7 +254,7 @@ void MainThread::search() {
 
       // Vote according to score and depth
       for (Thread* th : Threads)
-          votes[th->rootMoves[0].pv[0]] +=  (100 + int(100 * th->rootMoves[0].score) / (abs(int(th->rootMoves[0].score)) + 50))
+          votes[th->rootMoves[0].pv[0]] +=  (200 + int(100 * th->rootMoves[0].score) / (abs(int(th->rootMoves[0].score)) + 20))
                                           + int(th->completedDepth);
 
       // Select best thread
