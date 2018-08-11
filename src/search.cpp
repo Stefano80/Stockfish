@@ -1055,7 +1055,18 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
+          Depth d = newDepth;
+          if (value > alpha){
+            ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+                           + (*contHist[0])[movedPiece][to_sq(move)]
+                           + (*contHist[1])[movedPiece][to_sq(move)]
+                           + (*contHist[3])[movedPiece][to_sq(move)]
+                           - 4000;
+            
+            d += ONE_PLY * ss->statScore / 50000; 
+          } 
+
+          value = -search<PV>(pos, ss+1, -beta, -alpha, d, false);
       }
 
       // Step 18. Undo move
