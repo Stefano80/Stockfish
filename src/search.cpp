@@ -247,26 +247,16 @@ void MainThread::search() {
       &&  rootMoves[0].pv[0] != MOVE_NONE)
   {
       std::map<Move, int> votes;
-      Value minScore = this->rootMoves[0].score;
-
-      // Find out minimum score and reset votes for moves which can be voted
-      for (Thread* th: Threads)
-      {
-          minScore = std::min(minScore, th->rootMoves[0].score);
-          votes[th->rootMoves[0].pv[0]] = 0;
-      }
 
       // Vote according to score and depth
       for (Thread* th : Threads)
-          votes[th->rootMoves[0].pv[0]] +=  int(th->rootMoves[0].score - minScore)
-                                          + int(th->completedDepth);
+          votes[th->rootMoves[0].pv[0]] += std::max(0, int(th->rootMoves[0].score))  
+                                         + int(th->completedDepth);
 
       // Select best thread
       int bestVote = votes[this->rootMoves[0].pv[0]];
-      for (Thread* th : Threads)
-      {
-          if (votes[th->rootMoves[0].pv[0]] > bestVote)
-          {
+      for (Thread* th : Threads){
+          if (votes[th->rootMoves[0].pv[0]] > bestVote){
               bestVote = votes[th->rootMoves[0].pv[0]];
               bestThread = th;
           }
