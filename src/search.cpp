@@ -250,7 +250,7 @@ void MainThread::search() {
 
       // Vote according to score and depth
       for (Thread* th : Threads)
-          votes[th->rootMoves[0].pv[0]] += std::max(0, int(th->rootMoves[0].score))  
+          votes[th->rootMoves[0].pv[0]] += std::max(0, 3 * int(th->rootMoves[0].score) / 2)  
                                          + int(th->completedDepth);
 
       // Select best thread
