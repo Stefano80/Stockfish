@@ -1063,7 +1063,7 @@ moves_loop: // When in check, search starts from here
                            + (*contHist[3])[movedPiece][to_sq(move)]
                            - 4000;
             
-            d += ONE_PLY * std::max(0, std::min(ss->statScore * int(value - beta) /  2500000, 3)); 
+            d += ONE_PLY * std::max(0, std::min(ss->statScore * int(value - beta) /  3000000, 2)); 
           } 
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, d, false);
