@@ -145,6 +145,7 @@ namespace {
             score -= Doubled;
     }
 
+    score = make_score(2 * mg_value(score), eg_value(score));
     return score;
   }
 
