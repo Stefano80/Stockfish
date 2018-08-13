@@ -1100,7 +1100,7 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
-      if (value > bestValue)
+      if (value > bestValue + 2 * pos.capture(move))
       {
           bestValue = value;
 
