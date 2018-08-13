@@ -841,7 +841,7 @@ namespace {
         ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
         ttMove = ttHit ? tte->move() : MOVE_NONE;
 
-        if (!PvNode && v > beta + 5 * depth)
+        if (!PvNode && v < alpha - 60 * depth)
            return v;
     }
 
