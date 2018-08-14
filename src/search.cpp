@@ -1355,7 +1355,10 @@ moves_loop: // When in check, search starts from here
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
-      value = -qsearch<NT>(pos, ss+1, -beta, -alpha, depth - ONE_PLY);
+
+      Depth d = depth - ONE_PLY * (1 + msb(1 + moveCount)/2);
+
+      value = -qsearch<NT>(pos, ss+1, -beta, -alpha, d);
       pos.undo_move(move);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
