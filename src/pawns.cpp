@@ -32,9 +32,12 @@ namespace {
   #define S(mg, eg) make_score(mg, eg)
 
   // Pawn penalties
- constexpr Score Isolated = S( 4, 14);
- constexpr Score Backward = S(10, 21);
- constexpr Score Doubled  = S(11, 42);
+ Score Isolated = S( 4, 14);
+ Score Backward = S(10, 21);
+ Score Doubled  = S(11, 42);
+ int Seed[RANK_NB] = { 0, 16, 29, 13, 63, 115, 216, 340 };
+
+ TUNE(Isolated, Backward, Doubled, Seed, Pawns::init);
 
   // Connected pawn bonus by opposed, phalanx, #support and rank
   Score Connected[2][2][3][RANK_NB];
@@ -157,8 +160,6 @@ namespace Pawns {
 /// to reduce independent parameters and to allow easier tuning and better insight.
 
 void init() {
-
-  static constexpr int Seed[RANK_NB] = { 0, 16, 29, 13, 63, 115, 216, 340 };
 
   for (int opposed = 0; opposed <= 1; ++opposed)
       for (int phalanx = 0; phalanx <= 1; ++phalanx)

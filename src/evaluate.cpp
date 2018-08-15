@@ -141,18 +141,20 @@ namespace {
   };
 
   // PassedRank[Rank] contains a bonus according to the rank of a passed pawn
-  constexpr Score PassedRank[RANK_NB] = {
+  Score PassedRank[RANK_NB] = {
     S(0, 0), S(6, 23), S(11, 29), S(10, 40), S(52, 78), S(154, 202), S(332, 228)
   };
 
   // PassedFile[File] contains a bonus according to the file of a passed pawn
-  constexpr Score PassedFile[FILE_NB] = {
+  Score PassedFile[FILE_NB] = {
     S( -1,  8), S( 0, 10), S(-10, -10), S(-33,-10),
     S(-29,-10), S(-7, -8), S( 0,  9), S( -1,  6)
   };
 
   // PassedDanger[Rank] contains a term to weight the passed score
-  constexpr int PassedDanger[RANK_NB] = { 0, 0, 0, 4, 7, 11, 17 };
+  int PassedDanger[RANK_NB] = { 0, 0, 0, 4, 7, 11, 17 };
+
+  TUNE(PassedDanger, PassedRank, PassedFile);
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  3,  7);
