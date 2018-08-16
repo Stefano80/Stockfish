@@ -1172,7 +1172,7 @@ moves_loop: // When in check, search starts from here
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
     
-    if (! (excludedMove || (BOUND_LOWER && bestValue - alpha <= -Value(250))))
+    if (! (excludedMove || (BOUND_LOWER && bestValue > Value(1500))))
         tte->save(posKey, value_to_tt(bestValue, ss->ply),
                   bestValue >= beta ? BOUND_LOWER :
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
