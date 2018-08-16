@@ -556,7 +556,7 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, ttValue, eval, maxValue;
+    Value bestValue, secondValue, value, ttValue, eval, maxValue;
     bool ttHit, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
@@ -568,6 +568,7 @@ namespace {
     Color us = pos.side_to_move();
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
+    secondValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
 
     // Check for the available remaining time
@@ -1032,6 +1033,9 @@ moves_loop: // When in check, search starts from here
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
+
+              if (secondValue > -VALUE_INFINITE)
+                r += ONE_PLY * int(bestValue - secondValue) / 40;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
@@ -1102,6 +1106,7 @@ moves_loop: // When in check, search starts from here
 
       if (value > bestValue)
       {
+          secondValue = bestValue;
           bestValue = value;
 
           if (value > alpha)
