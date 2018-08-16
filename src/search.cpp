@@ -729,6 +729,9 @@ namespace {
                   ss->staticEval);
     }
 
+    improving =   ss->staticEval >= (ss-2)->staticEval
+               || (ss-2)->staticEval == VALUE_NONE;
+
     // Step 7. Futility pruning: child node (~30 Elo)
     if (   !rootNode
         &&  depth < 7 * ONE_PLY
@@ -740,9 +743,6 @@ namespace {
     if (   depth < 2 * ONE_PLY
         && eval <= alpha - RazorMargin)
         return qsearch<NT>(pos, ss, alpha, beta);
-
-    improving =   ss->staticEval >= (ss-2)->staticEval
-               || (ss-2)->staticEval == VALUE_NONE;
 
     // Step 9. Null move search with verification search (~40 Elo)
     if (   !PvNode
