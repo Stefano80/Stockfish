@@ -1024,6 +1024,9 @@ moves_loop: // When in check, search starts from here
                              + (*contHist[3])[movedPiece][to_sq(move)]
                              - 4000;
 
+              if (secondValue > -VALUE_INFINITE)
+                  ss->statScore += 50 * (bestValue - secondValue);
+
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
                   r -= ONE_PLY;
@@ -1034,8 +1037,7 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
 
-              if (secondValue > -VALUE_INFINITE)
-                r += ONE_PLY * int(bestValue - secondValue) / 40;
+
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
