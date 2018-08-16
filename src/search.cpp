@@ -1025,7 +1025,7 @@ moves_loop: // When in check, search starts from here
                              - 4000;
 
               if (secondValue > -VALUE_INFINITE)
-                  ss->statScore += 10 * (bestValue - secondValue);
+                  ss->statScore += moveCount * (bestValue - secondValue);
 
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
