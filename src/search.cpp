@@ -453,7 +453,7 @@ void Thread::search() {
 
       if (!Threads.stop){
           completedDepth = rootDepth;
-          confidence = rootDepth;
+          confidence = rootDepth + failedLow;
       }
 
       if (rootMoves[0].pv[0] != lastBestMove) {
