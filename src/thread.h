@@ -56,12 +56,12 @@ public:
   void idle_loop();
   void start_searching();
   void wait_for_search_finished();
-
+  
   Pawns::Table pawnsTable;
   Material::Table materialTable;
   Endgames endgames;
   size_t pvIdx, pvLast;
-  int selDepth, nmpMinPly;
+  int selDepth, nmpMinPly, confidence;
   Color nmpColor;
   std::atomic<uint64_t> nodes, tbHits;
 

@@ -259,7 +259,7 @@ void MainThread::search() {
       // Vote according to score and depth
       for (Thread* th : Threads)
           votes[th->rootMoves[0].pv[0]] +=  int(th->rootMoves[0].score - minScore)
-                                          + int(th->completedDepth);
+                                          + int(th->confidence);
 
       // Select best thread
       int bestVote = votes[this->rootMoves[0].pv[0]];
@@ -451,8 +451,10 @@ void Thread::search() {
               sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
       }
 
-      if (!Threads.stop)
+      if (!Threads.stop){
           completedDepth = rootDepth;
+          confidence = rootDepth;
+      }
 
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
