@@ -396,8 +396,9 @@ void Thread::search() {
           // high/low anymore.
           while (true)
           {
-              alpha +=  (2 + idx * int(rootDepth)) % 5 - 2;
-              beta  +=  (2 + idx * int(rootDepth)) % 5 - 2;
+              int seed = 1;
+              alpha +=  (seed + idx * int(rootDepth)) % (2 * seed + 1) - seed;
+              beta  +=  (seed + idx * int(rootDepth)) % (2 * seed + 1) - seed;
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false);
 
               // Bring the best move to the front. It is critical that sorting
