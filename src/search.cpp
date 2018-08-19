@@ -258,7 +258,7 @@ void MainThread::search() {
 
       // Vote according to score and depth
       for (Thread* th : Threads)
-          votes[th->rootMoves[0].pv[0]] +=  int(th->rootMoves[0].score - minScore)
+          votes[th->rootMoves[0].pv[0]] +=  int(th->rootMoves[0].score - minScore) * 100
                                           + int(th->confidence);
 
       // Select best thread
@@ -453,7 +453,7 @@ void Thread::search() {
 
       if (!Threads.stop){
           completedDepth = rootDepth;
-          confidence = rootDepth + delta / 64;
+          confidence = 100 * rootDepth + delta;
       }
 
       if (rootMoves[0].pv[0] != lastBestMove) {
