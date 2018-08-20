@@ -397,6 +397,10 @@ void Thread::search() {
           while (true)
           {
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false);
+              confidence = std::max(0, 100 * int(rootDepth) 
+                                     + std::min(int(delta), 50) 
+                                     + 15 * int(bestValue >= beta) 
+                                     - 30 * int(bestValue <= alpha));
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
@@ -451,10 +455,8 @@ void Thread::search() {
               sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
       }
 
-      if (!Threads.stop){
+      if (!Threads.stop)
           completedDepth = rootDepth;
-          confidence = 100 * rootDepth + delta;
-      }
 
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
