@@ -398,9 +398,8 @@ void Thread::search() {
           {
               bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false);
               confidence = std::max(0, 100 * int(rootDepth) 
-                                     + std::min(int(delta), 50) 
-                                     + 15 * int(bestValue >= beta) 
-                                     - 30 * int(bestValue <= alpha));
+                                     + std::min(int(delta), 50) * int(bestValue >= beta) 
+                                     - std::min(int(delta), 50) * int(bestValue <= alpha));
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
