@@ -309,6 +309,7 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
+  irreversibleMoves = 0;
 
   if (mainThread)
       mainThread->bestMoveChanges = 0, failedLow = false;
@@ -989,6 +990,7 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
+      thisThread->irreversibleMoves += captureOrPromotion;
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1066,6 +1068,8 @@ moves_loop: // When in check, search starts from here
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
       }
+
+      thisThread->irreversibleMoves -= captureOrPromotion;
 
       // Step 18. Undo move
       pos.undo_move(move);
