@@ -991,7 +991,7 @@ moves_loop: // When in check, search starts from here
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
 
-      bool irreversible = captureOrPromotion;
+      bool irreversible = (captureOrPromotion || type_of(movedPiece) == PAWN);
       thisThread->irreversibleMoves += irreversible;
 
       // Step 15. Make the move
