@@ -990,7 +990,7 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
-      thisThread->irreversibleMoves += captureOrPromotion;
+      thisThread->irreversibleMoves += (captureOrPromotion || type_of(movedPiece) == PAWN);
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1042,7 +1042,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore - bestValue * thisThread->irreversibleMoves ) / 20000 * ONE_PLY;
+              r -= (ss->statScore + bestValue * thisThread->irreversibleMoves ) / 20000 * ONE_PLY;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
@@ -1069,7 +1069,7 @@ moves_loop: // When in check, search starts from here
           value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
       }
 
-      thisThread->irreversibleMoves -= captureOrPromotion;
+      thisThread->irreversibleMoves -= (captureOrPromotion || type_of(movedPiece) == PAWN);
 
       // Step 18. Undo move
       pos.undo_move(move);
