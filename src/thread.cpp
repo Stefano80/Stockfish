@@ -118,7 +118,7 @@ void Thread::idle_loop() {
 }
 
 Value Thread::value_draw() {
-    return VALUE_DRAW + mg_value(contempt) / 15;
+    return VALUE_DRAW + 8 * (mg_value(contempt) - 12) / 100;
 }
 
 /// ThreadPool::set() creates/destroys threads to match the requested number.
