@@ -1214,7 +1214,7 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
 
-          ss->statScore += mctsScore - rm.score;
+          ss->statScore += (mctsScore - rm.score) * int(depth);
 
       }
 
