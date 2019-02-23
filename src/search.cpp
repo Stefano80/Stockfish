@@ -596,7 +596,7 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, ttValue, eval, maxValue, pureStaticEval;
+    Value bestValue, value, ttValue, eval, maxValue, pureStaticEval, mctsScore;
     bool ttHit, ttPv, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
@@ -609,6 +609,7 @@ namespace {
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
+    mctsScore = -VALUE_INFINITE;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -1184,6 +1185,7 @@ moves_loop: // When in check, search starts from here
           // Add all visits and returned scores to this root move's stats
           rm.visits += thisThread->visits;
           rm.zScore += thisThread->allScores;
+          mctsScore = Value (rm.zScore / rm.visits);
           
           thisThread->visits = 0;
           thisThread->allScores = 0;
@@ -1211,6 +1213,10 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+
+          if (mctsScore > rm.score + PawnValueMg)
+              ss->statScore = 0;
+
       }
 
       if (value > bestValue)
