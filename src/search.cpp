@@ -322,6 +322,10 @@ void Thread::search() {
   Color us = rootPos.side_to_move();
   bool failedLow;
 
+  // Reset mcts values
+  visits = 0;
+  allScores = 0;
+
   std::memset(ss-5, 0, 8 * sizeof(Stack));
   for (int i = 5; i > 0; i--)
      (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
@@ -381,10 +385,6 @@ void Thread::search() {
 
       size_t pvFirst = 0;
       pvLast = 0;
-
-      // Reset mcts values
-      visits = 0;
-      allScores = 0;
 
       // MultiPV loop. We perform a full root search for each PV line
       for (pvIdx = 0; pvIdx < multiPV && !Threads.stop; ++pvIdx)
