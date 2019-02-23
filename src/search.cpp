@@ -1214,8 +1214,7 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
 
-          if (mctsScore > rm.score + 5 * PawnValueMg)
-              ss->statScore = 0;
+          ss->statScore += mctsScore - rm.score;
 
       }
 
