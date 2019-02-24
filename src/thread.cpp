@@ -77,6 +77,11 @@ void Thread::start_searching() {
   cv.notify_one(); // Wake up the thread in idle_loop()
 }
 
+void Thread::update_mcts(Depth depth, Value value){
+    visits++;
+    allScores += value;
+}
+
 
 /// Thread::wait_for_search_finished() blocks on the condition variable
 /// until the thread has finished searching.
