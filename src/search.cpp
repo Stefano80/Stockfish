@@ -744,8 +744,7 @@ namespace {
                               std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY),
                               MOVE_NONE, VALUE_NONE);
 
-                    thisThread->visits++;
-                    thisThread->allScores += (ss->ply % 2 == 0) ? value : -value;
+                    thisThread->update_mcts(std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY), (ss->ply % 2 == 0) ? value : -value);
 
                     return value;
                 }
@@ -802,8 +801,7 @@ namespace {
     {
         Value razor = qsearch<NT>(pos, ss, alpha, beta);
 
-        thisThread->visits++;
-        thisThread->allScores += (ss->ply % 2 == 0) ? razor : -razor;
+        thisThread->update_mcts(DEPTH_ZERO, (ss->ply % 2 == 0) ? razor : -razor);
 
         return razor;
     }
@@ -817,8 +815,7 @@ namespace {
         &&  eval - futility_margin(depth, improving) >= beta
         &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
     {
-        thisThread->visits++;
-        thisThread->allScores += (ss->ply % 2 == 0) ? eval : -eval;
+        thisThread->update_mcts(DEPTH_ZERO, (ss->ply % 2 == 0) ? eval : -eval);
 
         return eval;
     }
@@ -855,8 +852,7 @@ namespace {
 
             if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 12 * ONE_PLY))
             {
-                thisThread->visits++;
-                thisThread->allScores += (ss->ply % 2 == 0) ? nullValue : -nullValue;
+                thisThread->update_mcts(depth - R, (ss->ply % 2 == 0) ? nullValue : -nullValue);
 
                 return nullValue;
             }
@@ -874,8 +870,7 @@ namespace {
 
             if (v >= beta)
             {
-                thisThread->visits++;
-                thisThread->allScores += (ss->ply % 2 == 0) ? nullValue : -nullValue;
+                thisThread->update_mcts(depth - R, (ss->ply % 2 == 0) ? nullValue : -nullValue);
 
                 return nullValue;
             }
@@ -917,8 +912,7 @@ namespace {
 
                 if (value >= raisedBeta)
                 {
-                    thisThread->visits++;
-                    thisThread->allScores += (ss->ply % 2 == 0) ? value : -value;
+                    thisThread->update_mcts(depth - 4 * ONE_PLY, (ss->ply % 2 == 0) ? value : -value);
 
                     return value;
                 }
@@ -1017,8 +1011,7 @@ moves_loop: // When in check, search starts from here
           // the hard beta bound.
           else if (cutNode && singularBeta > beta)
           {
-              thisThread->visits++;
-              thisThread->allScores += (ss->ply % 2 == 0) ? beta : -beta;
+              thisThread->update_mcts(depth / 2, (ss->ply % 2 == 0) ? beta : -beta);
 
               return beta;
           }
