@@ -450,6 +450,8 @@ void Thread::search() {
               // re-search, otherwise exit the loop.
               if (bestValue <= alpha || Value(rootMoves[0].zScore / rootMoves[0].visits) <= alpha - PawnValueMg / 2)
               {
+                  if (bestValue > alpha)
+                    bestValue = alpha;
                   beta = (alpha + beta) / 2;
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
