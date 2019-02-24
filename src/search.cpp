@@ -448,7 +448,7 @@ void Thread::search() {
 
               // In case of failing low/high increase aspiration window and
               // re-search, otherwise exit the loop.
-              if (bestValue <= alpha || Value(rootMoves[0].zScore / rootMoves[0].visits) <= alpha - PawnValueMg / 2)
+              if (bestValue <= alpha || Value(rootMoves[0].zScore / rootMoves[0].visits) <= alpha - PawnValueMg / 4)
               {
                   if (bestValue > alpha)
                     bestValue = alpha;
