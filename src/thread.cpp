@@ -78,8 +78,9 @@ void Thread::start_searching() {
 }
 
 void Thread::update_mcts(Depth depth, Value value){
-    visits++;
-    allScores += value;
+    int weight = std::max(1, int(depth) + 1);
+    visits += weight;
+    allScores += weight * value;
 }
 
 
