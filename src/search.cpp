@@ -265,6 +265,8 @@ void MainThread::search() {
           RootMove rm = th->rootMoves[0];
           int64_t s = rm.score - minScore + 1;
           int mctsScore = rm.visits ? rm.zScore / rm.visits: rm.score;
+          
+          // Offset votes with mcts error
           votes[rm.pv[0]] += 500 / (1 + abs(rm.score - mctsScore)) + s * s * int(th->completedDepth);
       }
 
