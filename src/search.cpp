@@ -264,7 +264,7 @@ void MainThread::search() {
       {
           RootMove rm = th->rootMoves[0];
           int64_t s = rm.score - minScore + 1;
-          votes[rm.pv[0]] += 500 / abs(rm.score - Value(rm.zScore / rm.visits)) + s * s * int(th->completedDepth);
+          votes[rm.pv[0]] += 500 / (1 + abs(rm.score - Value(rm.zScore / rm.visits))) + s * s * int(th->completedDepth);
       }
 
       // Select best thread
