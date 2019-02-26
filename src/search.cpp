@@ -470,6 +470,8 @@ void Thread::search() {
                   break;
 
               delta += delta / 4 + 5;
+              int mctsError = abs(bestValue - Value(rootMoves[0].zScore / rootMoves[0].visits));
+              delta += int(mctsError - Value(100))/40;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
