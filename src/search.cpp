@@ -150,7 +150,7 @@ namespace {
     return nodes;
   }
 
-Learn searchLearner(2, 2);
+Learn searchLearner(5, 2);
 
 } // namespace
 
@@ -1070,7 +1070,7 @@ moves_loop: // When in check, search starts from here
           }
 
           // Use a perceptron
-          float test[2] = {float(abs(bestValue)), float(ss->statScore)};
+          float test[] = {float(abs(bestValue)), float(ss->statScore), float(captureOrPromotion), float(newDepth), float(moveCount)};
           searchLearner.setThreshold(1.0);
           int pred = searchLearner.fetch(test);
 
