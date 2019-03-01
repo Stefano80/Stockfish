@@ -1069,12 +1069,12 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 20000 * ONE_PLY;
           }
 
+          // Use a perceptron
           float test[2] = {float(abs(bestValue)), float(ss->statScore)};
           searchLearner.setThreshold(1.0);
           int pred = searchLearner.fetch(test);
 
           Depth d = std::max(newDepth - std::max(r + pred * ONE_PLY, DEPTH_ZERO), ONE_PLY);
-
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
