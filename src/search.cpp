@@ -26,6 +26,7 @@
 #include <sstream>
 
 #include "evaluate.h"
+#include "learn.h"
 #include "misc.h"
 #include "movegen.h"
 #include "movepick.h"
@@ -149,6 +150,9 @@ namespace {
     return nodes;
   }
 
+Learn LMRnetwork(5, 3);
+
+
 } // namespace
 
 
@@ -174,6 +178,8 @@ void Search::init() {
       FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
       FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
   }
+
+  LMRnetwork.setThreshold(1.0);
 }
 
 
@@ -1066,9 +1072,17 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 20000 * ONE_PLY;
           }
 
+          // Use a perceptron
+          float test[] = {float(abs(bestValue)), float(ss->statScore), float(captureOrPromotion), float(newDepth), float(moveCount)};
+
+          int pred = LMRnetwork.infer(test);
+
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+
+          int target = value > alpha + value >= beta; 
+          LMRnetwork.train(test, target, 0.1);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
