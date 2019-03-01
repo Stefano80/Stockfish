@@ -26,6 +26,7 @@
 #include <sstream>
 
 #include "evaluate.h"
+#include "learn.h"
 #include "misc.h"
 #include "movegen.h"
 #include "movepick.h"
@@ -148,6 +149,8 @@ namespace {
     }
     return nodes;
   }
+
+Learn searchLearner(2, 2);
 
 } // namespace
 
@@ -1066,9 +1069,16 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 20000 * ONE_PLY;
           }
 
-          Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
+          float test[2] = {float(abs(bestValue)), float(ss->statScore)};
+          searchLearner.setThreshold(1.0);
+          int pred = searchLearner.fetch(test);
+
+          Depth d = std::max(newDepth - std::max(r + pred * ONE_PLY, DEPTH_ZERO), ONE_PLY);
+
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+
+          searchLearner.train(test, int(value <= alpha), 0.1);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
