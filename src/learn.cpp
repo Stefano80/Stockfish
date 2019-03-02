@@ -49,17 +49,17 @@ int Learn::train(float *stim, unsigned int _result, unsigned int prediction, flo
 {
   unsigned i,j;
 
-  int notneeded=1;  // assume we don't need training
-  if (prediction!=_result) notneeded=0;  // if we got the wrong answer, we need training
-  for (i=0;i<resct&&(notneeded==1);i++)
+  bool needTraining = false;  // assume we don't need training
+  if (prediction!=_result) needTraining = true;  // if we got the wrong answer, we need training
+  for (i=0;i<resct && needTraining; i++)
     {
       // if the correct response has a result< threshold, we do need training
-      if (i==_result && result[i]<threshold)  notneeded=0;
+      if (i==_result && result[i]<threshold)  needTraining = true;
       // if an incorrect response has a result>=threshold, we do need training
-      if (i!=_result && result[i]>=threshold) notneeded=0;
+      if (i!=_result && result[i]>=threshold) needTraining = true;
     }
   // If not needed, we are done
-  if (notneeded) return 0;
+  if (!needTraining) return 0;
 
   // Prevent wt from being 0
   if (wt==0) wt=1.0;
