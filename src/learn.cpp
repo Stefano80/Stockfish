@@ -48,7 +48,6 @@ int Learn::init(void)
 int Learn::train(float *stim, unsigned int _result, unsigned int prediction, float wt)
 {
   unsigned i,j;
-  prediction = infer(stim); // see what we think it is now
 
   int notneeded=1;  // assume we don't need training
   if (prediction!=_result) notneeded=0;  // if we got the wrong answer, we need training

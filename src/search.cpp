@@ -1077,6 +1077,7 @@ moves_loop: // When in check, search starts from here
               testNN[2] = float(captureOrPromotion); 
               testNN[3] = float(newDepth); 
               testNN[4] = float(moveCount);
+
               prediction = LMRnetwork.infer(testNN);
               trainNN = true;
 
@@ -1090,7 +1091,10 @@ moves_loop: // When in check, search starts from here
 
           if (trainNN){
             int result = (value > alpha) + (value >= beta); 
+            prediction = LMRnetwork.infer(testNN);
+
             LMRnetwork.train(testNN, result, prediction, 0.1);
+            trainNN = false;
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
