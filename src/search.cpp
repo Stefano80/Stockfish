@@ -1087,7 +1087,7 @@ moves_loop: // When in check, search starts from here
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          resultNN = (value > alpha) + (value >= beta); 
+          resultNN = (value > alpha) + (value >= beta) - 1; 
 
           if (trainNN && resultNN != prediction){
             // For some reason, in 0.5% of the cases, the prediction here is not the same as before. ToDo.
