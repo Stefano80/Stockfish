@@ -1090,7 +1090,7 @@ moves_loop: // When in check, search starts from here
           resultNN = (value > alpha) + (value >= beta); 
 
           if (trainNN && resultNN != prediction){
-            // For some reason, in 0.5% of the cases, the prediction here is not the same as before. To be solved.
+            // For some reason, in 0.5% of the cases, the prediction here is not the same as before. ToDo.
             LMRnetwork.train(testNN, resultNN, prediction, 0.1);
             trainNN = false;
           }
