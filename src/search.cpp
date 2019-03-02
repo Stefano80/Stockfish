@@ -1103,9 +1103,10 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
-              // Infer using a perceptron, 52%
+              // Infer using a perceptron, 65%
+              int pawns = abs(pos.count<PAWN>(WHITE) - pos.count<PAWN>(BLACK));
               features[0] = float(abs(bestValue) * pos.non_pawn_material());
-              features[1] = float(ss->statScore);
+              features[1] = float(ss->statScore * pawns);
               features[2] = float(moveCount);
               features[3] = float(int(r));
               prediction  = infer(features);
