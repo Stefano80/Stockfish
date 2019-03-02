@@ -579,7 +579,7 @@ namespace {
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
     float testNN[4];
-    int prediction, resultNN;
+    int prediction = 1, resultNN;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
