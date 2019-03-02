@@ -1102,7 +1102,7 @@ moves_loop: // When in check, search starts from here
               // Infer using a perceptron
               features[0] = float(abs(bestValue));
               features[1] = float(ss->statScore);
-              features[2] = float(newDepth);
+              features[2] = float(cutNode);
               features[3] = float(moveCount);
               prediction  = infer(features);
 
