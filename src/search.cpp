@@ -175,9 +175,9 @@ int infer(float input[percInput]){
 
 void train(float input[percInput]){
     for (int d1 = 0; d1 < percOutput; d1++){
-        perceptronWeights[0][d1] -= ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  >= 0)) * 0.01;
+        perceptronWeights[0][d1] -= ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  >= 0)) * 0.1;
         for (int d2 = 0; d2 < percInput; d2++){
-            perceptronWeights[1 + d2][d1] -= 0.01 * ((input[d2] > 0) - (input[d2] < 0)) * input[d2]; 
+            perceptronWeights[1 + d2][d1] -= 0.1 * ((input[d2] > 0) - (input[d2] < 0)) * input[d2]; 
         }
     }
 }
