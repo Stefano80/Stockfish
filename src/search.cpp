@@ -578,7 +578,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
-    float testNN[8];
+    float testNN[4];
     int prediction, resultNN;
 
     // Step 1. Initialize node
@@ -1076,10 +1076,6 @@ moves_loop: // When in check, search starts from here
               testNN[1] = float(ss->statScore);
               testNN[2] = float(newDepth); 
               testNN[3] = float(moveCount);
-              testNN[4] = float(pos.non_pawn_material()); 
-              testNN[5] = float(pos.count<PAWN>(WHITE) + pos.count<PAWN>(BLACK));
-              testNN[6] = float(cutNode); 
-              testNN[7] = float(type_of(movedPiece));
               
               prediction = LMRnetwork.infer(testNN);
               trainNN = true;
