@@ -1103,7 +1103,7 @@ moves_loop: // When in check, search starts from here
               features[0] = float(abs(bestValue));
               features[1] = float(ss->statScore);
               features[2] = float(newDepth);
-              features[3] = float(moveCount);
+              features[3] = float(moveCount) * int(pos.non_pawn_material());
               prediction  = infer(features);
 
               trainPerc = true;
