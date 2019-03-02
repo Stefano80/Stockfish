@@ -39,7 +39,7 @@ void Learn::set_stim(float s[])
 int Learn::init(void)
 {
   unsigned i, j;
-  threshold=1.0f;
+  threshold = 1.0f;
   for (i=0;i<resct;i++)
     for (j=0;j<stimct;j++)
       weights[i][j]=0.0f;
