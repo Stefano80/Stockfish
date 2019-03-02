@@ -579,7 +579,7 @@ namespace {
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
     float testNN[5];
-    int predictionNN;
+    int prediction;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1077,11 +1077,11 @@ moves_loop: // When in check, search starts from here
               testNN[2] = float(captureOrPromotion); 
               testNN[3] = float(newDepth); 
               testNN[4] = float(moveCount);
-              predictionNN = LMRnetwork.infer(testNN);
+              prediction = LMRnetwork.infer(testNN);
               trainNN = true;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore + predictionNN * 2000) / 20000 * ONE_PLY;
+              r -= (ss->statScore + prediction * 2000) / 20000 * ONE_PLY;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
@@ -1090,7 +1090,7 @@ moves_loop: // When in check, search starts from here
 
           if (trainNN){
             int result = (value > alpha) + (value >= beta); 
-            LMRnetwork.train(testNN, result, predictionNN, 0.1);
+            LMRnetwork.train(testNN, result, prediction, 0.1);
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
