@@ -579,7 +579,7 @@ namespace {
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
     float testNN[5];
-    int prediction;
+    int prediction, resultNN;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -895,6 +895,7 @@ moves_loop: // When in check, search starts from here
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
     {
       assert(is_ok(move));
+      bool trainNN = false;
 
       if (move == excludedMove)
           continue;
@@ -908,7 +909,6 @@ moves_loop: // When in check, search starts from here
           continue;
 
       ss->moveCount = ++moveCount;
-      bool trainNN = false;
 
       if (rootNode && thisThread == Threads.main() && Time.elapsed() > 3000)
           sync_cout << "info depth " << depth / ONE_PLY
@@ -1079,7 +1079,6 @@ moves_loop: // When in check, search starts from here
               testNN[4] = float(moveCount);
 
               prediction = LMRnetwork.infer(testNN);
-              trainNN = true;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= (ss->statScore + prediction * 2000) / 20000 * ONE_PLY;
@@ -1088,12 +1087,11 @@ moves_loop: // When in check, search starts from here
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+          resultNN = (value > alpha) + (value >= beta); 
 
-          if (trainNN){
-            int result = (value > alpha) + (value >= beta); 
-            prediction = LMRnetwork.infer(testNN);
-
-            LMRnetwork.train(testNN, result, prediction, 0.1);
+          if (trainNN && resultNN != prediction){
+            // For some reason, in 0.5% of the cases, the prediction here is not the same as before. To be solved.
+            LMRnetwork.train(testNN, resultNN, prediction, 0.1);
             trainNN = false;
           }
 
