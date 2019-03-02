@@ -1119,8 +1119,7 @@ moves_loop: // When in check, search starts from here
           if (trainPerc){
              int result = (value > alpha) + (value >= beta);
              train(features, prediction, result);
-
-             dbg_hit_on(prediction == result);
+             trainPerc = false;
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
