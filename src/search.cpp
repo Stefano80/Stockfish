@@ -150,7 +150,7 @@ namespace {
   }
 
 
-constexpr int percInput     = 4;
+constexpr int percInput     = 8;
 constexpr int percOutput    = 3;
 float perceptronWeights[percInput + 1][percOutput];
 
@@ -1104,6 +1104,10 @@ moves_loop: // When in check, search starts from here
               features[1] = float(ss->statScore);
               features[2] = float(newDepth);
               features[3] = float(moveCount);
+              features[4] = float(pos.non_pawn_material());
+              features[5] = float(pos.count<PAWN>(WHITE) + pos.count<PAWN>(BLACK));
+              features[6] = float(abs(pos.count<PAWN>(WHITE) - pos.count<PAWN>(BLACK)));
+              features[7] = float(cutNode);
               prediction  = infer(features);
 
               trainPerc = true;
