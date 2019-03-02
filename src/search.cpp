@@ -578,6 +578,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
+    float testNN[5];
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -906,6 +907,7 @@ moves_loop: // When in check, search starts from here
           continue;
 
       ss->moveCount = ++moveCount;
+      bool trainNN = false;
 
       if (rootNode && thisThread == Threads.main() && Time.elapsed() > 3000)
           sync_cout << "info depth " << depth / ONE_PLY
@@ -1068,21 +1070,27 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
+              // Infer using a perceptron
+              testNN[0] = float(abs(bestValue)); 
+              testNN[1] = float(ss->statScore);
+              testNN[2] = float(captureOrPromotion); 
+              testNN[3] = float(newDepth); 
+              testNN[4] = float(moveCount);
+              int pred = LMRnetwork.infer(testNN);
+              trainNN = true;
+
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
           }
-
-          // Use a perceptron
-          float test[] = {float(abs(bestValue)), float(ss->statScore), float(captureOrPromotion), float(newDepth), float(moveCount)};
-
-          int pred = LMRnetwork.infer(test);
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          int target = value > alpha + value >= beta; 
-          LMRnetwork.train(test, target, 0.1);
+          if (trainNN){
+            int target = (value > alpha) + (value >= beta); 
+            LMRnetwork.train(testNN, target, 0.1);
+          }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
