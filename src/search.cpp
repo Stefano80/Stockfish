@@ -177,7 +177,7 @@ void train(float input[percInput], float rate){
     for (int d1 = 0; d1 < percOutput; d1++){
         perceptronWeights[0][d1] -= ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  < 0)) * rate;
         for (int d2 = 0; d2 < percInput; d2++){
-            perceptronWeights[1 + d2][d1] -= rate * ((input[d2] > 0) - (input[d2] < 0)) * input[d2]; 
+            perceptronWeights[1 + d2][d1] -=  ((perceptronWeights[1 + d2][d1] > 0) - (perceptronWeights[1 + d2][d1] < 0)) * input[d2] * rate; 
         }
     }
 }
@@ -208,7 +208,11 @@ void Search::init() {
       FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
   }
 
-  std::memset(perceptronWeights, 0.0, sizeof perceptronWeights);
+  for (int d1 = 0; d1 <= percInput; d1++)
+    for (int d2 = 0; d2 < percOutput; d2++)
+    {
+      perceptronWeights[d1][d2] = float(d1*d2) - percInput*percOutput / 4.0;
+    }
 }
 
 
@@ -1103,7 +1107,7 @@ moves_loop: // When in check, search starts from here
               features[0] = float(abs(bestValue));
               features[1] = float(ss->statScore);
               features[2] = float(cutNode);
-              features[3] = float(moveCount) * int(pos.non_pawn_material());
+              features[3] = float(moveCount);
               prediction  = infer(features);
 
               trainPerc = true;
@@ -1119,9 +1123,10 @@ moves_loop: // When in check, search starts from here
           if (trainPerc){
              int result = value > alpha;
              if (prediction != result){
-                train(features, 1e-3 / float(5 + r));
+                train(features, 1e-2);
              }
              trainPerc = false;
+             dbg_hit_on(prediction == result);
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
