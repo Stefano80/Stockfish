@@ -578,7 +578,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
-    float testNN[5];
+    float testNN[4];
     int prediction, resultNN;
 
     // Step 1. Initialize node
@@ -1074,9 +1074,8 @@ moves_loop: // When in check, search starts from here
               // Infer using a perceptron
               testNN[0] = float(abs(bestValue)); 
               testNN[1] = float(ss->statScore);
-              testNN[2] = float(captureOrPromotion); 
-              testNN[3] = float(newDepth); 
-              testNN[4] = float(moveCount);
+              testNN[2] = float(newDepth); 
+              testNN[3] = float(moveCount);
 
               prediction = LMRnetwork.infer(testNN);
               trainNN = true;
