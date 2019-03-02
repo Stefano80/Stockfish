@@ -155,17 +155,31 @@ constexpr int percOutput    = 3;
 float perceptronWeights[percInput + 1][percOutput];
 
 int infer(float input[percInput], float weights[percInput + 1][percOutput]){
+    float continuousClasses[percOutput];
+    float bestFit     = -100000000.0;
+    int   bestClass   = -1;
+    std::memset(continuousClasses, 0.0, sizeof continuousClasses);
+
     for (int d1 = 0; d1 < percOutput; d1++){
-        float counter = perceptronWeights[0][d1];
+        continuousClasses[d1] += perceptronWeights[0][d1]; // bias
         for (int d2 = 0; d2 < percInput; d2++){
-            counter += perceptronWeights[1 + d2][d1];
+            continuousClasses[d1] += perceptronWeights[1 + d2][d1] * input[d2];
+        }
+        if (bestFit < continuousClasses[d1]){
+           bestFit = continuousClasses[d1];
+           bestClass = d1;
         }
     }
-    return 0;
+    return bestClass;
 }
 
-void train(int prediction, int result){
-    perceptronWeights[0][0] = 1;
+void train(float input[percInput], int prediction, int result){
+    for (int d1 = 0; d1 < percOutput; d1++){
+        perceptronWeights[0][d1] -= ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  >= 0)) * 0.01;
+        for (int d2 = 0; d2 < percInput; d2++){
+            perceptronWeights[1 + d2][d1] -= 0.01 * ((input[d2] > 0) - (input[d2] < 0)) * input[d2]; 
+        }
+    }
 }
 
 } // namespace
@@ -193,11 +207,8 @@ void Search::init() {
       FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
       FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
   }
-  for (int i = 0; i <= percInput; ++i ){
-      for (int j = 0; j < percOutput; ++j){
-          perceptronWeights[i][j] = 0;
-      }
-  }
+
+  std::memset(perceptronWeights, 0.0, sizeof perceptronWeights);
 }
 
 
@@ -597,6 +608,7 @@ namespace {
     Piece movedPiece;
     int moveCount, captureCount, quietCount, prediction;
     float features[percInput] = {0.0, 0.0, 0.0, 0.0};
+    bool trainPerc = false;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1094,6 +1106,8 @@ moves_loop: // When in check, search starts from here
               features[3] = float(moveCount);
               prediction  = infer(features, perceptronWeights);
 
+              trainPerc = true;
+
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
           }
@@ -1102,7 +1116,12 @@ moves_loop: // When in check, search starts from here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          train(prediction, 1);
+          if (trainPerc){
+             int result = (value > alpha) + (value >= beta);
+             train(features, prediction, result);
+
+             dbg_hit_on(prediction == result);
+          }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
