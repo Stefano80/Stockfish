@@ -45,12 +45,12 @@ int Learn::init(void)
 }
 
 // Do a training
-int Learn::train(float *stim, unsigned int _result, unsigned int v, float wt)
+int Learn::train(float *stim, unsigned int _result, unsigned int prediction, float wt)
 {
   unsigned i,j;
-  v = infer(stim); // see what we think it is now
+  prediction = infer(stim); // see what we think it is now
   int notneeded=1;  // assume we don't need training
-  if (v!=_result) notneeded=0;  // if we got the wrong answer, we need training
+  if (prediction!=_result) notneeded=0;  // if we got the wrong answer, we need training
   for (i=0;i<resct&&(notneeded==1);i++)
     {
       // if the correct response has a result< threshold, we do need training
