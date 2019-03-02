@@ -149,6 +149,19 @@ namespace {
     return nodes;
   }
 
+
+constexpr int percInput     = 4;
+constexpr int percOutput    = 3;
+float perceptronWeights[percInput + 1][percOutput];
+
+int infer(float input[percInput], float weights[percInput + 1][percOutput]){
+    return 0;
+}
+
+void train(int prediction, int result){
+    perceptronWeights[0][0] = 1;
+}
+
 } // namespace
 
 
@@ -173,6 +186,11 @@ void Search::init() {
   {
       FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
       FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
+  }
+  for (int i = 0; i <= percInput; ++i ){
+      for (int j = 0; j < percOutput; ++j){
+          perceptronWeights[i][j] = 0;
+      }
   }
 }
 
@@ -571,7 +589,8 @@ namespace {
     bool ttHit, ttPv, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, prediction;
+    float features[percInput] = {0.0, 0.0, 0.0, 0.0};
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1062,6 +1081,13 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
+              // Infer using a perceptron
+              features[0] = float(abs(bestValue));
+              features[1] = float(ss->statScore);
+              features[2] = float(newDepth);
+              features[3] = float(moveCount);
+              prediction  = infer(features, perceptronWeights);
+
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
           }
@@ -1069,6 +1095,8 @@ moves_loop: // When in check, search starts from here
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+
+          train(prediction, 1);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
