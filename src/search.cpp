@@ -1104,10 +1104,10 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Infer using a perceptron
-              features[0] = float(abs(bestValue));
+              features[0] = float(abs(bestValue) * pos.non_pawn_material());
               features[1] = float(ss->statScore);
-              features[2] = float(cutNode);
-              features[3] = float(moveCount);
+              features[2] = float(moveCount);
+              features[3] = float(int(r));
               prediction  = infer(features);
 
               trainPerc = true;
