@@ -45,10 +45,10 @@ int Learn::init(void)
 }
 
 // Do a training
-int Learn::train(float *stim, unsigned int _result, float wt)
+int Learn::train(float *stim, unsigned int _result, unsigned int v, float wt)
 {
   unsigned i,j;
-  unsigned int v=infer(stim); // see what we think it is now
+  v = infer(stim); // see what we think it is now
   int notneeded=1;  // assume we don't need training
   if (v!=_result) notneeded=0;  // if we got the wrong answer, we need training
   for (i=0;i<resct&&(notneeded==1);i++)
