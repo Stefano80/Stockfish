@@ -52,19 +52,19 @@ int Learn::train(float *stim, unsigned int _result, unsigned int prediction, flo
   unsigned i,j;
 
   // Prevent wt from being 0
-  if (wt==0) wt=1.0;
+  if (wt==0) wt = 1.0;
   // for each result...
   for (i=0;i<resct;i++){
-      float w=wt;
+      float w = wt;
       // if this is the correct result and it is >= threshold, then skip
       if (i==_result && result[i]>=threshold) continue;
       // if this is the incorrect result and it is < threshold, then skip
       if (i!=_result &&  result[i]<threshold) continue;
       // if we are on ann incorrect result, flip weight around (negative)
-      if (i!=_result) w=-w;
+      if (i!=_result) w = -w;
       // Update weights
-      for (j=0;j<stimct;j++){
-	      weights[i][j]+=w*_stim[j];
+      for (j=0; j < stimct; j++){
+	      weights[i][j] += w*_stim[j];
 	    }
   }
   return 0;
