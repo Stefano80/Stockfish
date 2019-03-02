@@ -49,6 +49,7 @@ int Learn::train(float *stim, unsigned int _result, unsigned int prediction, flo
 {
   unsigned i,j;
   prediction = infer(stim); // see what we think it is now
+
   int notneeded=1;  // assume we don't need training
   if (prediction!=_result) notneeded=0;  // if we got the wrong answer, we need training
   for (i=0;i<resct&&(notneeded==1);i++)
@@ -60,8 +61,7 @@ int Learn::train(float *stim, unsigned int _result, unsigned int prediction, flo
     }
   // If not needed, we are done
   if (notneeded) return 0;
-  // Get stimulus + bias
-  set_stim(stim);
+
   // Prevent wt from being 0
   if (wt==0) wt=1.0;
   // for each result...
