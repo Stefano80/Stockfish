@@ -1103,7 +1103,7 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
-              // Infer using a perceptron
+              // Infer using a perceptron, 52%
               features[0] = float(abs(bestValue) * pos.non_pawn_material());
               features[1] = float(ss->statScore);
               features[2] = float(moveCount);
