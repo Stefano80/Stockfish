@@ -1,7 +1,9 @@
 #include "learn.h"
+#include "misc.h"
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+
 
 using namespace std;
 
@@ -48,18 +50,6 @@ int Learn::init(void)
 int Learn::train(float *stim, unsigned int _result, unsigned int prediction, float wt)
 {
   unsigned i,j;
-
-  bool needTraining = false;  // assume we don't need training
-  if (prediction!=_result) needTraining = true;  // if we got the wrong answer, we need training
-  for (i=0;i<resct && needTraining; i++)
-    {
-      // if the correct response has a result< threshold, we do need training
-      if (i==_result && result[i]<threshold)  needTraining = true;
-      // if an incorrect response has a result>=threshold, we do need training
-      if (i!=_result && result[i]>=threshold) needTraining = true;
-    }
-  // If not needed, we are done
-  if (!needTraining) return 0;
 
   // Prevent wt from being 0
   if (wt==0) wt=1.0;

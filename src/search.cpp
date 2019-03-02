@@ -1079,6 +1079,7 @@ moves_loop: // When in check, search starts from here
               testNN[4] = float(moveCount);
 
               prediction = LMRnetwork.infer(testNN);
+              trainNN = true;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= (ss->statScore + prediction * 2000) / 20000 * ONE_PLY;
