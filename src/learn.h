@@ -12,7 +12,7 @@ public:
   Learn(unsigned int stimulusct, unsigned int resultct);
   ~Learn();
   int init(void);
-  int train(float *stim, unsigned int result, float wt=1.0f);
+  int train(float *stim, unsigned int result, unsigned int prediction, float wt=1.0f);
   unsigned int infer(float *stim);
   void setThreshold(float t) { threshold = t; };
   float getThreshold(void) { return threshold; };

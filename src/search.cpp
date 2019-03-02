@@ -1089,8 +1089,8 @@ moves_loop: // When in check, search starts from here
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
           if (trainNN){
-            int target = (value > alpha) + (value >= beta); 
-            LMRnetwork.train(testNN, target, 0.1);
+            int result = (value > alpha) + (value >= beta); 
+            LMRnetwork.train(testNN, result, predictionNN, 0.1);
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
