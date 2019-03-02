@@ -578,7 +578,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
-    float testNN[4];
+    float testNN[4]; // perceptron input
     int prediction = 1, resultNN;
 
     // Step 1. Initialize node
