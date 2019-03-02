@@ -173,7 +173,7 @@ int infer(float input[percInput]){
     return bestClass;
 }
 
-void train(float input[percInput], int prediction){
+void train(float input[percInput]){
     for (int d1 = 0; d1 < percOutput; d1++){
         perceptronWeights[0][d1] -= ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  >= 0)) * 0.01;
         for (int d2 = 0; d2 < percInput; d2++){
@@ -1119,7 +1119,7 @@ moves_loop: // When in check, search starts from here
           if (trainPerc){
              int result = (value > alpha) + (value >= beta);
              if (prediction != result){
-                train(features, prediction);
+                train(features);
              }
              trainPerc = false;
           }
