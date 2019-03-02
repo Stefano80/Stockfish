@@ -154,7 +154,7 @@ constexpr int percInput     = 4;
 constexpr int percOutput    = 3;
 float perceptronWeights[percInput + 1][percOutput];
 
-int infer(float input[percInput], float weights[percInput + 1][percOutput]){
+int infer(float input[percInput]){
     float continuousClasses[percOutput];
     float bestFit     = -100000000.0;
     int   bestClass   = -1;
@@ -173,7 +173,7 @@ int infer(float input[percInput], float weights[percInput + 1][percOutput]){
     return bestClass;
 }
 
-void train(float input[percInput], int prediction, int result){
+void train(float input[percInput], int prediction){
     for (int d1 = 0; d1 < percOutput; d1++){
         perceptronWeights[0][d1] -= ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  >= 0)) * 0.01;
         for (int d2 = 0; d2 < percInput; d2++){
@@ -1104,12 +1104,12 @@ moves_loop: // When in check, search starts from here
               features[1] = float(ss->statScore);
               features[2] = float(newDepth);
               features[3] = float(moveCount);
-              prediction  = infer(features, perceptronWeights);
+              prediction  = infer(features);
 
               trainPerc = true;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= ss->statScore / 20000 * ONE_PLY;
+              r -= (ss->statScore +  2000 * (prediction - 1))/ 20000 * ONE_PLY;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
@@ -1118,7 +1118,9 @@ moves_loop: // When in check, search starts from here
 
           if (trainPerc){
              int result = (value > alpha) + (value >= beta);
-             train(features, prediction, result);
+             if (prediction != result){
+                train(features, prediction);
+             }
              trainPerc = false;
           }
 
