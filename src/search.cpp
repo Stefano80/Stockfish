@@ -1126,7 +1126,6 @@ moves_loop: // When in check, search starts from here
                 train(features, 1e-2);
              }
              trainPerc = false;
-             dbg_hit_on(prediction == result);
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
