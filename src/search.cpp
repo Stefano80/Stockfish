@@ -1117,7 +1117,7 @@ moves_loop: // When in check, search starts from here
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
           if (trainPerc){
-             int result = (value > alpha) + (value >= beta);
+             int result = value > alpha;
              if (prediction != result){
                 train(features);
              }
