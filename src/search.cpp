@@ -155,6 +155,12 @@ constexpr int percOutput    = 3;
 float perceptronWeights[percInput + 1][percOutput];
 
 int infer(float input[percInput], float weights[percInput + 1][percOutput]){
+    for (int d1 = 0; d1 < percOutput; d1++){
+        float counter = perceptronWeights[0][d1];
+        for (int d2 = 0; d2 < percInput; d2++){
+            counter += perceptronWeights[1 + d2][d1];
+        }
+    }
     return 0;
 }
 
