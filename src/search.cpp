@@ -153,6 +153,7 @@ namespace {
 constexpr int percInput     = 4;
 constexpr int percOutput    = 3;
 float perceptronWeights[percInput + 1][percOutput];
+float perceptronAccuracy    = 0;
 
 int infer(float input[percInput]){
     float continuousClasses[percOutput];
@@ -1113,8 +1114,10 @@ moves_loop: // When in check, search starts from here
 
               trainPerc = true;
 
+              int perceptronScore = perceptronAccuracy * 1000 * (prediction - 1);
+
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore +  5000 * (prediction - 1))/ 20000 * ONE_PLY;
+              r -= (ss->statScore +  perceptronScore)/ 20000 * ONE_PLY;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
@@ -1123,6 +1126,8 @@ moves_loop: // When in check, search starts from here
 
           if (trainPerc){
              int result = value > alpha;
+             perceptronAccuracy += (prediction == result);
+             perceptronAccuracy *= 0.9; 
              if (prediction != result){
                 train(features, 1e-2);
              }
