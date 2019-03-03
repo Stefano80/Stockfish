@@ -151,7 +151,7 @@ namespace {
 
 
 constexpr int percInput     = 4;
-constexpr int percOutput    = 3;
+constexpr int percOutput    = 2;
 float perceptronWeights[percInput + 1][percOutput];
 float perceptronAccuracy    = 0;
 
