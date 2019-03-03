@@ -153,6 +153,40 @@ namespace {
     return nodes;
   }
 
+
+constexpr int percInput     = 4;
+constexpr int percOutput    = 2;
+float perceptronWeights[percInput + 1][percOutput];
+float perceptronAccuracy    = 0;
+float internalStates[percOutput];
+
+int infer(float input[percInput]){
+    float bestFit     = -100000000.0;
+    int   bestClass   = -1;
+    
+    for (int d1 = 0; d1 < percOutput; d1++){
+        internalStates[d1] = perceptronWeights[0][d1]; // bias
+        for (int d2 = 0; d2 < percInput; d2++){
+            internalStates[d1] += perceptronWeights[1 + d2][d1] * input[d2];
+        }
+        if (bestFit < internalStates[d1]){
+           bestFit = internalStates[d1];
+           bestClass = d1;
+        }
+    }
+    return bestClass;
+}
+
+void train(float input[percInput], float rate){
+    for (int d1 = 0; d1 < percOutput; d1++){
+        perceptronWeights[0][d1] -= 
+            ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  < 0)) * rate;
+        for (int d2 = 0; d2 < percInput; d2++){
+            perceptronWeights[1 + d2][d1] -=  ((perceptronWeights[1 + d2][d1] > 0) - (perceptronWeights[1 + d2][d1] < 0)) * input[d2] * rate; 
+        }
+    }
+}
+
 } // namespace
 
 
@@ -160,8 +194,33 @@ namespace {
 
 void Search::init() {
 
-  for (int i = 1; i < 64; ++i)
-      Reductions[i] = int(1024 * std::log(i) / std::sqrt(1.95));
+
+  for (int imp = 0; imp <= 1; ++imp)
+      for (int d = 1; d < 64; ++d)
+          for (int mc = 1; mc < 64; ++mc)
+          {
+              double r = log(d) * log(mc) / 1.95;
+
+              Reductions[imp][d][mc] = std::round(r);
+
+              // Increase reduction for non-PV nodes when eval is not improving
+              if (!imp && r > 1.0)
+                Reductions[imp][d][mc]++;
+          }
+
+  for (int d = 0; d < 16; ++d)
+  {
+      FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
+      FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
+  }
+
+  for (int d1 = 0; d1 <= percInput; d1++)
+    for (int d2 = 0; d2 < percOutput; d2++)
+    {
+      perceptronWeights[d1][d2] = float(d1*d2) - percInput*percOutput / 4.0;
+    }
+
+
 }
 
 
@@ -559,7 +618,9 @@ namespace {
     bool ttHit, ttPv, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, prediction;
+    float features[percInput] = {0.0, 0.0, 0.0, 0.0};
+    bool trainPerc = false;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1052,13 +1113,40 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
+              // Infer using a perceptron, 65%
+              int pawns   =     pos.count<PAWN>(WHITE) + pos.count<PAWN>(BLACK);
+
+              features[0] = float(abs(bestValue) * pawns);
+              features[1] = float(ss->statScore * pawns);
+              features[2] = float(moveCount);
+              features[3] = float(cutNode * pawns);
+              prediction  = infer(features);
+
+              trainPerc = true;
+
+              int perceptronScore = perceptronAccuracy * 1000 * (prediction - 0.5);
+
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= ss->statScore / 20000 * ONE_PLY;
+              r -= (ss->statScore +  perceptronScore)/ 20000 * ONE_PLY;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+
+          // Train the perceptron
+          if (trainPerc){
+             int result = value > alpha;
+             perceptronAccuracy += (prediction == result);
+             perceptronAccuracy *= 0.9;
+             float rate = 1e-4; 
+             if (prediction != result){
+                train(features,  rate);
+             } else {
+                train(features, -rate); 
+             }
+             trainPerc = false;
+          }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
