@@ -179,10 +179,9 @@ int infer(float input[percInput]){
 
 void train(float input[percInput], float rate){
     for (int d1 = 0; d1 < percOutput; d1++){
-        perceptronWeights[0][d1] -= 
-            ((perceptronWeights[0][d1]  > 0) - (perceptronWeights[0][d1]  < 0)) * rate;
+        perceptronWeights[0][d1] += rate;
         for (int d2 = 0; d2 < percInput; d2++){
-            perceptronWeights[1 + d2][d1] -=  ((perceptronWeights[1 + d2][d1] > 0) - (perceptronWeights[1 + d2][d1] < 0)) * input[d2] * rate; 
+            perceptronWeights[1 + d2][d1] += input[d2] * rate; 
         }
     }
 }
@@ -195,32 +194,14 @@ void train(float input[percInput], float rate){
 void Search::init() {
 
 
-  for (int imp = 0; imp <= 1; ++imp)
-      for (int d = 1; d < 64; ++d)
-          for (int mc = 1; mc < 64; ++mc)
-          {
-              double r = log(d) * log(mc) / 1.95;
-
-              Reductions[imp][d][mc] = std::round(r);
-
-              // Increase reduction for non-PV nodes when eval is not improving
-              if (!imp && r > 1.0)
-                Reductions[imp][d][mc]++;
-          }
-
-  for (int d = 0; d < 16; ++d)
-  {
-      FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
-      FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
-  }
-
+  for (int i = 1; i < 64; ++i)
+      Reductions[i] = int(1024 * std::log(i) / std::sqrt(1.95));
+          
   for (int d1 = 0; d1 <= percInput; d1++)
     for (int d2 = 0; d2 < percOutput; d2++)
     {
-      perceptronWeights[d1][d2] = float(d1*d2) - percInput*percOutput / 4.0;
+      perceptronWeights[d1][d2] = 20;
     }
-
-
 }
 
 
@@ -1134,17 +1115,14 @@ moves_loop: // When in check, search starts from here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
+          int result = value > alpha;
+
           // Train the perceptron
-          if (trainPerc){
-             int result = value > alpha;
-             perceptronAccuracy += (prediction == result);
+          if (trainPerc && (prediction != result)){
+             
+             perceptronAccuracy++;
              perceptronAccuracy *= 0.9;
-             float rate = 1e-4; 
-             if (prediction != result){
-                train(features,  rate);
-             } else {
-                train(features, -rate); 
-             }
+             train(features,  1e-4);
              trainPerc = false;
           }
 
