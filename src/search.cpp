@@ -1117,7 +1117,7 @@ moves_loop: // When in check, search starts from here
 
           int result = value > alpha;
 
-          // Train the perceptron
+          // Train the perceptron if result is wrong
           if (trainPerc && (prediction != result)){
              
              perceptronAccuracy++;
