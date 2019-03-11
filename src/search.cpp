@@ -154,7 +154,7 @@ namespace {
   }
 
 
-constexpr int percInput     = 4;
+constexpr int percInput     = 5;
 constexpr int percOutput    = 2;
 float perceptronWeights[percInput + 1][percOutput];
 float perceptronAccuracy    = 0;
@@ -177,11 +177,13 @@ int infer(float input[percInput]){
     return bestClass;
 }
 
-void train(float input[percInput], float rate){
+void train(float input[percInput], float rate, int prediction, int result){
+    int error = 0;
     for (int d1 = 0; d1 < percOutput; d1++){
-        perceptronWeights[0][d1] += rate;
+        error = - (prediction == d1) + (result == d1);
+        perceptronWeights[0][d1] += rate * error;
         for (int d2 = 0; d2 < percInput; d2++){
-            perceptronWeights[1 + d2][d1] += input[d2] * rate; 
+            perceptronWeights[1 + d2][d1] += input[d2] * rate * error; 
         }
     }
 }
@@ -1094,13 +1096,11 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
-              // Infer using a perceptron, 65%
-              int pawns   =     pos.count<PAWN>(WHITE) + pos.count<PAWN>(BLACK);
-
-              features[0] = float(abs(bestValue) * pawns);
-              features[1] = float(ss->statScore * pawns);
-              features[2] = float(moveCount);
-              features[3] = float(cutNode * pawns);
+              features[0] = cutNode;
+              features[1] = 0;
+              features[2] = 0;
+              features[3] = 0;
+              features[4] = 0;
               prediction  = infer(features);
 
               trainPerc = true;
@@ -1117,12 +1117,13 @@ moves_loop: // When in check, search starts from here
 
           int result = value > alpha;
 
+          perceptronAccuracy += (prediction == result);
+          perceptronAccuracy *= 0.9;
+          dbg_mean_of(perceptronAccuracy);
+
           // Train the perceptron if result is wrong
-          if (trainPerc && (prediction != result)){
-             
-             perceptronAccuracy++;
-             perceptronAccuracy *= 0.9;
-             train(features,  1e-4);
+          if (trainPerc && (prediction != result)){             
+             train(features,  1e-4, prediction, result);
              trainPerc = false;
           }
 
