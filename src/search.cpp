@@ -154,7 +154,7 @@ namespace {
   }
 
 
-constexpr int percInput     = 5;
+constexpr int percInput     = 4;
 constexpr int percOutput    = 2;
 float perceptronWeights[percInput + 1][percOutput];
 float perceptronAccuracy    = 0;
@@ -1096,16 +1096,13 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
-              features[0] = cutNode;
-              features[1] = 0;
-              features[2] = 0;
-              features[3] = 0;
-              features[4] = 0;
+              features[0] = cutNode * pos.non_pawn_material();
+              features[1] = int(depth);
+              features[2] = perceptronAccuracy;
+              features[3] = cutNode * int(r);
               prediction  = infer(features);
-
+              int perceptronScore = perceptronAccuracy * 3000 * (prediction - 0.2);
               trainPerc = true;
-
-              int perceptronScore = perceptronAccuracy * 1000 * (prediction - 0.5);
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= (ss->statScore +  perceptronScore)/ 20000 * ONE_PLY;
@@ -1117,14 +1114,13 @@ moves_loop: // When in check, search starts from here
 
           int result = value > alpha;
 
-          perceptronAccuracy += (prediction == result);
-          perceptronAccuracy *= 0.9;
-          dbg_mean_of(perceptronAccuracy);
-
-          // Train the perceptron if result is wrong
-          if (trainPerc && (prediction != result)){             
-             train(features,  1e-4, prediction, result);
-             trainPerc = false;
+          // Train the perceptron if needed
+          if (trainPerc){
+            trainPerc = false;
+            perceptronAccuracy += (prediction == result);
+            perceptronAccuracy *= 0.9;           
+            if (prediction != result)
+              train(features,  1e-4, prediction, result);
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
