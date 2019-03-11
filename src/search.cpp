@@ -1096,6 +1096,7 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
+              // Predict using a perceptron
               features[0] = cutNode * pos.non_pawn_material();
               features[1] = int(depth);
               features[2] = perceptronAccuracy;
