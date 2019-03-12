@@ -155,7 +155,7 @@ namespace {
 
 
 constexpr int percInput     = 4;
-constexpr int percOutput    = 2;
+constexpr int percOutput    = 3;
 float perceptronWeights[percInput + 1][percOutput];
 float perceptronAccuracy    = 0;
 float internalStates[percOutput];
@@ -1105,7 +1105,7 @@ moves_loop: // When in check, search starts from here
               features[2] = float(perceptronAccuracy);
               features[3] = float(cutNode * int(r));
               prediction  = infer(features);
-              int perceptronScore = perceptronAccuracy * 1000 * prediction;
+              int perceptronScore = perceptronAccuracy * 2000 * prediction;
               trainPerc = true;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
@@ -1116,7 +1116,7 @@ moves_loop: // When in check, search starts from here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          int result = value > alpha;
+          int result = (value > alpha) + (value > beta);
 
           // Train the perceptron if needed
           if (trainPerc){
