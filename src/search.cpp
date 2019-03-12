@@ -202,7 +202,10 @@ void Search::init() {
   for (int d1 = 0; d1 <= percInput; d1++)
     for (int d2 = 0; d2 < percOutput; d2++)
     {
-      perceptronWeights[d1][d2] = 20;
+      if (!d1)
+        perceptronWeights[d1][d2] = 1000 * (20 - 5 * d2);
+      else
+        perceptronWeights[d1][d2] = 0;
     }
 }
 
@@ -1097,16 +1100,16 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Predict using a perceptron
-              features[0] = cutNode * pos.non_pawn_material();
-              features[1] = int(depth);
-              features[2] = perceptronAccuracy;
-              features[3] = cutNode * int(r);
+              features[0] = float(cutNode * pos.non_pawn_material());
+              features[1] = float(depth);
+              features[2] = float(perceptronAccuracy);
+              features[3] = float(cutNode * int(r));
               prediction  = infer(features);
-              int perceptronScore = perceptronAccuracy * 3000 * (prediction - 0.2);
+              int perceptronScore = 0 * perceptronAccuracy * 3000 * (prediction - 0.2);
               trainPerc = true;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore +  perceptronScore)/ 20000 * ONE_PLY;
+              r -= (ss->statScore + perceptronScore)/ 20000 * ONE_PLY;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
@@ -1118,10 +1121,11 @@ moves_loop: // When in check, search starts from here
           // Train the perceptron if needed
           if (trainPerc){
             trainPerc = false;
+            dbg_mean_of(perceptronAccuracy);
             perceptronAccuracy += (prediction == result);
             perceptronAccuracy *= 0.9;           
             if (prediction != result)
-              train(features,  1e-4, prediction, result);
+              train(features,  1e-5, prediction, result);
           }
 
           doFullDepthSearch = (value > alpha && d != newDepth);
