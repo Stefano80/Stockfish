@@ -1121,7 +1121,6 @@ moves_loop: // When in check, search starts from here
           // Train the perceptron if needed
           if (trainPerc){
             trainPerc = false;
-            dbg_mean_of(perceptronAccuracy);
             perceptronAccuracy += (prediction == result);
             perceptronAccuracy *= 0.9;           
             if (prediction != result)
