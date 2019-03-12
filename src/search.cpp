@@ -1105,7 +1105,7 @@ moves_loop: // When in check, search starts from here
               features[2] = float(perceptronAccuracy);
               features[3] = float(cutNode * int(r));
               prediction  = infer(features);
-              int perceptronScore = perceptronAccuracy * 3000 * (prediction - 0.2);
+              int perceptronScore = perceptronAccuracy * 3000 * (prediction);
               trainPerc = true;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
