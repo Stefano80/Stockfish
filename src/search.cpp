@@ -154,39 +154,8 @@ namespace {
   }
 
 
-constexpr int percInput     = 4;
-constexpr int percOutput    = 3;
-float perceptronWeights[percInput + 1][percOutput];
-float perceptronAccuracy    = 0;
-float internalStates[percOutput];
 
-int infer(float input[percInput]){
-    float bestFit     = -100000000.0;
-    int   bestClass   = -1;
-    
-    for (int d1 = 0; d1 < percOutput; d1++){
-        internalStates[d1] = perceptronWeights[0][d1]; // bias
-        for (int d2 = 0; d2 < percInput; d2++){
-            internalStates[d1] += perceptronWeights[1 + d2][d1] * input[d2];
-        }
-        if (bestFit < internalStates[d1]){
-           bestFit = internalStates[d1];
-           bestClass = d1;
-        }
-    }
-    return bestClass;
-}
 
-void train(float input[percInput], float rate, int prediction, int result){
-    int error = 0;
-    for (int d1 = 0; d1 < percOutput; d1++){
-        error = - (prediction == d1) + (result == d1);
-        perceptronWeights[0][d1] += rate * error;
-        for (int d2 = 0; d2 < percInput; d2++){
-            perceptronWeights[1 + d2][d1] += input[d2] * rate * error; 
-        }
-    }
-}
 
 } // namespace
 
@@ -199,14 +168,6 @@ void Search::init() {
   for (int i = 1; i < 64; ++i)
       Reductions[i] = int(1024 * std::log(i) / std::sqrt(1.95));
           
-  for (int d1 = 0; d1 <= percInput; d1++)
-    for (int d2 = 0; d2 < percOutput; d2++)
-    {
-      if (!d1)
-        perceptronWeights[d1][d2] = 1000 * (20 - 5 * d2);
-      else
-        perceptronWeights[d1][d2] = 0;
-    }
 }
 
 
@@ -605,8 +566,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, prediction;
-    float features[percInput] = {0.0, 0.0, 0.0, 0.0};
-    bool trainPerc = false;
+    float features[PercInput] = {0.0, 0.0, 0.0, 0.0};
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1099,34 +1059,31 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
-              // Predict using a perceptron
-              features[0] = float(cutNode * pos.non_pawn_material());
-              features[1] = float(depth);
-              features[2] = float(perceptronAccuracy);
-              features[3] = float(cutNode * int(r));
-              prediction  = infer(features);
-              int perceptronScore = perceptronAccuracy * 2000 * prediction;
-              trainPerc = true;
-
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore + perceptronScore)/ 20000 * ONE_PLY;
+              r -= (ss->statScore)/ 20000 * ONE_PLY;
           }
+
+          // Predict using a perceptron
+          features[0] = float(ttCapture);
+          features[1] = float(depth);
+          features[2] = float(captureOrPromotion);
+          features[3] = float(cutNode);
+          prediction  = thisThread->infer(features);
+
+          if (thisThread->perceptronAccuracy > 10000000)
+            r -= prediction * ONE_PLY;
+
+          dbg_hit_on(thisThread->perceptronAccuracy > 4800); 
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          int result = (value > alpha) + (value > beta);
+          int result = value > alpha;
 
-          // Train the perceptron if needed
-          if (trainPerc){
-            trainPerc = false;
-            perceptronAccuracy += (prediction == result);
-            perceptronAccuracy *= 0.9;           
-            if (prediction != result)
-              train(features,  1e-5, prediction, result);
-          }
-
+          // Train the perceptron if needed         
+          thisThread->train(features,  1e-6, prediction, result);
+          
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
       else

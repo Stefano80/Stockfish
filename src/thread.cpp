@@ -66,6 +66,15 @@ void Thread::clear() {
           h->fill(0);
 
   continuationHistory[NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
+
+  for (int d1 = 0; d1 <= PercInput; d1++)
+  for (int d2 = 0; d2 < PercOutput; d2++)
+  {
+    if (!d1)
+      perceptronWeights[d1][d2] = 1000 * (20 - 5 * d2);
+      else
+        perceptronWeights[d1][d2] = 0;
+  }
 }
 
 /// Thread::start_searching() wakes up the thread that will start the search
@@ -115,6 +124,39 @@ void Thread::idle_loop() {
 
       search();
   }
+}
+
+int Thread::infer(float input[PercInput]){
+    float bestFit     = 0;
+    float internalStates[PercOutput];
+    int   bestClass   = 0;
+    
+    for (int d1 = 0; d1 < PercOutput; d1++){
+        internalStates[d1] = perceptronWeights[0][d1]; // bias
+        for (int d2 = 0; d2 < PercInput; d2++){
+            internalStates[d1] += perceptronWeights[1 + d2][d1] * input[d2];
+        }
+        if (bestFit < internalStates[d1]){
+           bestFit = internalStates[d1];
+           bestClass = d1;
+        }
+    }
+    return bestClass;
+}
+
+void Thread::train(float input[PercInput], float rate, int prediction, int result){
+    int error = 0;
+    perceptronAccuracy += 100 * (prediction == result);
+    perceptronAccuracy  = 98 * perceptronAccuracy / 100;
+    if (prediction == result)
+        return;
+    for (int d1 = 0; d1 < PercOutput; d1++){
+        error = - (prediction == d1) + (result == d1);
+        perceptronWeights[0][d1] += rate * error;
+        for (int d2 = 0; d2 < PercInput; d2++){
+            perceptronWeights[1 + d2][d1] += input[d2] * rate * error; 
+        }
+    }
 }
 
 /// ThreadPool::set() creates/destroys threads to match the requested number.
