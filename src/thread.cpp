@@ -20,6 +20,7 @@
 
 #include <algorithm> // For std::count
 #include <cassert>
+#include <iostream>
 
 #include "movegen.h"
 #include "search.h"
@@ -70,10 +71,7 @@ void Thread::clear() {
   for (int d1 = 0; d1 <= PercInput; d1++)
   for (int d2 = 0; d2 < PercOutput; d2++)
   {
-    if (!d1)
-      perceptronWeights[d1][d2] = 1000 * (20 - 5 * d2);
-      else
-        perceptronWeights[d1][d2] = 0;
+      perceptronWeights[d1][d2] = 0;
   }
 }
 
@@ -127,7 +125,7 @@ void Thread::idle_loop() {
 }
 
 int Thread::infer(float input[PercInput]){
-    float bestFit     = 0;
+    float bestFit     = -10000000;
     float internalStates[PercOutput];
     int   bestClass   = 0;
     
@@ -136,7 +134,7 @@ int Thread::infer(float input[PercInput]){
         for (int d2 = 0; d2 < PercInput; d2++){
             internalStates[d1] += perceptronWeights[1 + d2][d1] * input[d2];
         }
-        if (bestFit < internalStates[d1]){
+        if (internalStates[d1] > bestFit){
            bestFit = internalStates[d1];
            bestClass = d1;
         }
@@ -151,7 +149,7 @@ void Thread::train(float input[PercInput], float rate, int prediction, int resul
     if (prediction == result)
         return;
     for (int d1 = 0; d1 < PercOutput; d1++){
-        error = - (prediction == d1) + (result == d1);
+        error =  d1 == result? 1 : -1;
         perceptronWeights[0][d1] += rate * error;
         for (int d2 = 0; d2 < PercInput; d2++){
             perceptronWeights[1 + d2][d1] += input[d2] * rate * error; 

@@ -1064,10 +1064,10 @@ moves_loop: // When in check, search starts from here
           }
 
           // Predict using a perceptron
-          features[0] = float(ttCapture);
-          features[1] = float(depth);
-          features[2] = float(captureOrPromotion);
-          features[3] = float(cutNode);
+          features[0] = float(ttCapture) * 1000;
+          features[1] = float(depth) * 1000;
+          features[2] = float(captureOrPromotion) * 1000;
+          features[3] = float(cutNode) * 1000;
           prediction  = thisThread->infer(features);
 
           if (thisThread->perceptronAccuracy > 10000000)
@@ -1082,7 +1082,7 @@ moves_loop: // When in check, search starts from here
           int result = value > alpha;
 
           // Train the perceptron if needed         
-          thisThread->train(features,  1e-6, prediction, result);
+          thisThread->train(features,  1e-2, prediction, result);
           
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
