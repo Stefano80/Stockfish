@@ -1064,22 +1064,21 @@ moves_loop: // When in check, search starts from here
           }
 
           // Predict using a perceptron
-          features[0] = float(ttCapture) * 1000;
-          features[1] = float(depth) * 1000;
-          features[2] = float(captureOrPromotion) * 1000;
-          features[3] = float(cutNode) * 1000;
+
+          features[0] = float(inCheck) ;
+          features[1] = float(givesCheck) ;
+          features[2] = float(captureOrPromotion) ;
+          features[3] = float(cutNode);
           prediction  = thisThread->infer(features);
 
-          if (thisThread->perceptronAccuracy > 10000000)
+          if (thisThread->perceptronAccuracy > 4700)
             r -= prediction * ONE_PLY;
-
-          dbg_hit_on(thisThread->perceptronAccuracy > 4800); 
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          int result = value > alpha;
+          int result = (value > alpha);
 
           // Train the perceptron if needed         
           thisThread->train(features,  1e-2, prediction, result);

@@ -60,7 +60,7 @@ public:
   int infer(float input[PercInput]);
   void train(float input[PercInput], float rate, int prediction, int result);
 
-  float perceptronWeights[PercInput + 1][PercOutput];
+  float perceptronWeights[PercInput + 1];
   int   perceptronAccuracy;
   
   Pawns::Table pawnsTable;
