@@ -57,10 +57,10 @@ public:
   void start_searching();
   void wait_for_search_finished();
 
-  int infer(float input[PercInput]);
-  void train(float input[PercInput], float rate, int prediction, int result);
+  int infer(float input[PercInput], Color us);
+  void train(float input[PercInput], float rate, int prediction, int result, Color us);
 
-  float perceptronWeights[PercInput + 1];
+  float perceptronWeights[PercInput + 1][COLOR_NB];
   int   perceptronAccuracy;
   
   Pawns::Table pawnsTable;

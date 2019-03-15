@@ -1069,10 +1069,10 @@ moves_loop: // When in check, search starts from here
           features[1] = float(givesCheck) ;
           features[2] = float(captureOrPromotion) ;
           features[3] = float(cutNode);
-          prediction  = thisThread->infer(features);
+          prediction  = thisThread->infer(features, us);
 
-          int threshold = 4700;
-          if (thisThread->perceptronAccuracy > threshold)
+          int threshold = 4720;
+          if (thisThread->perceptronAccuracy > threshold && false)
             r -= prediction * ONE_PLY * (thisThread->perceptronAccuracy - threshold) / 30;
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
@@ -1080,9 +1080,9 @@ moves_loop: // When in check, search starts from here
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
           int result = (value > alpha);
-
+          
           // Train the perceptron if needed         
-          thisThread->train(features,  1e-2, prediction, result);
+          thisThread->train(features,  1e-2, prediction, result, us);
           
           doFullDepthSearch = (value > alpha && d != newDepth);
       }

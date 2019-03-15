@@ -71,7 +71,9 @@ void Thread::clear() {
   perceptronAccuracy = 0;
   for (int d1 = 0; d1 <= PercInput; d1++)
   {
-      perceptronWeights[d1] = 0;
+      perceptronWeights[d1][WHITE] = 0;
+      perceptronWeights[d1][BLACK] = 0;
+
   }
 }
 
@@ -124,24 +126,24 @@ void Thread::idle_loop() {
   }
 }
 
-int Thread::infer(float input[PercInput]){
+int Thread::infer(float input[PercInput], Color us){
  
-    float x = perceptronWeights[PercInput]; // bias
+    float x = perceptronWeights[PercInput][us]; // bias
     for (int d = 0; d < PercInput; d++){
-        x += perceptronWeights[d] * input[d];
+        x += perceptronWeights[d][us] * input[d];
     }
     return x > 100? 1 : 0;
 }
 
-void Thread::train(float input[PercInput], float rate, int prediction, int result){
+void Thread::train(float input[PercInput], float rate, int prediction, int result, Color us){
 
     int error = (result - prediction);
 
     perceptronAccuracy += 100 * (prediction == result);
     perceptronAccuracy  = 98 * perceptronAccuracy / 100;
-    perceptronWeights[PercInput] += rate * error;
+    perceptronWeights[PercInput][us] += rate * error;
     for (int d = 0; d < PercInput; d++){
-        perceptronWeights[d] += input[d] * rate * error; 
+        perceptronWeights[d][us] += input[d] * rate * error; 
       }
     }
 
