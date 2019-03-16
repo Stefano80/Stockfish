@@ -1071,9 +1071,9 @@ moves_loop: // When in check, search starts from here
           features[3] = float(cutNode);
           prediction  = thisThread->infer(features);
 
-          int threshold = 4500;
+          int threshold = 4600;
           if (thisThread->perceptronAccuracy > threshold)
-            r -= prediction * ONE_PLY * (thisThread->perceptronAccuracy - threshold) / 100;
+            r -= prediction * ONE_PLY * (thisThread->perceptronAccuracy - threshold) / 50;
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
