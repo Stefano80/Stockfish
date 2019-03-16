@@ -130,7 +130,7 @@ int Thread::infer(float input[PercInput]){
     for (int d = 0; d < PercInput; d++){
         x += perceptronWeights[d] * input[d];
     }
-    return x > 100? 1 : 0;
+    return int(x) / 100;
 }
 
 void Thread::train(float input[PercInput], float rate, int prediction, int result){
