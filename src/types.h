@@ -255,7 +255,6 @@ enum Rank : int {
 
 enum Perceptron : int {
   PercInput  = 4,
-  PercOutput = 2
 };
 
 /// Score enum stores a middlegame and an endgame value in a single integer (enum).

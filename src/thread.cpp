@@ -20,7 +20,6 @@
 
 #include <algorithm> // For std::count
 #include <cassert>
-#include <iostream>
 
 #include "movegen.h"
 #include "search.h"
@@ -125,7 +124,7 @@ void Thread::idle_loop() {
 }
 
 int Thread::infer(float input[PercInput]){
- 
+
     float x = perceptronWeights[PercInput]; // bias
     for (int d = 0; d < PercInput; d++){
         x += perceptronWeights[d] * input[d];
@@ -141,7 +140,7 @@ void Thread::train(float input[PercInput], float rate, int prediction, int resul
     perceptronAccuracy  = 98 * perceptronAccuracy / 100;
     perceptronWeights[PercInput] += rate * error;
     for (int d = 0; d < PercInput; d++){
-        perceptronWeights[d] += input[d] * rate * error; 
+        perceptronWeights[d] += input[d] * rate * error;
       }
     }
 
