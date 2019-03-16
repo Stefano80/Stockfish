@@ -1062,14 +1062,10 @@ moves_loop: // When in check, search starts from here
           features[1] =  float(inCheck);
           features[2] =  float(captureOrPromotion) ;
           features[3] = -float(cutNode);
-          features[4] =  float(givesCheck);
-          features[5] =  float(improving * cutNode);
-          features[6] =  float(improving * ttCapture);
-          features[7] = -float(ttCapture);
 
           prediction  =  thisThread->infer(features);
 
-          int threshold = 4550;
+          int threshold = 4500;
           if (thisThread->perceptronAccuracy > threshold)
             r -= prediction * ONE_PLY * (thisThread->perceptronAccuracy - threshold) / 100;
           
