@@ -20,6 +20,8 @@
 
 #include <algorithm> // For std::count
 #include <cassert>
+#include <cmath>
+
 
 #include "movegen.h"
 #include "search.h"
@@ -128,7 +130,7 @@ int Thread::infer(float input[PercInput]){
 
     float x = perceptronWeights[PercInput]; // bias
     for (int d = 0; d < PercInput; d++){
-        x += perceptronWeights[d] * input[d];
+        x += 1 / (exp(- perceptronWeights[d] * input[d]) + 1);
     }
     return int(x) / 100;
 }
