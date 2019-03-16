@@ -1058,11 +1058,10 @@ moves_loop: // When in check, search starts from here
           }
 
           // Predict using a perceptron
-
-          features[0] = float(inCheck) ;
-          features[1] = float(givesCheck) ;
-          features[2] = float(captureOrPromotion) ;
-          features[3] = float(cutNode);
+          features[0] =  float(inCheck) ;
+          features[1] =  float(givesCheck) ;
+          features[2] =  float(captureOrPromotion) ;
+          features[3] = -float(cutNode);
           prediction  = thisThread->infer(features);
 
           int threshold = 4500;
@@ -1076,7 +1075,7 @@ moves_loop: // When in check, search starts from here
           int result = (value > alpha) + (value > beta);
 
           // Train the perceptron if needed
-          thisThread->train(features,  1e-2, prediction, result);
+          thisThread->train(features,  0.5e-2, prediction, result);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }

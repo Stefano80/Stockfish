@@ -68,9 +68,10 @@ void Thread::clear() {
   continuationHistory[NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
 
   perceptronAccuracy = 0;
-  for (int d1 = 0; d1 <= PercInput; d1++)
+  perceptronWeights[PercInput] = 99.9;
+  for (int d1 = 0; d1 < PercInput; d1++)
   {
-      perceptronWeights[d1] = 0;
+      perceptronWeights[d1] = -0.01;
   }
 }
 
