@@ -57,6 +57,12 @@ public:
   void start_searching();
   void wait_for_search_finished();
 
+  int infer(float input[PercInput]);
+  void train(float input[PercInput], float rate, int prediction, int result);
+
+  float perceptronWeights[PercInput + 1];
+  int   perceptronAccuracy;
+  
   Pawns::Table pawnsTable;
   Material::Table materialTable;
   Endgames endgames;

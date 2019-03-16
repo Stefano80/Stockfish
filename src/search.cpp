@@ -153,6 +153,10 @@ namespace {
     return nodes;
   }
 
+
+
+
+
 } // namespace
 
 
@@ -160,8 +164,10 @@ namespace {
 
 void Search::init() {
 
+
   for (int i = 1; i < 64; ++i)
       Reductions[i] = int(1024 * std::log(i) / std::sqrt(1.95));
+          
 }
 
 
@@ -559,7 +565,8 @@ namespace {
     bool ttHit, ttPv, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, prediction;
+    float features[PercInput] = {0.0, 0.0, 0.0, 0.0};
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1053,13 +1060,30 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= ss->statScore / 20000 * ONE_PLY;
+              r -= (ss->statScore)/ 20000 * ONE_PLY;
           }
+
+          // Predict using a perceptron
+
+          features[0] = float(inCheck) ;
+          features[1] = float(givesCheck) ;
+          features[2] = float(captureOrPromotion) ;
+          features[3] = float(cutNode);
+          prediction  = thisThread->infer(features);
+
+          int threshold = 4500;
+          if (thisThread->perceptronAccuracy > threshold)
+            r -= prediction * ONE_PLY * (thisThread->perceptronAccuracy - threshold) / 100;
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
+          int result = (value > alpha) + (value > beta);
+
+          // Train the perceptron if needed         
+          thisThread->train(features,  1e-2, prediction, result);
+          
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
       else

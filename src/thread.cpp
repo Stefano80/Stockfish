@@ -20,6 +20,7 @@
 
 #include <algorithm> // For std::count
 #include <cassert>
+#include <iostream>
 
 #include "movegen.h"
 #include "search.h"
@@ -66,6 +67,12 @@ void Thread::clear() {
           h->fill(0);
 
   continuationHistory[NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
+
+  perceptronAccuracy = 0;
+  for (int d1 = 0; d1 <= PercInput; d1++)
+  {
+      perceptronWeights[d1] = 0;
+  }
 }
 
 /// Thread::start_searching() wakes up the thread that will start the search
@@ -116,6 +123,27 @@ void Thread::idle_loop() {
       search();
   }
 }
+
+int Thread::infer(float input[PercInput]){
+ 
+    float x = perceptronWeights[PercInput]; // bias
+    for (int d = 0; d < PercInput; d++){
+        x += perceptronWeights[d] * input[d];
+    }
+    return int(x) / 100;
+}
+
+void Thread::train(float input[PercInput], float rate, int prediction, int result){
+
+    int error = (result - prediction);
+
+    perceptronAccuracy += 100 * (prediction == result);
+    perceptronAccuracy  = 98 * perceptronAccuracy / 100;
+    perceptronWeights[PercInput] += rate * error;
+    for (int d = 0; d < PercInput; d++){
+        perceptronWeights[d] += input[d] * rate * error; 
+      }
+    }
 
 /// ThreadPool::set() creates/destroys threads to match the requested number.
 /// Created and launched threads will immediately go to sleep in idle_loop.
