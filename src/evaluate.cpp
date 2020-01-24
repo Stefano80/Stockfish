@@ -755,7 +755,7 @@ namespace {
             sf = std::min(sf, 36 + (pos.opposite_bishops() ? 2 : 7) * pos.count<PAWN>(strongSide));
             
         int c = pos.rule50_count() - 15;
-        sf = std::max(0, sf - (c * abs(c)) / 128);
+        sf = std::max(0, sf - (c * abs(c)) / 150);
     }
 
     return ScaleFactor(sf);
