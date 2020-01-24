@@ -483,11 +483,12 @@ namespace {
     constexpr Direction Up       = pawn_push(Us);
     constexpr Bitboard  TRank3BB = (Us == WHITE ? Rank3BB : Rank6BB);
 
-    Bitboard b, weak, defended, nonPawnEnemies, stronglyProtected, safe;
+    Bitboard b, weak, defended, nonPawnEnemies, knightRookEnemies, stronglyProtected, safe;
     Score score = SCORE_ZERO;
 
     // Non-pawn enemies
     nonPawnEnemies = pos.pieces(Them) & ~pos.pieces(PAWN);
+    knightRookEnemies = pos.pieces(Them) & pos.pieces(KNIGHT) & ~pos.pieces(ROOK);
 
     // Squares strongly protected by the enemy, either because they defend the
     // square with a pawn, or because they defend the square twice and we don't.
@@ -531,7 +532,7 @@ namespace {
 
     // Bonus for attacking enemy pieces with our relatively safe pawns
     b = pos.pieces(Us, PAWN) & safe;
-    b = pawn_attacks_bb<Us>(b) & nonPawnEnemies;
+    b = (pawn_attacks_bb<Us>(b) & nonPawnEnemies) | (pawn_attacks_bb<Us>(pos.pieces(Us, PAWN)) & knightRookEnemies);
     if (b)
         score += ThreatBySafePawn;
 
