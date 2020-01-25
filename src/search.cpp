@@ -288,7 +288,7 @@ void MainThread::search() {
       for (Thread* th : Threads)
       {
           votes[th->rootMoves[0].pv[0]] +=
-              (th->rootMoves[0].score - minScore + 14) * int(th->completedDepth) - int(th->bestMoveChanges);
+              (th->rootMoves[0].score - minScore + 14) * int(th->completedDepth) + int(th->bestMoveChanges);
 
           if (bestThread->rootMoves[0].score >= VALUE_MATE_IN_MAX_PLY)
           {
