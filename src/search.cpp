@@ -278,17 +278,17 @@ void MainThread::search() {
       &&  rootMoves[0].pv[0] != MOVE_NONE)
   {
       std::map<Move, int64_t> votes;
-      Value minScore = this->rootMoves[0].score;
+      Value minConfidence = this->confidence();
 
       // Find out minimum score
       for (Thread* th: Threads)
-          minScore = std::min(minScore, th->rootMoves[0].score);
+          minConfidence = std::min(minConfidence, th->confidence());
 
       // Vote according to score and depth, and select the best thread
       for (Thread* th : Threads)
       {
           votes[th->rootMoves[0].pv[0]] +=
-              (th->rootMoves[0].score - minScore + 14) * int(th->completedDepth) + int(th->bestMoveChanges);
+              (th->confidence() - minConfidence + 14) * int(th->completedDepth);
 
           if (bestThread->rootMoves[0].score >= VALUE_MATE_IN_MAX_PLY)
           {
