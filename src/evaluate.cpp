@@ -488,7 +488,7 @@ namespace {
 
     // Non-pawn enemies
     nonPawnEnemies = pos.pieces(Them) & ~pos.pieces(PAWN);
-    knightRookEnemies = pos.pieces(Them) & pos.pieces(KNIGHT) & pos.pieces(ROOK);
+    knightRookEnemies = pos.pieces(Them) & pos.pieces(KNIGHT, ROOK);
 
     // Squares strongly protected by the enemy, either because they defend the
     // square with a pawn, or because they defend the square twice and we don't.
