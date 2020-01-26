@@ -130,7 +130,7 @@ void Thread::idle_loop() {
   }
 }
 
-Value Thread::confidence() {return rootMoves[0].score + int(bestMoveChanges)/16;}
+Value Thread::confidence() {return rootMoves[0].score + 2 * int(bestMoveChanges);}
 
 /// ThreadPool::set() creates/destroys threads to match the requested number.
 /// Created and launched threads will immediately go to sleep in idle_loop.
