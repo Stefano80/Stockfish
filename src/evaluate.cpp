@@ -303,7 +303,9 @@ namespace {
                 score += MinorBehindPawn;
 
             // Penalty if the piece is far from the king
-            score -= KingProtector * distance(s, pos.square<KING>(Us));
+            score -= make_score(0, eg_value(KingProtector) * distance(s, pos.square<KING>(Us)));
+            score -= make_score(   mg_value(KingProtector) * distance<File>(s, pos.square<KING>(Us)), 0);
+            
 
             if (Pt == BISHOP)
             {
