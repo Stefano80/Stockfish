@@ -128,7 +128,7 @@ namespace {
 
   // 
   constexpr Score KingProtector[PIECE_TYPE_NB] = {
-    S(0, 0), S(0, 0), S(7, 8), S(7, 7), S(4, 4), S(0, 0)
+    S(0, 0), S(0, 0), S(8, 8), S(7, 7), S(3, 3), S(0, 0)
   };
 
   // Assorted bonuses and penalties
