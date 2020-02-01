@@ -126,12 +126,16 @@ namespace {
     S(0, 0), S(10, 28), S(17, 33), S(15, 41), S(62, 72), S(168, 177), S(276, 260)
   };
 
+  // 
+  constexpr Score KingProtector[PIECE_TYPE_NB] = {
+    S(0, 0), S(0, 0), S(7, 8), S(7, 7), S(4, 4), S(0, 0)
+  };
+
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score FlankAttacks       = S(  8,  0);
   constexpr Score Hanging            = S( 69, 36);
-  constexpr Score KingProtector      = S(  7,  8);
   constexpr Score KnightOnQueen      = S( 16, 12);
   constexpr Score LongDiagonalBishop = S( 45,  0);
   constexpr Score MinorBehindPawn    = S( 18,  3);
@@ -289,7 +293,7 @@ namespace {
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         // Penalty if the piece is far from the king
-        score -= KingProtector * distance(s, pos.square<KING>(Us));
+        score -= KingProtector[Pt] * distance(s, pos.square<KING>(Us));
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
