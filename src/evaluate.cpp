@@ -293,7 +293,7 @@ namespace {
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         // Penalty if the piece is far from the king
-        score -= KingProtector[Pt] * distance(s, pos.square<KING>(Us));
+        score -= KingProtector[Pt] * distance<File>(s, pos.square<KING>(Us));
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
