@@ -797,7 +797,7 @@ namespace {
     int danger = popcount(attacks_bb<QUEEN  >(pos.square<KING>(strongSide), pos.pieces(strongSide))
                         & attacks_bb<QUEEN  >(pos.square<QUEEN>(weakSide),  pos.pieces()));
 
-    if (lazyMargin < danger * LazyThreshold / 4)
+    if (lazyMargin > - danger * LazyThreshold / 4)
         return pos.side_to_move() == WHITE ? v : -v;
 
     // Main evaluation begins here
