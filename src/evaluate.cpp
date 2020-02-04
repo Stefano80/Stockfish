@@ -74,7 +74,7 @@ using namespace Trace;
 namespace {
 
   // Threshold for lazy and space evaluation
-  constexpr Value LazyThreshold  = Value(1400);
+  constexpr Value LazyThreshold  = Value(1200);
   constexpr Value SpaceThreshold = Value(12222);
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
@@ -794,7 +794,7 @@ namespace {
     int danger = popcount(attacks_bb<QUEEN  >(pos.square<KING>(strongSide), pos.pieces(strongSide))
                         & attacks_bb<QUEEN  >(pos.square<QUEEN>(weakSide),  pos.pieces()));
 
-    if (lazyMargin > danger * LazyThreshold / 2)
+    if (lazyMargin > danger * LazyThreshold)
         return pos.side_to_move() == WHITE ? v : -v;
 
     // Main evaluation begins here
