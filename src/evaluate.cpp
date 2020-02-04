@@ -788,16 +788,13 @@ namespace {
     Value v = (mg_value(score) + eg_value(score)) / 2;
     int lazyMargin = abs(v) - int(LazyThreshold + pos.non_pawn_material() / 64);
 
-    if (lazyMargin > 0)
-       return pos.side_to_move() == WHITE ? v : -v;
-
     Color weakSide    = Color(v > 0);
     Color strongSide  = ~weakSide;
 
     int danger = popcount(attacks_bb<QUEEN  >(pos.square<KING>(strongSide), pos.pieces(strongSide))
                         & attacks_bb<QUEEN  >(pos.square<QUEEN>(weakSide),  pos.pieces()));
 
-    if (lazyMargin > - danger * LazyThreshold / 4)
+    if (lazyMargin > danger * LazyThreshold / 4)
         return pos.side_to_move() == WHITE ? v : -v;
 
     // Main evaluation begins here
